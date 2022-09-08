@@ -20,6 +20,8 @@ pub mod camera;
 pub mod component;
 pub mod game;
 pub mod map;
+pub mod player;
+pub mod resource;
 pub mod scene;
 pub mod system;
 pub mod util;

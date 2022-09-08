@@ -1,20 +1,29 @@
 use bracket_lib::prelude::*;
+use euclid::{Box2D, Rect, Vector2D};
+
+use crate::util::{WorldPoint, WorldSpace, WorldVector};
 
 #[derive(Debug, Clone)]
 pub struct Position {
-    position: Point,
+    pub p: WorldPoint,
 }
 
 impl Position {
-    pub fn new(position: Point) -> Self {
-        Self { position }
+    pub fn new(point: WorldPoint) -> Self {
+        Self { p: point }
     }
 
-    pub fn get_x(&self) -> i32 {
-        self.position.x
+    pub fn move_by(&mut self, vector: WorldVector) {
+        self.p = self.p + vector;
     }
 
-    pub fn get_y(&self) -> i32 {
-        self.position.y
+    pub fn move_to(&mut self, point: WorldPoint) {
+        self.p = point;
+    }
+
+    // TODO: use Euler clamp instead
+    pub fn clamp(&mut self, rect: &Box2D<i32, WorldSpace>) {
+        self.p.x = self.p.x.max(rect.min.x).min(rect.max.x);
+        self.p.y = self.p.y.max(rect.min.y).min(rect.max.y);
     }
 }

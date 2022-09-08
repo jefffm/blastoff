@@ -1,8 +1,9 @@
-use crate::scene::{GameOverSelection, MainMenuSelection, MapGenerationState};
+use crate::scene::{GameOverSelection, MainMenuSelection, MapGenerationState, PauseMenuSelection};
 
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum RunState {
     MainMenu(MainMenuSelection),
+    PauseMenu(PauseMenuSelection),
     Initialization,
     MapGeneration(MapGenerationState),
     GameAwaitingInput,

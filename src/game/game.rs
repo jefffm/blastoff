@@ -2,17 +2,24 @@ use bracket_lib::prelude as rltk;
 use bracket_lib::prelude::*;
 use legion::*;
 use rand::RngCore;
+use tracing::debug;
 use tracing::info;
 
-use crate::component::*;
+use crate::camera::Camera;
+use crate::component::{Position, Renderable};
 use crate::game;
+use crate::game::consts;
+use crate::game::draw_ui;
+use crate::game::TurnsHistory;
+use crate::map::Loader;
 use crate::map::Map;
 use crate::map::MapGenerator;
 use crate::map::Simple;
+use crate::player;
 use crate::scene::Controller;
-use crate::scene::GameOverSelection;
 use crate::scene::MainMenuSelection;
 use crate::scene::MapGenerationState;
+use crate::system::build_systems;
 
 use super::RunState;
 
@@ -36,14 +43,10 @@ impl Game {
         info!("using rng seed: {}", rng_seed);
 
         let mut resources = Resources::default();
-        let schedule = Schedule::builder()
-            //.add_system(update_positions_system())
-            .build();
-
         resources.insert(RunState::MainMenu(MainMenuSelection::NewGame));
 
         Self {
-            schedule,
+            schedule: build_systems(),
             resources,
             world: World::default(),
             rng: rltk::RandomNumberGenerator::seeded(rng_seed),
@@ -52,24 +55,23 @@ impl Game {
         }
     }
 
-    pub fn create_player(&mut self) -> Entity {
-        self.world.push((
-            Position::new(Point::new(40, 25)),
-            Renderable::new(Point::new(20, 20), WHITE, BLACK, '@'),
-        ))
-    }
-
     fn run_systems(&mut self) {
         self.schedule.execute(&mut self.world, &mut self.resources);
     }
 
     pub fn handle_state(&mut self, state: RunState, ctx: &mut BTerm) -> RunState {
         match state {
-            RunState::MainMenu(selection) => self.controller.main_menu(ctx, selection),
+            RunState::MainMenu(selection) => self.controller.main_menu(ctx, selection, false),
+            RunState::PauseMenu(selection) => self.controller.pause_menu(ctx, selection),
             RunState::Initialization => {
+                self.resources.insert(TurnsHistory::new());
                 info!("Initializing level");
-                let map = Simple {}.generate(&mut self.rng);
+                // TODO: this is incompatible with Loader
+                let map = Simple {}.generate(&mut self.rng, 1);
                 self.maps.push(map);
+
+                let mut loader = Loader::new(Simple {}, &mut self.rng);
+                loader.load(1, &mut self.world, &mut self.resources);
                 RunState::MapGeneration(MapGenerationState::default())
             }
             RunState::MapGeneration(map_state) => {
@@ -77,26 +79,42 @@ impl Game {
                 self.controller.map_generation(ctx, map_state, &self.maps)
             }
             RunState::GameAwaitingInput => {
-                // player::game_input_turn(self, ctx)
-                // TODO: implement game
-                return RunState::GameOver(GameOverSelection::MainMenu);
-
-                RunState::GameTurn
+                player::game_turn_input(&mut self.world, &mut self.resources, ctx)
             }
             RunState::GameTurn => {
                 self.run_systems();
                 RunState::GameDraw
             }
             RunState::GameDraw => {
-                self.run_systems();
-                // get turn state
                 ctx.cls();
-                // self.draw_game()
-                // match on turn state (dead? level complete? Running? (do nothing))
+                self.draw_game(ctx);
                 RunState::GameAwaitingInput
             }
             RunState::GameOver(selection) => self.controller.game_over(ctx, selection),
         }
+    }
+
+    fn draw_game(&self, ctx: &mut BTerm) {
+        let map = self.resources.get::<Map>().unwrap();
+        let start_x = (consts::SCREEN_WIDTH - map.get_width() as u32) / 2;
+        let start_y = 11;
+        // map.draw(ctx, Point::new(start_x, start_y));
+        let mut data = <(Read<Position>, Read<Renderable>)>::query()
+            .iter(&self.world)
+            .collect::<Vec<_>>();
+        data.sort_by(|d1, d2| d2.1.render_order.cmp(&d1.1.render_order));
+        for (pos, render) in data.iter() {
+            ctx.set(
+                // start_x as i32 + pos.p.x,
+                // start_y as i32 + pos.p.y,
+                pos.p.x,
+                pos.p.y,
+                render.glyph.fg,
+                render.glyph.bg,
+                render.glyph.glyph,
+            );
+        }
+        draw_ui(&self.resources, ctx);
     }
 }
 

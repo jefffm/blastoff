@@ -4,25 +4,23 @@ use std::fmt;
 use crate::game::consts::TITLE_HEADER;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
-pub enum MainMenuSelection {
-    NewGame = 0,
-    Continue = 1,
-    Quit = 2,
+pub enum PauseMenuSelection {
+    Continue = 0,
+    ExitToMainMenu = 1,
 }
 
-impl fmt::Display for MainMenuSelection {
+impl fmt::Display for PauseMenuSelection {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let text = match self {
-            MainMenuSelection::NewGame => "New Game",
-            MainMenuSelection::Continue => "Continue",
-            MainMenuSelection::Quit => "Quit",
+            Self::Continue => "Continue",
+            Self::ExitToMainMenu => "Exit to main menu",
         };
         f.write_str(text)
     }
 }
 
-impl MainMenuSelection {
-    fn print(&self, y: i32, selection: MainMenuSelection, ctx: &mut BTerm) {
+impl PauseMenuSelection {
+    fn print(&self, y: i32, selection: PauseMenuSelection, ctx: &mut BTerm) {
         let fg = if &selection == self {
             RGB::named(WHITE)
         } else {
@@ -33,39 +31,32 @@ impl MainMenuSelection {
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
-pub enum MainMenuResult {
-    NoSelection { selected: MainMenuSelection },
-    Selected { selected: MainMenuSelection },
+pub enum PauseMenuResult {
+    NoSelection { selected: PauseMenuSelection },
+    Selected { selected: PauseMenuSelection },
 }
-pub fn main_menu(
-    ctx: &mut BTerm,
-    selection: MainMenuSelection,
-    can_continue: bool,
-) -> MainMenuResult {
+pub fn pause_menu(ctx: &mut BTerm, selection: PauseMenuSelection) -> PauseMenuResult {
     ctx.print_color_centered(11, RGB::named(WHITE), RGB::named(BLACK), TITLE_HEADER);
 
-    let entries = if can_continue {
-        vec![
-            MainMenuSelection::Continue,
-            MainMenuSelection::NewGame,
-            MainMenuSelection::Quit,
-        ]
-    } else {
-        vec![MainMenuSelection::NewGame, MainMenuSelection::Quit]
-    };
+    let entries = vec![
+        PauseMenuSelection::Continue,
+        PauseMenuSelection::ExitToMainMenu,
+    ];
+
     for (i, entry) in entries.iter().enumerate() {
         entry.print(14 + i as i32, selection, ctx);
     }
+
     match ctx.key {
         None => {
-            return MainMenuResult::NoSelection {
+            return PauseMenuResult::NoSelection {
                 selected: selection,
             }
         }
         Some(key) => match key {
             VirtualKeyCode::Escape => {
-                return MainMenuResult::NoSelection {
-                    selected: MainMenuSelection::Quit,
+                return PauseMenuResult::NoSelection {
+                    selected: PauseMenuSelection::Continue,
                 }
             }
             VirtualKeyCode::Up => {
@@ -73,7 +64,7 @@ pub fn main_menu(
                     .iter()
                     .position(|&x| x == selection)
                     .expect("MainMenuSelection");
-                return MainMenuResult::NoSelection {
+                return PauseMenuResult::NoSelection {
                     selected: entries[(idx + entries.len() - 1) % entries.len()],
                 };
             }
@@ -82,17 +73,17 @@ pub fn main_menu(
                     .iter()
                     .position(|&x| x == selection)
                     .expect("MainMenuSelection");
-                return MainMenuResult::NoSelection {
+                return PauseMenuResult::NoSelection {
                     selected: entries[(idx + 1) % entries.len()],
                 };
             }
             VirtualKeyCode::Return => {
-                return MainMenuResult::Selected {
+                return PauseMenuResult::Selected {
                     selected: selection,
                 }
             }
             _ => {
-                return MainMenuResult::NoSelection {
+                return PauseMenuResult::NoSelection {
                     selected: selection,
                 }
             }

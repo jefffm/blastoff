@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use std::fmt;
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum GameOverSelection {
     MainMenu = 0,
     Quit = 1,
@@ -28,7 +28,7 @@ impl GameOverSelection {
     }
 }
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum GameOverResult {
     NoSelection { selected: GameOverSelection },
     Selected { selected: GameOverSelection },

@@ -9,8 +9,12 @@ use crate::scene::*;
 #[derive(Debug, PartialEq, Default)]
 pub struct Controller {}
 impl Controller {
-    pub fn main_menu(&self, ctx: &mut BTerm, menu_selection: MainMenuSelection) -> RunState {
-        let can_continue = false; // TODO: need to implement save/load before continue can work
+    pub fn main_menu(
+        &self,
+        ctx: &mut BTerm,
+        menu_selection: MainMenuSelection,
+        can_continue: bool,
+    ) -> RunState {
         ctx.cls();
         let result = main_menu(ctx, menu_selection, can_continue);
         match result {
@@ -20,6 +24,20 @@ impl Controller {
                 MainMenuSelection::Continue => RunState::GameDraw,
                 MainMenuSelection::Quit => {
                     ::std::process::exit(0);
+                }
+            },
+        }
+    }
+
+    pub fn pause_menu(&self, ctx: &mut BTerm, menu_selection: PauseMenuSelection) -> RunState {
+        ctx.cls();
+        let result = pause_menu(ctx, menu_selection);
+        match result {
+            PauseMenuResult::NoSelection { selected } => RunState::PauseMenu(selected),
+            PauseMenuResult::Selected { selected } => match selected {
+                PauseMenuSelection::Continue => RunState::GameDraw,
+                PauseMenuSelection::ExitToMainMenu => {
+                    RunState::MainMenu(MainMenuSelection::NewGame)
                 }
             },
         }
@@ -36,7 +54,7 @@ impl Controller {
             if state.is_complete(history) {
                 // If we're done, move on to the next state
                 debug!("Map generation complete!");
-                RunState::GameAwaitingInput
+                RunState::GameDraw
             } else {
                 // If we have more frames to render for map generation, pass the
                 // state onto the next tick.
@@ -47,7 +65,7 @@ impl Controller {
                 RunState::MapGeneration(state)
             }
         } else {
-            RunState::GameAwaitingInput
+            RunState::GameDraw
         }
     }
 
