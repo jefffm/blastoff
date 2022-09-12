@@ -1,12 +1,13 @@
-use crate::util::{ScreenPoint, WorldPoint, WorldToScreen};
+use crate::util::{ScreenPoint, ScreenRect, WorldPoint, WorldToScreen};
 
 pub struct Viewport {
+    screen: ScreenRect,
     w2s: WorldToScreen,
 }
 
 impl Viewport {
-    pub fn new(w2s: WorldToScreen) -> Self {
-        Self { w2s }
+    pub fn new(screen: ScreenRect, w2s: WorldToScreen) -> Self {
+        Self { screen, w2s }
     }
 
     pub fn from_points(screen_point: ScreenPoint, world_point: WorldPoint) -> WorldToScreen {
