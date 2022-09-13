@@ -6,18 +6,20 @@ use tracing::info;
 
 use crate::component::{Position, Renderable};
 use crate::game;
-use crate::game::consts;
-use crate::game::draw_ui;
+use crate::game::consts::{self, SCREEN_HEIGHT, SCREEN_WIDTH};
 use crate::game::TurnsHistory;
 use crate::map::Loader;
 
 use crate::map::Simple;
 use crate::player;
-use crate::resource::Resources;
+use crate::resource::{Resources, Screen, Viewport};
 use crate::scene::Controller;
 use crate::scene::MainMenuSelection;
 use crate::scene::MapGenerationState;
 use crate::system::{build_systems, Scheduler};
+use crate::util::{
+    ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportToScreen,
+};
 
 use super::RunState;
 
@@ -25,6 +27,7 @@ pub struct Game {
     scheduler: Scheduler,
     world: World,
     resources: Resources,
+    screen: Screen,
 }
 
 impl Default for Game {
@@ -53,7 +56,15 @@ impl Game {
                 mapgen_history: Vec::default(),
                 run_state: RunState::MainMenu(MainMenuSelection::NewGame),
                 turn_history: TurnsHistory::default(),
+                viewport: Viewport::default(),
             },
+            screen: Screen::new(
+                ScreenRect::new(
+                    ScreenPoint::new(0, 0),
+                    ScreenSize::new(SCREEN_WIDTH as i32, SCREEN_HEIGHT as i32),
+                ),
+                ViewportToScreen::from_points(ViewportPoint::new(0, 0), ScreenPoint::new(2, 2)),
+            ),
         }
     }
 
@@ -95,38 +106,11 @@ impl Game {
             }
             RunState::GameDraw => {
                 ctx.cls();
-                self.draw_game(ctx);
+                self.screen.draw_game(ctx, &self.world, &self.resources);
                 RunState::GameAwaitingInput
             }
             RunState::GameOver(selection) => self.resources.controller.game_over(ctx, selection),
         }
-    }
-
-    fn draw_game(&self, ctx: &mut BTerm) {
-        let map = self.resources.map.as_ref().unwrap();
-        let _start_x = (consts::SCREEN_WIDTH - map.get_width() as u32) / 2;
-        let _start_y = 11;
-        // map.draw(ctx, Point::new(start_x, start_y));
-        let mut data = self
-            .world
-            .query::<(&Position, &Renderable)>()
-            .iter()
-            .map(|(_ent, (&pos, render))| (pos, render.clone()))
-            .collect::<Vec<_>>();
-
-        data.sort_by(|(_, r1), (_, r2)| r1.render_order.cmp(&r2.render_order));
-        for (pos, render) in data.iter() {
-            ctx.set(
-                // start_x as i32 + pos.p.x,
-                // start_y as i32 + pos.p.y,
-                pos.p.x,
-                pos.p.y,
-                render.glyph.fg,
-                render.glyph.bg,
-                render.glyph.glyph,
-            );
-        }
-        draw_ui(&self.resources, ctx);
     }
 }
 

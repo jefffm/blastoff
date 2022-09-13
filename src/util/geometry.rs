@@ -1,23 +1,11 @@
-// use glamour::prelude::*;
-
-// struct ViewSpace;
-// impl Unit for ViewSpace {
-//     type Scalar = i32;
-// }
-
-// struct WorldSpace;
-// impl Unit for WorldSpace {
-//     type Scalar = i32;
-// }
-
-// pub type ViewPoint = Point2<ViewSpace>;
-// pub type ViewVector = Vector2<ViewSpace>;
-
-// pub type WorldPoint = Point2<WorldSpace>;
-// pub type WorldVector = Vector2<WorldSpace>;
-
-// pub type ViewToWorld = Transform2<ViewSpace, WorldSpace>;
-// pub type WorldToView = Transform2<WorldSpace, ViewSpace>;
+//! This module defines three coordinate systems: ScreenSpace -> ViewportSpace
+//! -> WorldSpace.
+//!
+//! - ScreenSpace is the literal tiles rendered to the screen
+//! - ViewportSpace is the viewport rendering the game world. The viewport is
+//! not 100% of the screen, and so these coordinates are mapped back into
+//! ScreenSpace.
+//! - WorldSpace is the game world's coordinates. The center of the map is the center of a WorldRect.
 
 use std::{convert::TryInto, fmt::Debug};
 
@@ -31,6 +19,15 @@ pub type ScreenPoint = Point2D<i32, ScreenSpace>;
 pub type ScreenSize = Size2D<i32, ScreenSpace>;
 pub type ScreenRect = Rect<i32, ScreenSpace>;
 
+pub type ViewportToScreen = Transform2D<i32, ViewportSpace, ScreenSpace>;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ViewportSpace;
+
+pub type ViewportPoint = Point2D<i32, ViewportSpace>;
+pub type ViewportSize = Size2D<i32, ViewportSpace>;
+pub type ViewportRect = Rect<i32, ViewportSpace>;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WorldSpace;
 
@@ -39,8 +36,7 @@ pub type WorldVector = Vector2D<i32, WorldSpace>;
 pub type WorldSize = Size2D<i32, WorldSpace>;
 pub type WorldRect = Rect<i32, WorldSpace>;
 
-pub type WorldToScreen = Transform2D<i32, WorldSpace, ScreenSpace>;
-pub type ScreenToWorld = Transform2D<i32, ScreenSpace, WorldSpace>;
+pub type WorldToViewport = Transform2D<i32, WorldSpace, ViewportSpace>;
 
 pub trait TransformExt<T, Src, Dest>
 where
@@ -97,73 +93,66 @@ where
 mod tests {
     use super::*;
 
-    fn run_translation_tests(screen: ScreenRect, world: WorldRect) {
+    fn run_translation_tests(viewport: ViewportRect, world: WorldRect) {
         // centered
-        let mut w2s = WorldToScreen::from_points(world.center(), screen.center());
+        let mut w2s = WorldToViewport::from_points(world.center(), viewport.center());
         assert_eq!(
             w2s.transform_point(world.center()),
-            screen.center(),
-            "Screen should be centered over the map center ({:?})",
+            viewport.center(),
+            "Viewport should be centered over the map center ({:?})",
             world.center()
         );
 
         // viewport over 0, 0
-        w2s.update_transform(world.min(), screen.center());
+        w2s.update_transform(world.min(), viewport.center());
         assert_eq!(
             w2s.transform_point(world.min()),
-            screen.center(),
-            "Screen should be centered over {:?}",
+            viewport.center(),
+            "Viewport should be centered over {:?}",
             world.min()
         );
 
         // viewport over bottom right corner
-        w2s.update_transform(world.max(), screen.center());
+        w2s.update_transform(world.max(), viewport.center());
         assert_eq!(
             w2s.transform_point(world.max()),
-            screen.center(),
+            viewport.center(),
             "Screen should be centered over {:?}",
             world.max()
         );
     }
 
+    fn create_viewport(width: i32, height: i32) -> ViewportRect {
+        ViewportRect::new(ViewportPoint::new(0, 0), ViewportSize::new(width, height))
+    }
+
+    fn create_world(width: i32, height: i32) -> WorldRect {
+        WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(width, height))
+    }
+
     #[test]
     fn translation_same_size() {
-        let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(10, 10));
-        let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(10, 10));
-
-        run_translation_tests(screen, world)
+        run_translation_tests(create_viewport(10, 10), create_world(10, 10))
     }
 
     #[test]
     fn translation_bigmap() {
-        let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(10, 10));
-        let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(100, 100));
-
-        run_translation_tests(screen, world)
+        run_translation_tests(create_viewport(10, 10), create_world(100, 100))
     }
 
     #[test]
     fn translation_smallmap() {
-        let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(50, 50));
-        let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(5, 5));
-
-        run_translation_tests(screen, world)
+        run_translation_tests(create_viewport(50, 50), create_world(5, 5))
     }
 
     #[test]
     fn translation_longmap() {
-        let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(50, 50));
-        let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(100, 5));
-
-        run_translation_tests(screen, world)
+        run_translation_tests(create_viewport(50, 50), create_world(100, 5))
     }
 
     #[test]
     fn translation_tallmap() {
-        let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(50, 50));
-        let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(6, 75));
-
-        run_translation_tests(screen, world)
+        run_translation_tests(create_viewport(50, 50), create_world(6, 75))
     }
 
     #[test]

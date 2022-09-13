@@ -1,6 +1,6 @@
 use bracket_lib::prelude::*;
 
-use crate::{resource::Resources};
+use crate::resource::Resources;
 
 pub fn draw_ui(resources: &Resources, ctx: &mut BTerm) {
     let map = resources.map.as_ref().unwrap();

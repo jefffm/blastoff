@@ -1,5 +1,8 @@
 use bracket_lib::prelude::RandomNumberGenerator;
 
+mod screen;
+pub use screen::*;
+
 mod viewport;
 pub use viewport::*;
 
@@ -16,4 +19,5 @@ pub struct Resources {
     pub mapgen_history: Vec<Map>,
     pub run_state: RunState,
     pub turn_history: TurnsHistory,
+    pub viewport: Viewport,
 }
