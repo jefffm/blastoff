@@ -117,10 +117,10 @@ impl Game {
         data.sort_by(|(_, r1), (_, r2)| r1.render_order.cmp(&r2.render_order));
         for (pos, render) in data.iter() {
             ctx.set(
-                // start_x as f32 + pos.p.x,
-                // start_y as f32 + pos.p.y,
-                pos.p.x.round() as i32,
-                pos.p.y.round() as i32,
+                // start_x as i32 + pos.p.x,
+                // start_y as i32 + pos.p.y,
+                pos.p.x,
+                pos.p.y,
                 render.glyph.fg,
                 render.glyph.bg,
                 render.glyph.glyph,

@@ -1,5 +1,4 @@
 use bracket_lib::prelude::{to_cp437, BTerm, BLACK, WHITE};
-use euclid::num::Round;
 use serde::{Deserialize, Serialize};
 
 use crate::util::ScreenPoint;
@@ -49,13 +48,7 @@ impl TileKind {
     }
 
     pub fn render(&self, ctx: &mut BTerm, point: ScreenPoint) {
-        ctx.set(
-            point.x.round() as i32,
-            point.y.round() as i32,
-            WHITE,
-            BLACK,
-            to_cp437(self.glyph()),
-        );
+        ctx.set(point.x, point.y, WHITE, BLACK, to_cp437(self.glyph()));
     }
 }
 
@@ -69,8 +62,8 @@ impl From<TileKind> for Tile {
     }
 }
 
-// fn wall_glyph(map: &Map, x: f32, y: f32) -> FontCharType {
-//     if x < 1 || x > map.width - 2 || y < 1 || y > map.height - 2 as f32 {
+// fn wall_glyph(map: &Map, x: i32, y: i32) -> FontCharType {
+//     if x < 1 || x > map.width - 2 || y < 1 || y > map.height - 2 as i32 {
 //         return 35;
 //     }
 //     let mut mask: u8 = 0;

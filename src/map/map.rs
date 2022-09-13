@@ -16,7 +16,7 @@ use crate::{
 pub struct Map {
     name: String,
     tiles: Vec<Tile>,
-    rect: Rect<f32, WorldSpace>,
+    rect: Rect<i32, WorldSpace>,
     blocked: FixedBitSet,
     revealed: FixedBitSet,
     visible: FixedBitSet,
@@ -25,9 +25,9 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn new(name: String, width: f32, height: f32, tiles: Vec<Tile>, level: u32) -> Self {
-        let rect = Rect::new(WorldPoint::new(0.0, 0.0), Size2D::new(width, height));
-        let area = rect.size.area().ceil() as usize;
+    pub fn new(name: String, width: i32, height: i32, tiles: Vec<Tile>, level: u32) -> Self {
+        let rect = Rect::new(WorldPoint::new(0, 0), Size2D::new(width, height));
+        let area = rect.size.area().try_into().unwrap();
 
         let blocked = FixedBitSet::with_capacity(area);
         let revealed = FixedBitSet::with_capacity(area);
@@ -47,7 +47,7 @@ impl Map {
 
     pub fn reset_content(&mut self) {
         self.content =
-            vec![Vec::<Entity>::new(); (self.get_height() * self.get_width()).ceil() as usize];
+            vec![Vec::<Entity>::new(); (self.get_height() * self.get_width()).try_into().unwrap()];
     }
 
     pub fn add_content(&mut self, point: &WorldPoint, entity: &Entity) {
@@ -99,15 +99,15 @@ impl Map {
         self.revealed.contains(point.to_index(self.get_width()))
     }
 
-    pub fn get_rect(&self) -> &Rect<f32, WorldSpace> {
+    pub fn get_rect(&self) -> &Rect<i32, WorldSpace> {
         &self.rect
     }
 
-    pub fn get_width(&self) -> f32 {
+    pub fn get_width(&self) -> i32 {
         self.rect.width()
     }
 
-    pub fn get_height(&self) -> f32 {
+    pub fn get_height(&self) -> i32 {
         self.rect.height()
     }
 
@@ -116,16 +116,11 @@ impl Map {
     }
 
     pub fn iter_tiles(&self) -> impl Iterator<Item = (WorldPoint, &Tile)> {
-        let min = self.rect.min();
-        let max = self.rect.max();
-
-        // TODO: this range seems like it could have problems
-        let xrange = (min.x.floor() as u32)..(max.x.ceil() as u32);
-        let yrange = (min.y.floor() as u32)..(max.y.ceil() as u32);
-
+        let xrange = self.rect.x_range();
+        let yrange = self.rect.y_range();
         xrange.flat_map(move |x| {
             yrange.clone().map(move |y| {
-                let point = WorldPoint::new(x as f32, y as f32);
+                let point = WorldPoint::new(x, y);
                 (point, &self.tiles[point.to_index(self.get_width())])
             })
         })
@@ -165,11 +160,11 @@ mod tests {
             TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(),
         ];
 
-        let map = Map::new(String::from("test"), 5.0, 5.0, tiles, 1);
+        let map = Map::new(String::from("test"), 5, 5, tiles, 1);
 
         // Check that we can traverse the entire map rect
-        for (point, tile) in map.iter_tiles() {
-            map.is_blocked(&point);
+        for (x, y) in map.get_rect().x_range().zip(map.get_rect().y_range()) {
+            map.is_blocked(&WorldPoint::new(x, y));
         }
     }
 }

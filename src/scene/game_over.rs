@@ -42,13 +42,17 @@ pub fn game_over(ctx: &mut BTerm, selection: GameOverSelection) -> GameOverResul
         entry.print(14 + i as i32, selection, ctx);
     }
     match ctx.key {
-        None => GameOverResult::NoSelection {
-            selected: selection,
-        },
+        None => {
+            GameOverResult::NoSelection {
+                selected: selection,
+            }
+        }
         Some(key) => match key {
-            VirtualKeyCode::Escape => GameOverResult::NoSelection {
-                selected: GameOverSelection::Quit,
-            },
+            VirtualKeyCode::Escape => {
+                GameOverResult::NoSelection {
+                    selected: GameOverSelection::Quit,
+                }
+            }
             VirtualKeyCode::Up => {
                 let idx = entries.iter().position(|&x| x == selection).unwrap();
                 GameOverResult::NoSelection {
@@ -61,12 +65,16 @@ pub fn game_over(ctx: &mut BTerm, selection: GameOverSelection) -> GameOverResul
                     selected: entries[(idx + 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Return => GameOverResult::Selected {
-                selected: selection,
-            },
-            _ => GameOverResult::NoSelection {
-                selected: selection,
-            },
+            VirtualKeyCode::Return => {
+                GameOverResult::Selected {
+                    selected: selection,
+                }
+            }
+            _ => {
+                GameOverResult::NoSelection {
+                    selected: selection,
+                }
+            }
         },
     }
 }

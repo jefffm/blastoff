@@ -17,8 +17,8 @@ impl Glyph {
     }
     pub fn render(&self, ctx: &mut BTerm, point: &ScreenPoint) {
         ctx.set(
-            point.x.round() as i32,
-            point.y.round() as i32,
+            point.x,
+            point.y,
             self.fg,
             self.bg,
             self.glyph,

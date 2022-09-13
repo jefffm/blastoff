@@ -23,7 +23,7 @@ pub fn try_move_player(direction: Cardinal, world: &mut World, map: &Map) -> Vec
 
         // TODO: clean up "off by one" point clamping for player movement
         let dest_point = (source_point + direction.to_vector())
-            .clamp(rect.min(), rect.max() - WorldVector::new(1.0, 1.0));
+            .clamp(rect.min(), rect.max() - WorldVector::new(1, 1));
 
         if !map.is_blocked(&dest_point) {
             // If the move is not blocked, push it to the stack

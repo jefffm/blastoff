@@ -23,22 +23,16 @@ impl MapGenerator for Simple {
     fn generate(&self, _rng: &mut RandomNumberGenerator, level: u32) -> Map {
         let tiles = vec![Tile::from(TileKind::Floor); MAP_HEIGHT as usize * MAP_WIDTH as usize];
 
-        let mut map = Map::new(
-            "Simple Map".into(),
-            MAP_WIDTH as f32,
-            MAP_HEIGHT as f32,
-            tiles,
-            level,
-        );
+        let mut map = Map::new("Simple Map".into(), MAP_WIDTH, MAP_HEIGHT, tiles, level);
 
         // Make the boundaries walls
         for x in 0..MAP_WIDTH {
-            map[&WorldPoint::new(x as f32, 0.0)] = TileKind::Wall.into();
-            map[&WorldPoint::new(x as f32, MAP_HEIGHT as f32 - 1.0)] = TileKind::Wall.into();
+            map[&WorldPoint::new(x, 0)] = TileKind::Wall.into();
+            map[&WorldPoint::new(x, MAP_HEIGHT - 1)] = TileKind::Wall.into();
         }
         for y in 0..MAP_HEIGHT {
-            map[&WorldPoint::new(0.0, y as f32)] = TileKind::Wall.into();
-            map[&WorldPoint::new(MAP_WIDTH as f32 - 1.0, y as f32)] = TileKind::Wall.into();
+            map[&WorldPoint::new(0, y)] = TileKind::Wall.into();
+            map[&WorldPoint::new(MAP_WIDTH - 1, y)] = TileKind::Wall.into();
         }
 
         map

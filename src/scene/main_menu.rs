@@ -57,13 +57,17 @@ pub fn main_menu(
         entry.print(14 + i as i32, selection, ctx);
     }
     match ctx.key {
-        None => MainMenuResult::NoSelection {
-            selected: selection,
-        },
+        None => {
+            MainMenuResult::NoSelection {
+                selected: selection,
+            }
+        }
         Some(key) => match key {
-            VirtualKeyCode::Escape => MainMenuResult::NoSelection {
-                selected: MainMenuSelection::Quit,
-            },
+            VirtualKeyCode::Escape => {
+                MainMenuResult::NoSelection {
+                    selected: MainMenuSelection::Quit,
+                }
+            }
             VirtualKeyCode::Up => {
                 let idx = entries
                     .iter()
@@ -82,12 +86,16 @@ pub fn main_menu(
                     selected: entries[(idx + 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Return => MainMenuResult::Selected {
-                selected: selection,
-            },
-            _ => MainMenuResult::NoSelection {
-                selected: selection,
-            },
+            VirtualKeyCode::Return => {
+                MainMenuResult::Selected {
+                    selected: selection,
+                }
+            }
+            _ => {
+                MainMenuResult::NoSelection {
+                    selected: selection,
+                }
+            }
         },
     }
 }
