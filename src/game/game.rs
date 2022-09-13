@@ -4,9 +4,8 @@ use hecs::World;
 use rand::RngCore;
 use tracing::info;
 
-use crate::component::{Position, Renderable};
 use crate::game;
-use crate::game::consts::{self, SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::game::consts::{SCREEN_HEIGHT, SCREEN_WIDTH};
 use crate::game::TurnsHistory;
 use crate::map::Loader;
 
@@ -84,23 +83,29 @@ impl Game {
             RunState::PauseMenu(selection) => self.resources.controller.pause_menu(ctx, selection),
             RunState::Initialization => {
                 info!("Initializing level");
-                // TODO: this is incompatible with Loader
-                // let map = Simple {}.generate(&mut self.rng, 1);
-                // self.maps.push(map);
+                info!("Map generation");
+                // Initialize mapgen history
+                self.resources.mapgen_history = Vec::new();
 
-                let mut loader = Loader::new(Simple {}, &mut self.resources.rng);
+                // Create the loader
+                let mut loader = Loader::new(
+                    Simple {},
+                    &mut self.resources.rng,
+                    &mut self.resources.mapgen_history,
+                );
+
+                // Load and spawn the map
                 let map = loader.load(1, &mut self.world);
                 self.resources.map = Some(map);
+
+                // View Map generation (if enabled)
                 RunState::MapGeneration(MapGenerationState::default())
             }
-            RunState::MapGeneration(map_state) => {
-                info!("Map generation");
-                self.resources.controller.map_generation(
-                    ctx,
-                    map_state,
-                    &self.resources.mapgen_history,
-                )
-            }
+            RunState::MapGeneration(map_state) => self.resources.controller.map_generation(
+                ctx,
+                map_state,
+                &self.resources.mapgen_history,
+            ),
             RunState::GameAwaitingInput => {
                 player::game_turn_input(&mut self.world, &mut self.resources, ctx)
             }

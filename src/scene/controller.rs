@@ -50,15 +50,12 @@ impl Controller {
         history: &Vec<Map>,
     ) -> RunState {
         if game::env().show_map_generation {
-            debug!("Rendering debug map generation");
             if state.is_complete(history) {
                 // If we're done, move on to the next state
-                debug!("Map generation complete!");
                 RunState::GameTurn
             } else {
                 // If we have more frames to render for map generation, pass the
                 // state onto the next tick.
-                debug!("Rendering next tick");
                 ctx.cls();
                 state.render(ctx, history);
                 state.tick(ctx);
