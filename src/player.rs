@@ -14,16 +14,17 @@ use crate::{
 
 /// Move the player by a vector2d of 1 in a single cardinal direction
 pub fn try_move_player(direction: Cardinal, world: &mut World, map: &Map) -> Vec<Action> {
+    let rect = map.get_rect();
+
     let mut actions = vec![];
 
     for (id, (pos, _player)) in world.query::<(&Position, &Player)>().iter() {
-        // Get the destination position after move
-        let mut dest = *pos;
-        dest.move_by(direction.to_vector());
-        dest.clamp(&map.get_rect().to_box2d());
-        if !map.is_blocked(&dest.p) {
+        let source_point = pos.p;
+        let dest_point = (source_point + direction.to_vector()).clamp(rect.min(), rect.max());
+
+        if !map.is_blocked(&dest_point) {
             // If the move is not blocked, push it to the stack
-            actions.push(Action::Moves(id, pos.p, dest.p));
+            actions.push(Action::Moves(id, source_point, dest_point));
         }
     }
 

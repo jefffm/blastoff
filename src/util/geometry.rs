@@ -149,4 +149,34 @@ mod tests {
 
         run_translation_tests(screen, world)
     }
+
+    #[test]
+    fn translation_longmap() {
+        let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(50, 50));
+        let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(100, 5));
+
+        run_translation_tests(screen, world)
+    }
+
+    #[test]
+    fn translation_tallmap() {
+        let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(50, 50));
+        let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(6, 75));
+
+        run_translation_tests(screen, world)
+    }
+
+    #[test]
+    fn index_test() {
+        let width = 13;
+        let height = 11;
+        let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(width, height));
+
+        let mut map = vec![0; (width * height) as usize];
+
+        for (x, y) in world.x_range().zip(world.y_range()) {
+            let idx = WorldPoint::new(x, y).to_index(width);
+            map[idx] = 1;
+        }
+    }
 }
