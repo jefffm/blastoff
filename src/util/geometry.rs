@@ -169,7 +169,7 @@ mod tests {
             .flat_map(move |x| {
                 world
                     .y_range()
-                    .clone()
+                    
                     .map(move |y| WorldPoint::new(x, y).to_index(width))
             })
             .map(|idx| map[idx] = 1)
