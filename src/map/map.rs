@@ -118,12 +118,22 @@ impl Map {
     pub fn iter_tiles(&self) -> impl Iterator<Item = (WorldPoint, &Tile)> {
         let xrange = self.rect.x_range();
         let yrange = self.rect.y_range();
+
         xrange.flat_map(move |x| {
             yrange.clone().map(move |y| {
                 let point = WorldPoint::new(x, y);
                 (point, &self.tiles[point.to_index(self.get_width())])
             })
         })
+    }
+
+    pub fn get(&self, point: WorldPoint) -> Option<&Tile> {
+        if self.rect.contains(point) {
+            let idx = point.to_index(self.get_width());
+            Some(&self.tiles[idx])
+        } else {
+            None
+        }
     }
 }
 

@@ -18,7 +18,8 @@ use crate::scene::MainMenuSelection;
 use crate::scene::MapGenerationState;
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
-    ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportToScreen,
+    ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportRect, ViewportSize,
+    ViewportToScreen, WorldToViewport,
 };
 
 use super::RunState;
@@ -56,7 +57,10 @@ impl Game {
                 mapgen_history: Vec::default(),
                 run_state: RunState::MainMenu(MainMenuSelection::NewGame),
                 turn_history: TurnsHistory::default(),
-                viewport: Viewport::default(),
+                viewport: Viewport::new(
+                    ViewportRect::new(ViewportPoint::new(0, 0), ViewportSize::new(50, 50)),
+                    WorldToViewport::default(),
+                ),
             },
             screen: Screen::new(
                 ScreenRect::new(

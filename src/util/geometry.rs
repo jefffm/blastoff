@@ -161,11 +161,18 @@ mod tests {
         let height = 11;
         let world = WorldRect::new(WorldPoint::new(0, 0), WorldSize::new(width, height));
 
-        let mut map = vec![0; (width * height) as usize];
+        let map = &mut vec![0; (width * height) as usize];
 
-        for (x, y) in world.x_range().zip(world.y_range()) {
-            let idx = WorldPoint::new(x, y).to_index(width);
-            map[idx] = 1;
-        }
+        // Create every point from the world rect and make sure we can set it in the vec
+        let _result = world
+            .x_range()
+            .flat_map(move |x| {
+                world
+                    .y_range()
+                    .clone()
+                    .map(move |y| WorldPoint::new(x, y).to_index(width))
+            })
+            .map(|idx| map[idx] = 1)
+            .collect::<Vec<_>>();
     }
 }

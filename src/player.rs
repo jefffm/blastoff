@@ -32,6 +32,7 @@ pub fn try_move_player(direction: Cardinal, world: &mut World, map: &Map) -> Vec
             let dest_point = (source_point + direction.to_vector())
                 .clamp(rect.min(), rect.max() - WorldVector::new(1, 1));
 
+            // TODO: move this logic somewhere (Map method?)
             if !map.is_blocked(&dest_point) && map[&dest_point].is_passable() {
                 // If the move is not blocked, move player and camera together
                 actions.push(Action::Moves(p_ent, source_point, dest_point));
