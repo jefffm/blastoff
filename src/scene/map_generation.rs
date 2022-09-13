@@ -12,7 +12,7 @@ impl MapGenerationState {
     pub fn tick(&mut self, ctx: &mut BTerm) {
         self.timer += ctx.frame_time_ms;
 
-        if self.timer > 250.0 {
+        if self.timer > 50.0 {
             self.index += 1;
             self.timer = 0.0;
         }
@@ -23,6 +23,6 @@ impl MapGenerationState {
     }
 
     pub fn render(&self, ctx: &mut BTerm, history: &[Map]) {
-        camera::render_debug_map(&history[self.index], ctx, true);
+        camera::render_debug_map(&history[self.index], ctx, true, self.index);
     }
 }

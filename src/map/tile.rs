@@ -18,6 +18,10 @@ impl Tile {
     pub fn is_passable(&self) -> bool {
         self.kind.is_passable()
     }
+
+    pub fn get_kind(&self) -> &TileKind {
+        &self.kind
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]

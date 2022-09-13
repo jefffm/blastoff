@@ -1,5 +1,3 @@
-
-
 use bracket_lib::prelude::*;
 use hecs::World;
 use tracing::debug;
@@ -21,7 +19,7 @@ pub struct Simple {}
 /// Create an extremely simple 10x10 map surrounded by wall
 impl MapGenerator for Simple {
     fn generate(
-        &self,
+        &mut self,
         _rng: &mut RandomNumberGenerator,
         mapgen_history: &mut Vec<Map>,
         level: u32,

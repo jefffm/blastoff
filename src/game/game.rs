@@ -9,7 +9,7 @@ use crate::game::consts::{SCREEN_HEIGHT, SCREEN_WIDTH};
 use crate::game::TurnsHistory;
 use crate::map::Loader;
 
-use crate::map::Simple;
+use crate::map::{Bsp, Simple};
 use crate::player;
 use crate::resource::{Resources, Screen, Viewport};
 use crate::scene::Controller;
@@ -18,7 +18,7 @@ use crate::scene::MapGenerationState;
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
     ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportRect, ViewportSize,
-    ViewportToScreen, WorldToViewport,
+    ViewportToScreen, WorldSize, WorldToViewport,
 };
 
 use super::RunState;
@@ -89,7 +89,7 @@ impl Game {
 
                 // Create the loader
                 let mut loader = Loader::new(
-                    Simple {},
+                    Bsp::new(WorldSize::new(100, 100)),
                     &mut self.resources.rng,
                     &mut self.resources.mapgen_history,
                 );

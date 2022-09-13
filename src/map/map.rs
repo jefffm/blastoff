@@ -9,8 +9,10 @@ use std::{
 
 use crate::{
     map::Tile,
-    util::{PointExt, WorldPoint, WorldSpace},
+    util::{PointExt, WorldPoint, WorldSize, WorldSpace},
 };
+
+use super::TileKind;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Map {
@@ -25,6 +27,11 @@ pub struct Map {
 }
 
 impl Map {
+    pub fn init(name: String, size: WorldSize, level: u32) -> Self {
+        let tiles = vec![Tile::from(TileKind::Wall); (size.height * size.width) as usize];
+        Self::new(name, size.width, size.height, tiles, level)
+    }
+
     pub fn new(name: String, width: i32, height: i32, tiles: Vec<Tile>, level: u32) -> Self {
         let rect = Rect::new(WorldPoint::new(0, 0), Size2D::new(width, height));
         let area = rect.size.area().try_into().unwrap();
@@ -52,13 +59,7 @@ impl Map {
 
     pub fn add_content(&mut self, point: &WorldPoint, entity: &Entity) {
         let idx = point.to_index(self.get_width());
-        assert!(
-            self.rect.contains(*point),
-            "{:?} is not a point in Map rect {:?}, and idx would panic: {:?}",
-            point,
-            self.rect,
-            idx
-        );
+        self.assert_idx_for_point(idx, point);
 
         self.content[idx].push(*entity);
     }
@@ -135,19 +136,35 @@ impl Map {
             None
         }
     }
+
+    fn assert_idx_for_point(&self, idx: usize, point: &WorldPoint) {
+        assert!(
+            self.rect.contains(*point),
+            "{:?} is not a point in Map rect {:?}, and idx would panic: {:?} (vec length: {:?})",
+            point,
+            self.rect,
+            idx,
+            self.tiles.len()
+        );
+    }
 }
 
 impl Index<&WorldPoint> for Map {
     type Output = Tile;
 
     fn index(&self, point: &WorldPoint) -> &Self::Output {
-        &self.tiles[point.to_index(self.get_width())]
+        let idx = point.to_index(self.get_width());
+        self.assert_idx_for_point(idx, point);
+
+        &self.tiles[idx]
     }
 }
 
 impl IndexMut<&WorldPoint> for Map {
     fn index_mut(&mut self, point: &WorldPoint) -> &mut Self::Output {
         let idx = point.to_index(self.get_width());
+        self.assert_idx_for_point(idx, point);
+
         &mut self.tiles[idx]
     }
 }
@@ -160,21 +177,25 @@ mod tests {
 
     #[test]
     fn map_test() {
-        // Create a 5x5 grid with the border surrounded by wall
-        #[rustfmt::skip]
-        let tiles = vec![
-            TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(),
-            TileKind::Wall.into(), TileKind::Floor.into(), TileKind::Floor.into(), TileKind::Floor.into(), TileKind::Wall.into(),
-            TileKind::Wall.into(), TileKind::Floor.into(), TileKind::Floor.into(), TileKind::Floor.into(), TileKind::Wall.into(),
-            TileKind::Wall.into(), TileKind::Floor.into(), TileKind::Floor.into(), TileKind::Floor.into(), TileKind::Wall.into(),
-            TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(),
-        ];
-
-        let map = Map::new(String::from("test"), 5, 5, tiles, 1);
+        let map = &mut Map::init(String::from("test"), WorldSize::new(50, 50), 1);
 
         // Check that we can traverse the entire map rect
-        for (x, y) in map.get_rect().x_range().zip(map.get_rect().y_range()) {
-            map.is_blocked(&WorldPoint::new(x, y));
+        for x in map.rect.x_range() {
+            for y in map.rect.y_range() {
+                let point = &WorldPoint::new(x, y);
+                map[&point] = TileKind::Floor.into();
+                map.set_blocked(point);
+            }
         }
+
+        assert_eq!(map.rect.max(), WorldPoint::new(50, 50));
+        assert!(
+            !map.is_blocked(&WorldPoint::new(50, 50)),
+            "expect the bottom right edge to be unvisited"
+        );
+        assert!(
+            map.is_blocked(&WorldPoint::new(49, 49)),
+            "expect (49, 49) to be the actual maximum usable point"
+        );
     }
 }
