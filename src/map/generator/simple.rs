@@ -13,8 +13,8 @@ use crate::map::Tile;
 use crate::map::TileKind;
 use crate::util::WorldPoint;
 
-const MAP_WIDTH: i32 = 10;
-const MAP_HEIGHT: i32 = 10;
+const MAP_WIDTH: i32 = 25;
+const MAP_HEIGHT: i32 = 25;
 
 pub struct Simple {}
 

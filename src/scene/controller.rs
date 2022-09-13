@@ -54,7 +54,7 @@ impl Controller {
             if state.is_complete(history) {
                 // If we're done, move on to the next state
                 debug!("Map generation complete!");
-                RunState::GameDraw
+                RunState::GameTurn
             } else {
                 // If we have more frames to render for map generation, pass the
                 // state onto the next tick.
@@ -65,7 +65,7 @@ impl Controller {
                 RunState::MapGeneration(state)
             }
         } else {
-            RunState::GameDraw
+            RunState::GameTurn
         }
     }
 
