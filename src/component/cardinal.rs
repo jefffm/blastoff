@@ -14,14 +14,14 @@ pub enum Cardinal {
 impl Cardinal {
     pub fn to_vector(&self) -> WorldVector {
         match self {
-            Cardinal::SW => WorldVector::new(-1, 1),
-            Cardinal::W => WorldVector::new(-1, 0),
-            Cardinal::NW => WorldVector::new(-1, -1),
-            Cardinal::N => WorldVector::new(0, -1),
-            Cardinal::NE => WorldVector::new(1, -1),
-            Cardinal::E => WorldVector::new(1, 0),
-            Cardinal::SE => WorldVector::new(1, 1),
-            Cardinal::S => WorldVector::new(0, 1),
+            Cardinal::SW => WorldVector::new(-1.0, 1.0),
+            Cardinal::W => WorldVector::new(-1.0, 0.0),
+            Cardinal::NW => WorldVector::new(-1.0, -1.0),
+            Cardinal::N => WorldVector::new(0.0, -1.0),
+            Cardinal::NE => WorldVector::new(1.0, -1.0),
+            Cardinal::E => WorldVector::new(1.0, 0.0),
+            Cardinal::SE => WorldVector::new(1.0, 1.0),
+            Cardinal::S => WorldVector::new(0.0, 1.0),
         }
     }
     pub fn inv(&self) -> Cardinal {

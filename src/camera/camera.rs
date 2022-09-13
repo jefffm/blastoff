@@ -31,6 +31,12 @@ impl Camera {
     }
 
     pub fn draw(&mut self, ctx: &mut BTerm, glyph: &Glyph, point: &ScreenPoint) {
-        ctx.set(point.x, point.y, glyph.fg, glyph.bg, glyph.glyph)
+        ctx.set(
+            point.x.round() as i32,
+            point.y.round() as i32,
+            glyph.fg,
+            glyph.bg,
+            glyph.glyph,
+        )
     }
 }

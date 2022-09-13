@@ -12,6 +12,6 @@ impl Viewport {
 
     pub fn from_points(screen_point: ScreenPoint, world_point: WorldPoint) -> WorldToScreen {
         let translation = screen_point.to_untyped() - world_point.to_untyped();
-        WorldToScreen::new(1, 0, 0, 1, translation.x, translation.y)
+        WorldToScreen::new(1.0, 0.0, 0.0, 1.0, translation.x, translation.y)
     }
 }

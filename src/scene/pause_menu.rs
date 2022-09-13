@@ -48,17 +48,13 @@ pub fn pause_menu(ctx: &mut BTerm, selection: PauseMenuSelection) -> PauseMenuRe
     }
 
     match ctx.key {
-        None => {
-            PauseMenuResult::NoSelection {
-                selected: selection,
-            }
-        }
+        None => PauseMenuResult::NoSelection {
+            selected: selection,
+        },
         Some(key) => match key {
-            VirtualKeyCode::Escape => {
-                PauseMenuResult::NoSelection {
-                    selected: PauseMenuSelection::Continue,
-                }
-            }
+            VirtualKeyCode::Escape => PauseMenuResult::NoSelection {
+                selected: PauseMenuSelection::Continue,
+            },
             VirtualKeyCode::Up => {
                 let idx = entries
                     .iter()
@@ -77,16 +73,12 @@ pub fn pause_menu(ctx: &mut BTerm, selection: PauseMenuSelection) -> PauseMenuRe
                     selected: entries[(idx + 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Return => {
-                PauseMenuResult::Selected {
-                    selected: selection,
-                }
-            }
-            _ => {
-                PauseMenuResult::NoSelection {
-                    selected: selection,
-                }
-            }
+            VirtualKeyCode::Return => PauseMenuResult::Selected {
+                selected: selection,
+            },
+            _ => PauseMenuResult::NoSelection {
+                selected: selection,
+            },
         },
     }
 }
