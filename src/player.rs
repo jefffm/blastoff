@@ -22,6 +22,8 @@ pub fn try_move_player(direction: Cardinal, world: &mut World, map: &Map) -> Vec
         let source_point = pos.p;
         let dest_point = (source_point + direction.to_vector()).clamp(rect.min(), rect.max());
 
+        tracing::debug!("Max point in rect: {:?}", rect.max());
+
         if !map.is_blocked(&dest_point) {
             // If the move is not blocked, push it to the stack
             actions.push(Action::Moves(id, source_point, dest_point));
@@ -83,6 +85,7 @@ pub fn game_turn_input(ecs: &mut World, resources: &mut Resources, ctx: &mut BTe
     }
 
     if !actions.is_empty() {
+        tracing::debug!("playing turn {:?}", actions);
         resources.turn_history.play_turn(ecs, actions);
     }
     RunState::GameTurn

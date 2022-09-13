@@ -50,7 +50,15 @@ impl Map {
             vec![Vec::<Entity>::new(); (self.get_height() * self.get_width()).try_into().unwrap()];
     }
 
+    #[tracing::instrument(skip(self))]
     pub fn add_content(&mut self, point: &WorldPoint, entity: &Entity) {
+        assert!(
+            self.rect.contains(*point),
+            "{:?} is not a point in Map rect {:?}",
+            point,
+            self.rect
+        );
+
         let idx = point.to_index(self.get_width());
         self.content[idx].push(*entity);
     }
@@ -141,7 +149,7 @@ mod tests {
     use crate::map::TileKind;
 
     #[test]
-    fn test_iter() {
+    fn map_test() {
         // Create a 5x5 grid with the border surrounded by wall
         #[rustfmt::skip]
         let tiles = vec![
@@ -152,6 +160,11 @@ mod tests {
             TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(),
         ];
 
-        let _map = Map::new(String::from("test"), 5, 5, tiles, 1);
+        let map = Map::new(String::from("test"), 5, 5, tiles, 1);
+
+        // Check that we can traverse the entire map rect
+        for (x, y) in map.get_rect().x_range().zip(map.get_rect().y_range()) {
+            map.is_blocked(&WorldPoint::new(x, y));
+        }
     }
 }
