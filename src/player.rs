@@ -9,7 +9,7 @@ use crate::{
     map::Map,
     resource::Resources,
     scene::PauseMenuSelection,
-    util::WorldPoint,
+    util::{WorldPoint, WorldVector},
 };
 
 /// Move the player by a vector2d of 1 in a single cardinal direction
@@ -20,7 +20,8 @@ pub fn try_move_player(direction: Cardinal, world: &mut World, map: &Map) -> Vec
 
     for (id, (pos, _player)) in world.query::<(&Position, &Player)>().iter() {
         let source_point = pos.p;
-        let dest_point = (source_point + direction.to_vector()).clamp(rect.min(), rect.max());
+        let dest_point = (source_point + direction.to_vector())
+            .clamp(rect.min(), rect.max() - WorldVector::new(1, 1));
 
         tracing::debug!("Max point in rect: {:?}", rect.max());
 
