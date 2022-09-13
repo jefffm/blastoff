@@ -50,16 +50,16 @@ impl Map {
             vec![Vec::<Entity>::new(); (self.get_height() * self.get_width()).try_into().unwrap()];
     }
 
-    #[tracing::instrument(skip(self))]
     pub fn add_content(&mut self, point: &WorldPoint, entity: &Entity) {
+        let idx = point.to_index(self.get_width());
         assert!(
             self.rect.contains(*point),
-            "{:?} is not a point in Map rect {:?}",
+            "{:?} is not a point in Map rect {:?}, and idx would panic: {:?}",
             point,
-            self.rect
+            self.rect,
+            idx
         );
 
-        let idx = point.to_index(self.get_width());
         self.content[idx].push(*entity);
     }
 

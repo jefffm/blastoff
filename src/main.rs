@@ -1,7 +1,6 @@
 use bracket_lib::prelude as rltk;
 use bracket_lib::prelude::*;
 bracket_lib::prelude::add_wasm_support!();
-use tracing::debug;
 use tracing::info;
 
 use tracing::Level;
@@ -31,7 +30,6 @@ fn main() -> rltk::BResult<()> {
         .with_max_level(Level::DEBUG)
         .init();
     info!("linking resources");
-    debug!("test");
     rltk::link_resource!(FONT_16X16_YUN, "resources/fonts/yun_16x16.png");
     rltk::link_resource!(FONT_16X16_REX, "resources/fonts/rex_16x16.png");
     rltk::link_resource!(FONT_14X14_REX, "resources/fonts/rex_14x14.png");
@@ -79,7 +77,7 @@ fn main() -> rltk::BResult<()> {
         .with_title(format!("Roguemon v{}", VERSION))
         .with_fps_cap(60.0)
         .with_tile_dimensions(tile_size, tile_size)
-        // .with_vsync(true)
+        .with_vsync(true)
         .build()?;
 
     info!("creating GameState");
