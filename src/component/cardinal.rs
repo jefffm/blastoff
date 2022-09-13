@@ -1,5 +1,3 @@
-use legion::World;
-
 use crate::util::WorldVector;
 
 #[derive(Clone, Copy, Debug, PartialEq)]

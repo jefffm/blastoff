@@ -1,7 +1,4 @@
-use bracket_lib::prelude::Point;
-use legion::world::Entity;
-use legion::*;
-
+use hecs::{Entity, World};
 use tracing::instrument;
 
 use crate::{
@@ -22,7 +19,13 @@ pub enum TurnState {
     PlayerAtExit,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+impl Default for TurnState {
+    fn default() -> Self {
+        Self::Running
+    }
+}
+
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct TurnsHistory {
     pub steps: i32,
     pub state: TurnState,
@@ -37,18 +40,16 @@ impl TurnsHistory {
         }
     }
 
-    #[instrument(level = "debug")]
+    #[instrument(skip_all, level = "debug")]
     pub fn play_turn(&mut self, ecs: &mut World, actions: Vec<Action>) {
         for &action in actions.iter() {
             match action {
                 Action::Moves(entity, current, next) => {
-                    let mut entry = ecs.entry(entity).unwrap();
-                    let pos = entry.get_component_mut::<Position>().unwrap();
+                    let mut pos = ecs.get::<&mut Position>(entity).unwrap();
                     pos.move_to(next);
                 }
                 Action::Activates(entity) => {
-                    let mut entry = ecs.entry(entity).unwrap();
-                    entry.add_component(Activated {});
+                    ecs.insert_one(entity, Activated {});
                 }
             }
         }

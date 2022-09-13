@@ -1,4 +1,4 @@
-use legion::*;
+use hecs::World;
 
 use super::Map;
 

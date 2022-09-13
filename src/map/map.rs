@@ -1,7 +1,6 @@
-use bracket_lib::prelude::BTerm;
 use euclid::{Rect, Size2D};
 use fixedbitset::FixedBitSet;
-use legion::{Entity, World};
+use hecs::Entity;
 use serde::{Deserialize, Serialize};
 use std::{
     convert::TryInto,

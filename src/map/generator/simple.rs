@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 
 use bracket_lib::prelude::*;
+use hecs::World;
 use tracing::debug;
 
 use crate::camera::Glyph;
@@ -39,11 +40,11 @@ impl MapGenerator for Simple {
 }
 
 impl Spawner for Simple {
-    fn spawn(&self, map: &Map, world: &mut legion::World) {
+    fn spawn(&self, map: &Map, world: &mut World) {
         let center = map.get_rect().center();
 
         // Add the player
-        world.push((
+        world.spawn((
             Position::new(center),
             Renderable::new(
                 Glyph::new(to_cp437('@'), RGBA::from(WHITE), RGBA::from(BLACK)),
@@ -53,7 +54,7 @@ impl Spawner for Simple {
         ));
 
         // Add the camera
-        world.push((Position::new(center), Camera {}));
+        world.spawn((Position::new(center), Camera {}));
 
         debug!("spawn complete");
     }

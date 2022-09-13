@@ -1,6 +1,7 @@
 use bracket_lib::prelude::RandomNumberGenerator;
-use legion::*;
+use hecs::World;
 
+use super::Map;
 use super::MapGenerator;
 use super::Spawner;
 
@@ -20,9 +21,11 @@ where
         Self { inner, rng }
     }
 
-    pub fn load(&mut self, level: u32, world: &mut World, resources: &mut Resources) {
+    /// Generates the map and returns the Spawner
+    pub fn load(&mut self, level: u32, world: &mut World) -> Map {
         let map = self.inner.generate(self.rng, level);
         self.inner.spawn(&map, world);
-        resources.insert(map);
+
+        map
     }
 }

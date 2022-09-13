@@ -1,11 +1,9 @@
 use bracket_lib::prelude as rltk;
 use bracket_lib::prelude::*;
-use legion::*;
+use hecs::World;
 use rand::RngCore;
-use tracing::debug;
 use tracing::info;
 
-use crate::camera::Camera;
 use crate::component::{Position, Renderable};
 use crate::game;
 use crate::game::consts;
@@ -16,20 +14,18 @@ use crate::map::Map;
 use crate::map::MapGenerator;
 use crate::map::Simple;
 use crate::player;
+use crate::resource::Resources;
 use crate::scene::Controller;
 use crate::scene::MainMenuSelection;
 use crate::scene::MapGenerationState;
-use crate::system::build_systems;
+use crate::system::{build_systems, Scheduler};
 
 use super::RunState;
 
 pub struct Game {
-    schedule: Schedule,
-    resources: Resources,
-    rng: rltk::RandomNumberGenerator,
+    scheduler: Scheduler,
     world: World,
-    controller: Controller,
-    maps: Vec<Map>,
+    resources: Resources,
 }
 
 impl Game {
@@ -42,41 +38,48 @@ impl Game {
 
         info!("using rng seed: {}", rng_seed);
 
-        let mut resources = Resources::default();
-        resources.insert(RunState::MainMenu(MainMenuSelection::NewGame));
-
         Self {
-            schedule: build_systems(),
-            resources,
+            scheduler: build_systems(),
             world: World::default(),
-            rng: rltk::RandomNumberGenerator::seeded(rng_seed),
-            controller: Controller::default(),
-            maps: Vec::<Map>::default(),
+            resources: Resources {
+                rng: rltk::RandomNumberGenerator::seeded(rng_seed),
+                controller: Controller::default(),
+                map: None,
+                mapgen_history: Vec::default(),
+                run_state: RunState::MainMenu(MainMenuSelection::NewGame),
+                turn_history: TurnsHistory::default(),
+            },
         }
     }
 
     fn run_systems(&mut self) {
-        self.schedule.execute(&mut self.world, &mut self.resources);
+        self.scheduler.execute(&mut self.world, &mut self.resources);
     }
 
     pub fn handle_state(&mut self, state: RunState, ctx: &mut BTerm) -> RunState {
         match state {
-            RunState::MainMenu(selection) => self.controller.main_menu(ctx, selection, false),
-            RunState::PauseMenu(selection) => self.controller.pause_menu(ctx, selection),
+            RunState::MainMenu(selection) => {
+                self.resources.controller.main_menu(ctx, selection, false)
+            }
+            RunState::PauseMenu(selection) => self.resources.controller.pause_menu(ctx, selection),
             RunState::Initialization => {
-                self.resources.insert(TurnsHistory::new());
                 info!("Initializing level");
                 // TODO: this is incompatible with Loader
-                let map = Simple {}.generate(&mut self.rng, 1);
-                self.maps.push(map);
+                // let map = Simple {}.generate(&mut self.rng, 1);
+                // self.maps.push(map);
 
-                let mut loader = Loader::new(Simple {}, &mut self.rng);
-                loader.load(1, &mut self.world, &mut self.resources);
+                let mut loader = Loader::new(Simple {}, &mut self.resources.rng);
+                let map = loader.load(1, &mut self.world);
+                self.resources.map = Some(map);
                 RunState::MapGeneration(MapGenerationState::default())
             }
             RunState::MapGeneration(map_state) => {
                 info!("Map generation");
-                self.controller.map_generation(ctx, map_state, &self.maps)
+                self.resources.controller.map_generation(
+                    ctx,
+                    map_state,
+                    &self.resources.mapgen_history,
+                )
             }
             RunState::GameAwaitingInput => {
                 player::game_turn_input(&mut self.world, &mut self.resources, ctx)
@@ -90,19 +93,23 @@ impl Game {
                 self.draw_game(ctx);
                 RunState::GameAwaitingInput
             }
-            RunState::GameOver(selection) => self.controller.game_over(ctx, selection),
+            RunState::GameOver(selection) => self.resources.controller.game_over(ctx, selection),
         }
     }
 
     fn draw_game(&self, ctx: &mut BTerm) {
-        let map = self.resources.get::<Map>().unwrap();
+        let map = self.resources.map.as_ref().unwrap();
         let start_x = (consts::SCREEN_WIDTH - map.get_width() as u32) / 2;
         let start_y = 11;
         // map.draw(ctx, Point::new(start_x, start_y));
-        let mut data = <(Read<Position>, Read<Renderable>)>::query()
-            .iter(&self.world)
+        let mut data = self
+            .world
+            .query::<(&Position, &Renderable)>()
+            .iter()
+            .map(|(_ent, (&pos, render))| (pos, render.clone()))
             .collect::<Vec<_>>();
-        data.sort_by(|d1, d2| d2.1.render_order.cmp(&d1.1.render_order));
+
+        data.sort_by(|(_, r1), (_, r2)| r1.render_order.cmp(&r2.render_order));
         for (pos, render) in data.iter() {
             ctx.set(
                 // start_x as i32 + pos.p.x,
@@ -120,8 +127,9 @@ impl Game {
 
 impl GameState for Game {
     fn tick(&mut self, ctx: &mut BTerm) {
-        let state = self.resources.remove::<RunState>().unwrap();
+        // TODO: remove unnecessary clone
+        let state = self.resources.run_state.clone();
         let new_state = self.handle_state(state, ctx);
-        self.resources.insert(new_state);
+        self.resources.run_state = new_state;
     }
 }

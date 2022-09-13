@@ -3,7 +3,7 @@ use euclid::{Box2D, Rect, Vector2D};
 
 use crate::util::{WorldPoint, WorldSpace, WorldVector};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Position {
     pub p: WorldPoint,
 }
