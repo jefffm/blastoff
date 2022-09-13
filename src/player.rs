@@ -1,10 +1,10 @@
 use bracket_lib::prelude::*;
-use hecs::World;
+use hecs::{Entity, World};
 
 use tracing::debug;
 
 use crate::{
-    component::{Cardinal, Player, Position},
+    component::{Camera, Cardinal, Player, Position},
     game::{Action, RunState},
     map::Map,
     resource::Resources,
@@ -15,20 +15,29 @@ use crate::{
 /// Move the player by a vector2d of 1 in a single cardinal direction
 pub fn try_move_player(direction: Cardinal, world: &mut World, map: &Map) -> Vec<Action> {
     let rect = map.get_rect();
-
     let mut actions = vec![];
+    let mut player_entity: Option<Entity> = None;
+    let mut player_position: Option<WorldPoint> = None;
 
-    for (id, (pos, _player)) in world.query::<(&Position, &Player)>().iter() {
-        let source_point = pos.p;
+    for (ent, (pos, _player)) in world.query::<(&Position, &Player)>().iter() {
+        player_entity = Some(ent);
+        player_position = Some(pos.p);
+    }
 
-        // TODO: clean up "off by one" point clamping for player movement
-        let dest_point = (source_point + direction.to_vector())
-            .clamp(rect.min(), rect.max() - WorldVector::new(1, 1));
+    for (camera_entity, (c_pos, _camera)) in world.query::<(&mut Position, &Camera)>().iter() {
+        if let Some((p_ent, p_pos)) = player_entity.zip(player_position) {
+            let source_point = p_pos;
 
-        if !map.is_blocked(&dest_point) {
-            // If the move is not blocked, push it to the stack
-            actions.push(Action::Moves(id, source_point, dest_point));
-        }
+            // TODO: clean up "off by one" point clamping for player movement
+            let dest_point = (source_point + direction.to_vector())
+                .clamp(rect.min(), rect.max() - WorldVector::new(1, 1));
+
+            if !map.is_blocked(&dest_point) {
+                // If the move is not blocked, move player and camera together
+                actions.push(Action::Moves(p_ent, source_point, dest_point));
+                actions.push(Action::Moves(camera_entity, c_pos.p, dest_point));
+            }
+        };
     }
 
     actions

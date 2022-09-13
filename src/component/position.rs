@@ -1,6 +1,4 @@
-use euclid::Box2D;
-
-use crate::util::{WorldPoint, WorldSpace, WorldVector};
+use crate::util::{WorldPoint, WorldVector};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Position {

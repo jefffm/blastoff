@@ -15,22 +15,4 @@ pub fn render_debug_map(map: &Map, ctx: &mut BTerm, _show_boundaries: bool) {
     }
 }
 
-pub struct Camera {
-    screen: ScreenRect,
-    w2s: WorldToScreen,
-}
-
-impl Camera {
-    pub fn new(screen: ScreenRect, w2s: WorldToScreen) -> Self {
-        Self { screen, w2s }
-    }
-
-    pub fn draw_from_world(&mut self, ctx: &mut BTerm, glyph: &Glyph, point: WorldPoint) {
-        let screen_point = self.w2s.transform_point(point);
-        self.draw(ctx, glyph, &screen_point)
-    }
-
-    pub fn draw(&mut self, ctx: &mut BTerm, glyph: &Glyph, point: &ScreenPoint) {
-        ctx.set(point.x, point.y, glyph.fg, glyph.bg, glyph.glyph)
-    }
-}
+// TODO: viewport and camera: choose which to use
