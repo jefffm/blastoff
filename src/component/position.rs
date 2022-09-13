@@ -1,5 +1,5 @@
-use bracket_lib::prelude::*;
-use euclid::{Box2D, Rect, Vector2D};
+
+use euclid::{Box2D};
 
 use crate::util::{WorldPoint, WorldSpace, WorldVector};
 
@@ -14,7 +14,7 @@ impl Position {
     }
 
     pub fn move_by(&mut self, vector: WorldVector) {
-        self.p = self.p + vector;
+        self.p += vector;
     }
 
     pub fn move_to(&mut self, point: WorldPoint) {

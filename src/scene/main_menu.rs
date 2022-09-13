@@ -58,13 +58,13 @@ pub fn main_menu(
     }
     match ctx.key {
         None => {
-            return MainMenuResult::NoSelection {
+            MainMenuResult::NoSelection {
                 selected: selection,
             }
         }
         Some(key) => match key {
             VirtualKeyCode::Escape => {
-                return MainMenuResult::NoSelection {
+                MainMenuResult::NoSelection {
                     selected: MainMenuSelection::Quit,
                 }
             }
@@ -73,26 +73,26 @@ pub fn main_menu(
                     .iter()
                     .position(|&x| x == selection)
                     .expect("MainMenuSelection");
-                return MainMenuResult::NoSelection {
+                MainMenuResult::NoSelection {
                     selected: entries[(idx + entries.len() - 1) % entries.len()],
-                };
+                }
             }
             VirtualKeyCode::Down => {
                 let idx = entries
                     .iter()
                     .position(|&x| x == selection)
                     .expect("MainMenuSelection");
-                return MainMenuResult::NoSelection {
+                MainMenuResult::NoSelection {
                     selected: entries[(idx + 1) % entries.len()],
-                };
+                }
             }
             VirtualKeyCode::Return => {
-                return MainMenuResult::Selected {
+                MainMenuResult::Selected {
                     selected: selection,
                 }
             }
             _ => {
-                return MainMenuResult::NoSelection {
+                MainMenuResult::NoSelection {
                     selected: selection,
                 }
             }

@@ -43,35 +43,35 @@ pub fn game_over(ctx: &mut BTerm, selection: GameOverSelection) -> GameOverResul
     }
     match ctx.key {
         None => {
-            return GameOverResult::NoSelection {
+            GameOverResult::NoSelection {
                 selected: selection,
             }
         }
         Some(key) => match key {
             VirtualKeyCode::Escape => {
-                return GameOverResult::NoSelection {
+                GameOverResult::NoSelection {
                     selected: GameOverSelection::Quit,
                 }
             }
             VirtualKeyCode::Up => {
                 let idx = entries.iter().position(|&x| x == selection).unwrap();
-                return GameOverResult::NoSelection {
+                GameOverResult::NoSelection {
                     selected: entries[(idx + entries.len() - 1) % entries.len()],
-                };
+                }
             }
             VirtualKeyCode::Down => {
                 let idx = entries.iter().position(|&x| x == selection).unwrap();
-                return GameOverResult::NoSelection {
+                GameOverResult::NoSelection {
                     selected: entries[(idx + 1) % entries.len()],
-                };
+                }
             }
             VirtualKeyCode::Return => {
-                return GameOverResult::Selected {
+                GameOverResult::Selected {
                     selected: selection,
                 }
             }
             _ => {
-                return GameOverResult::NoSelection {
+                GameOverResult::NoSelection {
                     selected: selection,
                 }
             }

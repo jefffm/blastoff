@@ -112,7 +112,7 @@ impl Map {
         let yrange = self.rect.y_range();
         xrange.flat_map(move |x| {
             yrange.clone().map(move |y| {
-                let point = WorldPoint::new(x.clone(), y.clone());
+                let point = WorldPoint::new(x, y);
                 (point, &self.tiles[point.to_index(self.get_width())])
             })
         })
@@ -143,7 +143,7 @@ mod tests {
     #[test]
     fn test_iter() {
         // Create a 5x5 grid with the border surrounded by wall
-        #[cfg_attr(rustfmt, rustfmt_skip)]
+        #[rustfmt::skip]
         let tiles = vec![
             TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(),
             TileKind::Wall.into(), TileKind::Floor.into(), TileKind::Floor.into(), TileKind::Floor.into(), TileKind::Wall.into(),
@@ -152,6 +152,6 @@ mod tests {
             TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(), TileKind::Wall.into(),
         ];
 
-        let _map = Map::new(String::from("test"), 5, 5, tiles.into(), 1);
+        let _map = Map::new(String::from("test"), 5, 5, tiles, 1);
     }
 }

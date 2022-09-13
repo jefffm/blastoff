@@ -1,4 +1,4 @@
-use bracket_lib::prelude::{to_cp437, BTerm, Point, BLACK, WHITE};
+use bracket_lib::prelude::{to_cp437, BTerm, BLACK, WHITE};
 use serde::{Deserialize, Serialize};
 
 use crate::util::ScreenPoint;
@@ -55,7 +55,7 @@ impl TileKind {
 impl From<TileKind> for Tile {
     fn from(kind: TileKind) -> Self {
         Self {
-            kind: kind,
+            kind,
             revealed: false,
             visible: false,
         }

@@ -19,8 +19,8 @@ impl Glyph {
         ctx.set(
             point.x,
             point.y,
-            self.fg.clone(),
-            self.bg.clone(),
+            self.fg,
+            self.bg,
             self.glyph,
         )
     }

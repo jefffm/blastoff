@@ -10,8 +10,7 @@ use crate::game::consts;
 use crate::game::draw_ui;
 use crate::game::TurnsHistory;
 use crate::map::Loader;
-use crate::map::Map;
-use crate::map::MapGenerator;
+
 use crate::map::Simple;
 use crate::player;
 use crate::resource::Resources;
@@ -26,6 +25,12 @@ pub struct Game {
     scheduler: Scheduler,
     world: World,
     resources: Resources,
+}
+
+impl Default for Game {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Game {
@@ -99,8 +104,8 @@ impl Game {
 
     fn draw_game(&self, ctx: &mut BTerm) {
         let map = self.resources.map.as_ref().unwrap();
-        let start_x = (consts::SCREEN_WIDTH - map.get_width() as u32) / 2;
-        let start_y = 11;
+        let _start_x = (consts::SCREEN_WIDTH - map.get_width() as u32) / 2;
+        let _start_y = 11;
         // map.draw(ctx, Point::new(start_x, start_y));
         let mut data = self
             .world

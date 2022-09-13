@@ -44,12 +44,13 @@ impl TurnsHistory {
     pub fn play_turn(&mut self, ecs: &mut World, actions: Vec<Action>) {
         for &action in actions.iter() {
             match action {
-                Action::Moves(entity, current, next) => {
+                Action::Moves(entity, _current, next) => {
                     let mut pos = ecs.get::<&mut Position>(entity).unwrap();
                     pos.move_to(next);
                 }
                 Action::Activates(entity) => {
-                    ecs.insert_one(entity, Activated {});
+                    ecs.insert_one(entity, Activated {})
+                        .unwrap_or_else(|err| tracing::error!("{:?}", err));
                 }
             }
         }

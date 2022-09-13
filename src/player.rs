@@ -4,8 +4,8 @@ use hecs::World;
 use tracing::debug;
 
 use crate::{
-    component::{Activated, Cardinal, Player, Position},
-    game::{Action, RunState, TurnsHistory},
+    component::{Cardinal, Player, Position},
+    game::{Action, RunState},
     map::Map,
     resource::Resources,
     scene::PauseMenuSelection,
@@ -18,7 +18,7 @@ pub fn try_move_player(direction: Cardinal, world: &mut World, map: &Map) -> Vec
 
     for (id, (pos, _player)) in world.query::<(&Position, &Player)>().iter() {
         // Get the destination position after move
-        let mut dest = pos.clone();
+        let mut dest = *pos;
         dest.move_by(direction.to_vector());
         dest.clamp(&map.get_rect().to_box2d());
         if !map.is_blocked(&dest.p) {
@@ -81,7 +81,7 @@ pub fn game_turn_input(ecs: &mut World, resources: &mut Resources, ctx: &mut BTe
         },
     }
 
-    if actions.len() > 0 {
+    if !actions.is_empty() {
         resources.turn_history.play_turn(ecs, actions);
     }
     RunState::GameTurn

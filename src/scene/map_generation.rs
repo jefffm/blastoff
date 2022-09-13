@@ -21,7 +21,7 @@ impl MapGenerationState {
         self.index >= history.len()
     }
 
-    pub fn render(&self, ctx: &mut BTerm, history: &Vec<Map>) {
+    pub fn render(&self, ctx: &mut BTerm, history: &[Map]) {
         camera::render_debug_map(&history[self.index], ctx, true);
     }
 }

@@ -1,10 +1,10 @@
 use bracket_lib::prelude::*;
 
-use crate::{map::Map, resource::Resources};
+use crate::{resource::Resources};
 
 pub fn draw_ui(resources: &Resources, ctx: &mut BTerm) {
     let map = resources.map.as_ref().unwrap();
-    let turn_history = &resources.turn_history;
+    let _turn_history = &resources.turn_history;
     ctx.print(1, 1, format!("Level : {}", map.get_level()));
     // ctx.print(1, 2, format!("Steps : {}", turn_history.steps));
     // ctx.print(1, 3, format!("Energy: {}", turn_history.energy_used));

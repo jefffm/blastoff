@@ -1,7 +1,7 @@
 use hecs::World;
 
 use crate::component::{Camera, Player, Position};
-use crate::resource::{Resources, Viewport};
+use crate::resource::{Resources};
 use crate::util::WorldPoint;
 
 /// Keep the camera focused on the player's location
