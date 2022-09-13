@@ -19,6 +19,8 @@
 // pub type ViewToWorld = Transform2<ViewSpace, WorldSpace>;
 // pub type WorldToView = Transform2<WorldSpace, ViewSpace>;
 
+use std::{convert::TryInto, fmt::Debug};
+
 use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
 use serde::{Deserialize, Serialize};
 
@@ -40,7 +42,7 @@ pub type WorldRect = Rect<i32, WorldSpace>;
 pub type WorldToScreen = Transform2D<i32, WorldSpace, ScreenSpace>;
 pub type ScreenToWorld = Transform2D<i32, ScreenSpace, WorldSpace>;
 
-trait TransformExt<T, Src, Dest>
+pub trait TransformExt<T, Src, Dest>
 where
     T: Copy + std::ops::Sub + std::ops::Sub<Output = T>,
 {
@@ -65,6 +67,29 @@ impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
         let translation = Self::create_translation(src_point, dest_point);
         self.m31 = translation.x;
         self.m32 = translation.y;
+    }
+}
+
+pub trait PointExt<T, U>
+where
+    T: TryInto<usize>,
+    <T as TryInto<usize>>::Error: Debug,
+{
+    /// Helper to get the Vec index for any given WorldPoint (assuming the
+    /// vector is height * width for this instance of Map).
+    fn to_index(&self, width: T) -> usize;
+}
+
+impl<T, U> PointExt<T, U> for Point2D<T, U>
+where
+    T: TryInto<usize> + Copy,
+    <T as TryInto<usize>>::Error: Debug,
+{
+    fn to_index(&self, width: T) -> usize {
+        let x: usize = self.x.try_into().unwrap();
+        let y: usize = self.y.try_into().unwrap();
+        let w: usize = width.try_into().unwrap();
+        (y * w) + x
     }
 }
 

@@ -9,7 +9,7 @@ use std::{
 
 use crate::{
     map::Tile,
-    util::{WorldPoint, WorldSpace},
+    util::{PointExt, WorldPoint, WorldSpace},
 };
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -45,22 +45,13 @@ impl Map {
         }
     }
 
-    /// Helper to get the Vec index for any given WorldPoint (assuming the
-    /// vector is height * width for this instance of Map).
-    fn get_index(&self, point: &WorldPoint) -> usize {
-        let x: usize = point.x.try_into().unwrap();
-        let y: usize = point.y.try_into().unwrap();
-        let w: usize = self.get_width().try_into().unwrap();
-        (y * w) + x
-    }
-
     pub fn reset_content(&mut self) {
         self.content =
             vec![Vec::<Entity>::new(); (self.get_height() * self.get_width()).try_into().unwrap()];
     }
 
     pub fn add_content(&mut self, point: &WorldPoint, entity: &Entity) {
-        let idx = self.get_index(point);
+        let idx = point.to_index(self.get_width());
         self.content[idx].push(*entity);
     }
 
@@ -69,11 +60,11 @@ impl Map {
     }
 
     pub fn set_blocked(&mut self, point: &WorldPoint) {
-        self.blocked.insert(self.get_index(point))
+        self.blocked.insert(point.to_index(self.get_width()))
     }
 
     pub fn is_blocked(&self, point: &WorldPoint) -> bool {
-        self.blocked.contains(self.get_index(point))
+        self.blocked.contains(point.to_index(self.get_width()))
     }
 
     pub fn reset_visible(&mut self) {
@@ -81,11 +72,11 @@ impl Map {
     }
 
     pub fn set_visible(&mut self, point: &WorldPoint) {
-        self.visible.insert(self.get_index(point))
+        self.visible.insert(point.to_index(self.get_width()))
     }
 
     pub fn is_visible(&self, point: &WorldPoint) -> bool {
-        self.visible.contains(self.get_index(point))
+        self.visible.contains(point.to_index(self.get_width()))
     }
 
     pub fn reset_revealed(&mut self) {
@@ -93,11 +84,11 @@ impl Map {
     }
 
     pub fn set_revealed(&mut self, point: &WorldPoint) {
-        self.revealed.insert(self.get_index(point))
+        self.revealed.insert(point.to_index(self.get_width()))
     }
 
     pub fn is_revealed(&self, point: &WorldPoint) -> bool {
-        self.revealed.contains(self.get_index(point))
+        self.revealed.contains(point.to_index(self.get_width()))
     }
 
     pub fn get_rect(&self) -> &Rect<i32, WorldSpace> {
@@ -122,7 +113,7 @@ impl Map {
         xrange.flat_map(move |x| {
             yrange.clone().map(move |y| {
                 let point = WorldPoint::new(x.clone(), y.clone());
-                (point, &self.tiles[self.get_index(&point)])
+                (point, &self.tiles[point.to_index(self.get_width())])
             })
         })
     }
@@ -132,14 +123,13 @@ impl Index<&WorldPoint> for Map {
     type Output = Tile;
 
     fn index(&self, point: &WorldPoint) -> &Self::Output {
-        let idx = self.get_index(&point);
-        &self.tiles[idx]
+        &self.tiles[point.to_index(self.get_width())]
     }
 }
 
 impl IndexMut<&WorldPoint> for Map {
     fn index_mut(&mut self, point: &WorldPoint) -> &mut Self::Output {
-        let idx = self.get_index(&point);
+        let idx = point.to_index(self.get_width());
         &mut self.tiles[idx]
     }
 }
