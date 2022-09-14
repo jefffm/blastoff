@@ -1,36 +1,17 @@
+use std::fmt;
+
+mod wall;
+pub use wall::*;
+
+mod floor;
+pub use floor::*;
+
 use bracket_lib::prelude::{
     to_cp437, ColorPair, DrawBatch, Point, BLACK, GRAY1, GRAY22, LIGHT_YELLOW, WHITE,
 };
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 use crate::util::ScreenPoint;
-
-#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
-pub struct Tile {
-    kind: TileKind,
-    revealed: bool,
-    visible: bool,
-}
-
-impl Tile {
-    pub fn render(
-        &self,
-        draw_batch: &mut DrawBatch,
-        point: ScreenPoint,
-        visibility_kind: VisibilityKind,
-    ) {
-        self.kind.render(draw_batch, point, visibility_kind)
-    }
-
-    pub fn is_passable(&self) -> bool {
-        self.kind.is_passable()
-    }
-
-    pub fn get_kind(&self) -> &TileKind {
-        &self.kind
-    }
-}
-
 pub enum VisibilityKind {
     Torch,
     Daylight,
@@ -38,7 +19,7 @@ pub enum VisibilityKind {
     Remembered,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum TileKind {
     Floor,
     Wall,
@@ -51,21 +32,27 @@ impl Default for TileKind {
 }
 
 impl TileKind {
-    fn glyph(&self) -> char {
+    pub fn handler(&self) -> Box<dyn TileHandler> {
         match self {
-            Self::Floor => '.',
-            Self::Wall => '#',
+            Self::Floor => Box::new(Floor {}),
+            Self::Wall => Box::new(Wall {}),
         }
     }
+}
 
-    fn is_passable(&self) -> bool {
-        match self {
-            Self::Floor => true,
-            Self::Wall => false,
-        }
+/// TileHandler
+pub trait TileHandler {
+    fn glyph(&self) -> char;
+
+    fn color_pair(&self) -> ColorPair {
+        // Default implementation
+        ColorPair::new(LIGHT_YELLOW, BLACK)
     }
 
-    pub fn render(
+    fn is_passable(&self) -> bool;
+    fn is_opaque(&self) -> bool;
+
+    fn render(
         &self,
         draw_batch: &mut DrawBatch,
         point: ScreenPoint,
@@ -89,16 +76,6 @@ impl TileKind {
             _ => {
                 todo!("not implemented yet!");
             }
-        }
-    }
-}
-
-impl From<TileKind> for Tile {
-    fn from(kind: TileKind) -> Self {
-        Self {
-            kind,
-            revealed: false,
-            visible: false,
         }
     }
 }

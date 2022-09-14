@@ -7,7 +7,6 @@ use crate::component::*;
 use crate::map::Map;
 use crate::map::MapGenerator;
 use crate::map::Spawner;
-use crate::map::Tile;
 use crate::map::TileKind;
 use crate::util::WorldPoint;
 
@@ -24,7 +23,7 @@ impl MapGenerator for Simple {
         mapgen_history: &mut Vec<Map>,
         level: u32,
     ) -> Map {
-        let tiles = vec![Tile::from(TileKind::Floor); MAP_HEIGHT as usize * MAP_WIDTH as usize];
+        let tiles = vec![TileKind::Floor; MAP_HEIGHT as usize * MAP_WIDTH as usize];
 
         let mut map = Map::new("Simple Map".into(), MAP_WIDTH, MAP_HEIGHT, tiles, level);
 

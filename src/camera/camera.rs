@@ -31,7 +31,8 @@ pub fn render_debug_map(
         let world_point = viewport.to_world_point(viewport_point);
         if let Some(tile) = map.get(world_point) {
             let screen_point = t2.transform_point(viewport_point);
-            tile.render(draw_batch, screen_point, VisibilityKind::Torch);
+            tile.handler()
+                .render(draw_batch, screen_point, VisibilityKind::Torch);
         }
     }
 

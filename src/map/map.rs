@@ -8,17 +8,14 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-use crate::{
-    map::Tile,
-    util::{PointExt, WorldPoint, WorldSize, WorldSpace},
-};
+use crate::util::{PointExt, WorldPoint, WorldSize, WorldSpace};
 
-use super::TileKind;
+use super::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Map {
     name: String,
-    tiles: Vec<Tile>,
+    tiles: Vec<TileKind>,
     rect: Rect<i32, WorldSpace>,
     blocked: FixedBitSet,
     revealed: FixedBitSet,
@@ -28,12 +25,13 @@ pub struct Map {
 }
 
 impl Map {
+    /// Create a map with a given size filled in with Wall tiles
     pub fn init(name: String, size: WorldSize, level: u32) -> Self {
-        let tiles = vec![Tile::from(TileKind::Wall); (size.height * size.width) as usize];
+        let tiles = vec![TileKind::Wall; (size.height * size.width) as usize];
         Self::new(name, size.width, size.height, tiles, level)
     }
 
-    pub fn new(name: String, width: i32, height: i32, tiles: Vec<Tile>, level: u32) -> Self {
+    pub fn new(name: String, width: i32, height: i32, tiles: Vec<TileKind>, level: u32) -> Self {
         let rect = Rect::new(WorldPoint::new(0, 0), Size2D::new(width, height));
         let area = rect.size.area().try_into().unwrap();
 
@@ -139,7 +137,7 @@ impl Map {
         self.level
     }
 
-    pub fn iter_tiles(&self) -> impl Iterator<Item = (WorldPoint, &Tile)> {
+    pub fn iter_tiles(&self) -> impl Iterator<Item = (WorldPoint, &TileKind)> {
         let xrange = self.rect.x_range();
         let yrange = self.rect.y_range();
 
@@ -151,7 +149,7 @@ impl Map {
         })
     }
 
-    pub fn get(&self, point: WorldPoint) -> Option<&Tile> {
+    pub fn get(&self, point: WorldPoint) -> Option<&TileKind> {
         if self.rect.contains(point) {
             let idx = point.to_index(self.get_width());
             Some(&self.tiles[idx])
@@ -174,7 +172,7 @@ impl Map {
 
 impl BaseMap for Map {
     fn is_opaque(&self, idx: usize) -> bool {
-        self.tiles[idx].get_kind() == &TileKind::Wall
+        self.tiles[idx].handler().is_opaque()
     }
 }
 
@@ -185,7 +183,7 @@ impl Algorithm2D for Map {
 }
 
 impl Index<&WorldPoint> for Map {
-    type Output = Tile;
+    type Output = TileKind;
 
     fn index(&self, point: &WorldPoint) -> &Self::Output {
         let idx = point.to_index(self.get_width());
@@ -208,8 +206,6 @@ impl IndexMut<&WorldPoint> for Map {
 mod tests {
     use super::*;
 
-    use crate::map::TileKind;
-
     #[test]
     fn map_test() {
         let map = &mut Map::init(String::from("test"), WorldSize::new(50, 50), 1);
@@ -218,7 +214,7 @@ mod tests {
         for x in map.rect.x_range() {
             for y in map.rect.y_range() {
                 let point = &WorldPoint::new(x, y);
-                map[&point] = TileKind::Floor.into();
+                map[&point] = TileKind::Floor;
                 map.set_blocked(point);
             }
         }

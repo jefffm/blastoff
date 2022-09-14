@@ -109,7 +109,7 @@ fn is_possible(rect: &WorldRect, map: &Map) -> bool {
             }
 
             // If any point in the new rectangle is already carved out for a room, abort
-            if map[&point].get_kind() != &TileKind::Wall {
+            if map[&point] != TileKind::Wall {
                 return false;
             }
         }
