@@ -75,12 +75,21 @@ impl Game {
         self.scheduler.execute(&mut self.world, &mut self.resources);
     }
 
-    pub fn handle_state(&mut self, state: RunState, ctx: &mut BTerm) -> RunState {
+    pub fn handle_state(
+        &mut self,
+        state: RunState,
+        ctx: &mut BTerm,
+        draw_batch: &mut DrawBatch,
+    ) -> RunState {
         match state {
-            RunState::MainMenu(selection) => {
-                self.resources.controller.main_menu(ctx, selection, false)
-            }
-            RunState::PauseMenu(selection) => self.resources.controller.pause_menu(ctx, selection),
+            RunState::MainMenu(selection) => self
+                .resources
+                .controller
+                .main_menu(ctx, draw_batch, selection, false),
+            RunState::PauseMenu(selection) => self
+                .resources
+                .controller
+                .pause_menu(ctx, draw_batch, selection),
             RunState::Initialization => {
                 info!("Initializing level");
                 info!("Map generation");
@@ -103,6 +112,7 @@ impl Game {
             }
             RunState::MapGeneration(map_state) => self.resources.controller.map_generation(
                 ctx,
+                draw_batch,
                 map_state,
                 &self.resources.mapgen_history,
             ),
@@ -114,11 +124,14 @@ impl Game {
                 RunState::GameDraw
             }
             RunState::GameDraw => {
-                ctx.cls();
-                self.screen.draw_game(ctx, &self.world, &self.resources);
+                self.screen
+                    .draw_game(&self.world, &self.resources, draw_batch);
                 RunState::GameAwaitingInput
             }
-            RunState::GameOver(selection) => self.resources.controller.game_over(ctx, selection),
+            RunState::GameOver(selection) => self
+                .resources
+                .controller
+                .game_over(ctx, draw_batch, selection),
         }
     }
 }
@@ -127,7 +140,11 @@ impl GameState for Game {
     fn tick(&mut self, ctx: &mut BTerm) {
         // TODO: remove unnecessary clone
         let state = self.resources.run_state.clone();
-        let new_state = self.handle_state(state, ctx);
+        let mut draw_batch = DrawBatch::new();
+
+        let new_state = self.handle_state(state, ctx, &mut draw_batch);
+
         self.resources.run_state = new_state;
+        rltk::render_draw_buffer(ctx).expect("Render Draw Buffer");
     }
 }

@@ -1,4 +1,4 @@
-use bracket_lib::prelude::{to_cp437, BTerm, BLACK, WHITE};
+use bracket_lib::prelude::{to_cp437, ColorPair, DrawBatch, Point, BLACK, WHITE};
 use serde::{Deserialize, Serialize};
 
 use crate::util::ScreenPoint;
@@ -11,8 +11,8 @@ pub struct Tile {
 }
 
 impl Tile {
-    pub fn render(&self, ctx: &mut BTerm, point: ScreenPoint) {
-        self.kind.render(ctx, point)
+    pub fn render(&self, draw_batch: &mut DrawBatch, point: ScreenPoint) {
+        self.kind.render(draw_batch, point)
     }
 
     pub fn is_passable(&self) -> bool {
@@ -51,8 +51,12 @@ impl TileKind {
         }
     }
 
-    pub fn render(&self, ctx: &mut BTerm, point: ScreenPoint) {
-        ctx.set(point.x, point.y, WHITE, BLACK, to_cp437(self.glyph()));
+    pub fn render(&self, draw_batch: &mut DrawBatch, point: ScreenPoint) {
+        draw_batch.set(
+            Point::new(point.x, point.y),
+            ColorPair::new(WHITE, BLACK),
+            to_cp437(self.glyph()),
+        );
     }
 }
 

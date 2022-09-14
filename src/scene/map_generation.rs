@@ -2,7 +2,7 @@ use crate::camera;
 use crate::map::Map;
 use bracket_lib::prelude::*;
 
-#[derive(Default, Debug, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct MapGenerationState {
     timer: f32,
     index: usize,
@@ -22,7 +22,7 @@ impl MapGenerationState {
         self.index >= history.len()
     }
 
-    pub fn render(&self, ctx: &mut BTerm, history: &[Map]) {
-        camera::render_debug_map(&history[self.index], ctx, true, self.index);
+    pub fn render(&self, ctx: &BTerm, draw_batch: &mut DrawBatch, history: &[Map]) {
+        camera::render_debug_map(ctx, draw_batch, &history[self.index], true, self.index);
     }
 }

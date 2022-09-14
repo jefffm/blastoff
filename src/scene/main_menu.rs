@@ -22,13 +22,13 @@ impl fmt::Display for MainMenuSelection {
 }
 
 impl MainMenuSelection {
-    fn print(&self, y: i32, selection: MainMenuSelection, ctx: &mut BTerm) {
+    fn print(&self, y: i32, selection: MainMenuSelection, draw_batch: &mut DrawBatch) {
         let fg = if &selection == self {
             RGB::named(WHITE)
         } else {
             RGB::named(GRAY)
         };
-        ctx.print_color_centered(y, fg, RGB::named(BLACK), self.to_string());
+        draw_batch.print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
     }
 }
 
@@ -39,10 +39,16 @@ pub enum MainMenuResult {
 }
 pub fn main_menu(
     ctx: &mut BTerm,
+    draw_batch: &mut DrawBatch,
     selection: MainMenuSelection,
     can_continue: bool,
 ) -> MainMenuResult {
-    ctx.print_color_centered(11, RGB::named(WHITE), RGB::named(BLACK), TITLE_HEADER);
+    draw_batch.cls();
+    draw_batch.print_color_centered(
+        11,
+        TITLE_HEADER,
+        ColorPair::new(RGB::named(WHITE), RGB::named(BLACK)),
+    );
 
     let entries = if can_continue {
         vec![
@@ -54,20 +60,19 @@ pub fn main_menu(
         vec![MainMenuSelection::NewGame, MainMenuSelection::Quit]
     };
     for (i, entry) in entries.iter().enumerate() {
-        entry.print(14 + i as i32, selection, ctx);
+        entry.print(14 + i as i32, selection, draw_batch);
     }
+
+    draw_batch.submit(0).expect("DrawBatch submit");
+
     match ctx.key {
-        None => {
-            MainMenuResult::NoSelection {
-                selected: selection,
-            }
-        }
+        None => MainMenuResult::NoSelection {
+            selected: selection,
+        },
         Some(key) => match key {
-            VirtualKeyCode::Escape => {
-                MainMenuResult::NoSelection {
-                    selected: MainMenuSelection::Quit,
-                }
-            }
+            VirtualKeyCode::Escape => MainMenuResult::NoSelection {
+                selected: MainMenuSelection::Quit,
+            },
             VirtualKeyCode::Up => {
                 let idx = entries
                     .iter()
@@ -86,16 +91,12 @@ pub fn main_menu(
                     selected: entries[(idx + 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Return => {
-                MainMenuResult::Selected {
-                    selected: selection,
-                }
-            }
-            _ => {
-                MainMenuResult::NoSelection {
-                    selected: selection,
-                }
-            }
+            VirtualKeyCode::Return => MainMenuResult::Selected {
+                selected: selection,
+            },
+            _ => MainMenuResult::NoSelection {
+                selected: selection,
+            },
         },
     }
 }

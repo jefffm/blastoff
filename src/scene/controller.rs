@@ -1,6 +1,5 @@
 use bracket_lib::prelude::*;
 
-
 use crate::game;
 use crate::game::RunState;
 use crate::map::Map;
@@ -12,11 +11,11 @@ impl Controller {
     pub fn main_menu(
         &self,
         ctx: &mut BTerm,
+        draw_batch: &mut DrawBatch,
         menu_selection: MainMenuSelection,
         can_continue: bool,
     ) -> RunState {
-        ctx.cls();
-        let result = main_menu(ctx, menu_selection, can_continue);
+        let result = main_menu(ctx, draw_batch, menu_selection, can_continue);
         match result {
             MainMenuResult::NoSelection { selected } => RunState::MainMenu(selected),
             MainMenuResult::Selected { selected } => match selected {
@@ -29,9 +28,13 @@ impl Controller {
         }
     }
 
-    pub fn pause_menu(&self, ctx: &mut BTerm, menu_selection: PauseMenuSelection) -> RunState {
-        ctx.cls();
-        let result = pause_menu(ctx, menu_selection);
+    pub fn pause_menu(
+        &self,
+        ctx: &mut BTerm,
+        draw_batch: &mut DrawBatch,
+        menu_selection: PauseMenuSelection,
+    ) -> RunState {
+        let result = pause_menu(ctx, draw_batch, menu_selection);
         match result {
             PauseMenuResult::NoSelection { selected } => RunState::PauseMenu(selected),
             PauseMenuResult::Selected { selected } => match selected {
@@ -46,6 +49,7 @@ impl Controller {
     pub fn map_generation(
         &self,
         ctx: &mut BTerm,
+        draw_batch: &mut DrawBatch,
         mut state: MapGenerationState,
         history: &Vec<Map>,
     ) -> RunState {
@@ -56,8 +60,7 @@ impl Controller {
             } else {
                 // If we have more frames to render for map generation, pass the
                 // state onto the next tick.
-                ctx.cls();
-                state.render(ctx, history);
+                state.render(ctx, draw_batch, history);
                 state.tick(ctx);
                 RunState::MapGeneration(state)
             }
@@ -66,8 +69,13 @@ impl Controller {
         }
     }
 
-    pub fn game_over(&self, ctx: &mut BTerm, menu_selection: GameOverSelection) -> RunState {
-        let result = game_over(ctx, menu_selection);
+    pub fn game_over(
+        &self,
+        ctx: &mut BTerm,
+        draw_batch: &mut DrawBatch,
+        menu_selection: GameOverSelection,
+    ) -> RunState {
+        let result = game_over(ctx, draw_batch, menu_selection);
         match result {
             GameOverResult::NoSelection { selected } => RunState::GameOver(selected),
             GameOverResult::Selected { selected } => match selected {

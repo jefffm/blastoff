@@ -20,13 +20,13 @@ impl fmt::Display for PauseMenuSelection {
 }
 
 impl PauseMenuSelection {
-    fn print(&self, y: i32, selection: PauseMenuSelection, ctx: &mut BTerm) {
+    fn print(&self, y: i32, selection: PauseMenuSelection, draw_batch: &mut DrawBatch) {
         let fg = if &selection == self {
             RGB::named(WHITE)
         } else {
             RGB::named(GRAY)
         };
-        ctx.print_color_centered(y, fg, RGB::named(BLACK), self.to_string());
+        draw_batch.print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
     }
 }
 
@@ -35,8 +35,13 @@ pub enum PauseMenuResult {
     NoSelection { selected: PauseMenuSelection },
     Selected { selected: PauseMenuSelection },
 }
-pub fn pause_menu(ctx: &mut BTerm, selection: PauseMenuSelection) -> PauseMenuResult {
-    ctx.print_color_centered(11, RGB::named(WHITE), RGB::named(BLACK), TITLE_HEADER);
+pub fn pause_menu(
+    ctx: &mut BTerm,
+    draw_batch: &mut DrawBatch,
+    selection: PauseMenuSelection,
+) -> PauseMenuResult {
+    draw_batch.cls();
+    draw_batch.print_color_centered(11, TITLE_HEADER, ColorPair::new(WHITE, BLACK));
 
     let entries = vec![
         PauseMenuSelection::Continue,
@@ -44,21 +49,19 @@ pub fn pause_menu(ctx: &mut BTerm, selection: PauseMenuSelection) -> PauseMenuRe
     ];
 
     for (i, entry) in entries.iter().enumerate() {
-        entry.print(14 + i as i32, selection, ctx);
+        entry.print(14 + i as i32, selection, draw_batch);
     }
 
+    draw_batch.submit(0).expect("DrawBatch submit");
+
     match ctx.key {
-        None => {
-            PauseMenuResult::NoSelection {
-                selected: selection,
-            }
-        }
+        None => PauseMenuResult::NoSelection {
+            selected: selection,
+        },
         Some(key) => match key {
-            VirtualKeyCode::Escape => {
-                PauseMenuResult::NoSelection {
-                    selected: PauseMenuSelection::Continue,
-                }
-            }
+            VirtualKeyCode::Escape => PauseMenuResult::NoSelection {
+                selected: PauseMenuSelection::Continue,
+            },
             VirtualKeyCode::Up => {
                 let idx = entries
                     .iter()
@@ -77,16 +80,12 @@ pub fn pause_menu(ctx: &mut BTerm, selection: PauseMenuSelection) -> PauseMenuRe
                     selected: entries[(idx + 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Return => {
-                PauseMenuResult::Selected {
-                    selected: selection,
-                }
-            }
-            _ => {
-                PauseMenuResult::NoSelection {
-                    selected: selection,
-                }
-            }
+            VirtualKeyCode::Return => PauseMenuResult::Selected {
+                selected: selection,
+            },
+            _ => PauseMenuResult::NoSelection {
+                selected: selection,
+            },
         },
     }
 }

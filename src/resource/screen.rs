@@ -19,15 +19,21 @@ impl Screen {
         Self { rect, transform }
     }
 
-    fn draw(&self, ctx: &mut BTerm, glyph: &Glyph, point: &ScreenPoint) {
-        ctx.set(point.x, point.y, glyph.fg, glyph.bg, glyph.glyph)
+    fn draw(&self, draw_batch: &mut DrawBatch, glyph: &Glyph, point: &ScreenPoint) {
+        draw_batch.set(
+            Point::new(point.x, point.y),
+            ColorPair::new(glyph.fg, glyph.bg),
+            glyph.glyph,
+        );
     }
 
     pub fn to_screen_point(&self, point: ViewportPoint) -> ScreenPoint {
         self.transform.transform_point(point)
     }
 
-    pub fn draw_game(&self, ctx: &mut BTerm, world: &World, resources: &Resources) {
+    pub fn draw_game(&self, world: &World, resources: &Resources, draw_batch: &mut DrawBatch) {
+        draw_batch.cls();
+
         let viewport = &resources.viewport;
         let map = resources.map.as_ref().unwrap();
 
@@ -36,7 +42,7 @@ impl Screen {
             let world_point = viewport.to_world_point(viewport_point);
             if let Some(tile) = map.get(world_point) {
                 let screen_point = self.to_screen_point(viewport_point);
-                tile.render(ctx, screen_point);
+                tile.render(draw_batch, screen_point);
             }
         }
 
@@ -52,10 +58,12 @@ impl Screen {
         for (pos, render) in data.iter() {
             let viewport_point = viewport.to_viewport_point(pos.p);
             let screen_point = self.to_screen_point(viewport_point);
-            self.draw(ctx, &render.glyph, &screen_point);
+            self.draw(draw_batch, &render.glyph, &screen_point);
         }
 
         // Draw the UI overlay last
         // draw_ui(&self.resources, ctx);
+
+        draw_batch.submit(0).expect("DrawBatch submit");
     }
 }
