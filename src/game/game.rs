@@ -126,7 +126,7 @@ impl Game {
             }
             RunState::GameDraw => {
                 self.screen
-                    .draw_game(&self.world, &self.resources, ctx, draw_batch);
+                    .draw_game(&self.world, &mut self.resources, ctx, draw_batch);
                 RunState::GameAwaitingInput
             }
             RunState::GameOver(selection) => self

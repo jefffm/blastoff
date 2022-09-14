@@ -34,7 +34,7 @@ impl Screen {
     pub fn draw_game(
         &self,
         world: &World,
-        resources: &Resources,
+        resources: &mut Resources,
         ctx: &BTerm,
         draw_batch: &mut DrawBatch,
     ) {
@@ -52,8 +52,13 @@ impl Screen {
                 if map.is_visible(&world_point) {
                     if let Some(tile) = map.get(world_point) {
                         let screen_point = self.to_screen_point(viewport_point);
-                        tile.handler()
-                            .render(draw_batch, screen_point, VisibilityKind::Torch);
+                        tile.handler().render(
+                            draw_batch,
+                            screen_point,
+                            VisibilityKind::Torch {
+                                brightness: resources.rng.roll_dice(1, 40) as u32,
+                            },
+                        );
                     }
                 } else if map.is_revealed(&world_point) {
                     if let Some(tile) = map.get(world_point) {

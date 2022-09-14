@@ -7,13 +7,15 @@ mod floor;
 pub use floor::*;
 
 use bracket_lib::prelude::{
-    to_cp437, ColorPair, DrawBatch, Point, BLACK, GRAY1, GRAY22, LIGHT_YELLOW, WHITE,
+    to_cp437, ColorPair, DrawBatch, Point, BLACK, DARK_BLUE, GRAY1, GRAY22, GRAY46, LIGHT_YELLOW,
+    ORANGERED, RGBA, WHITE,
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 use crate::util::ScreenPoint;
 pub enum VisibilityKind {
-    Torch,
+    Torch { brightness: u32 },
+    DiscoBall { value: u32 },
     Daylight,
     Dim,
     Remembered,
@@ -43,7 +45,6 @@ impl TileKind {
 /// TileHandler
 pub trait TileHandler {
     fn glyph(&self) -> char;
-
     fn color_pair(&self) -> ColorPair {
         // Default implementation
         ColorPair::new(LIGHT_YELLOW, BLACK)
@@ -59,10 +60,14 @@ pub trait TileHandler {
         visibility_kind: VisibilityKind,
     ) {
         match visibility_kind {
-            VisibilityKind::Torch => {
+            VisibilityKind::Torch { brightness } => {
+                // TODO: use torch brightness to modify rendering brightness
                 draw_batch.set(
                     Point::new(point.x, point.y),
-                    ColorPair::new(LIGHT_YELLOW, BLACK),
+                    ColorPair::new(
+                        RGBA::from(GRAY46).lerp(RGBA::from(LIGHT_YELLOW), 1.0 / brightness as f32),
+                        BLACK,
+                    ),
                     to_cp437(self.glyph()),
                 );
             }
@@ -70,6 +75,16 @@ pub trait TileHandler {
                 draw_batch.set(
                     Point::new(point.x, point.y),
                     ColorPair::new(GRAY22, BLACK),
+                    to_cp437(self.glyph()),
+                );
+            }
+            VisibilityKind::DiscoBall { value } => {
+                draw_batch.set(
+                    Point::new(point.x, point.y),
+                    ColorPair::new(
+                        RGBA::from(BLACK).lerp(RGBA::from(WHITE), 1.0 / value as f32),
+                        BLACK,
+                    ),
                     to_cp437(self.glyph()),
                 );
             }
