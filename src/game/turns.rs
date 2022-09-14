@@ -40,7 +40,7 @@ impl TurnsHistory {
         }
     }
 
-    #[instrument(skip_all, level = "debug")]
+    #[instrument(skip_all, level = "trace")]
     pub fn play_turn(&mut self, ecs: &mut World, actions: Vec<Action>) {
         for &action in actions.iter() {
             match action {

@@ -125,7 +125,7 @@ impl Game {
             }
             RunState::GameDraw => {
                 self.screen
-                    .draw_game(&self.world, &self.resources, draw_batch);
+                    .draw_game(&self.world, &self.resources, ctx, draw_batch);
                 RunState::GameAwaitingInput
             }
             RunState::GameOver(selection) => self
@@ -140,6 +140,8 @@ impl GameState for Game {
     fn tick(&mut self, ctx: &mut BTerm) {
         // TODO: remove unnecessary clone
         let state = self.resources.run_state.clone();
+        tracing::trace!("State: {:?}", state);
+
         let mut draw_batch = DrawBatch::new();
 
         let new_state = self.handle_state(state, ctx, &mut draw_batch);

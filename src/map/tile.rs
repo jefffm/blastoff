@@ -1,4 +1,6 @@
-use bracket_lib::prelude::{to_cp437, ColorPair, DrawBatch, Point, BLACK, WHITE};
+use bracket_lib::prelude::{
+    to_cp437, ColorPair, DrawBatch, Point, BLACK, GRAY1, GRAY22, LIGHT_YELLOW, WHITE,
+};
 use serde::{Deserialize, Serialize};
 
 use crate::util::ScreenPoint;
@@ -11,8 +13,13 @@ pub struct Tile {
 }
 
 impl Tile {
-    pub fn render(&self, draw_batch: &mut DrawBatch, point: ScreenPoint) {
-        self.kind.render(draw_batch, point)
+    pub fn render(
+        &self,
+        draw_batch: &mut DrawBatch,
+        point: ScreenPoint,
+        visibility_kind: VisibilityKind,
+    ) {
+        self.kind.render(draw_batch, point, visibility_kind)
     }
 
     pub fn is_passable(&self) -> bool {
@@ -22,6 +29,13 @@ impl Tile {
     pub fn get_kind(&self) -> &TileKind {
         &self.kind
     }
+}
+
+pub enum VisibilityKind {
+    Torch,
+    Daylight,
+    Dim,
+    Remembered,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -51,12 +65,31 @@ impl TileKind {
         }
     }
 
-    pub fn render(&self, draw_batch: &mut DrawBatch, point: ScreenPoint) {
-        draw_batch.set(
-            Point::new(point.x, point.y),
-            ColorPair::new(WHITE, BLACK),
-            to_cp437(self.glyph()),
-        );
+    pub fn render(
+        &self,
+        draw_batch: &mut DrawBatch,
+        point: ScreenPoint,
+        visibility_kind: VisibilityKind,
+    ) {
+        match visibility_kind {
+            VisibilityKind::Torch => {
+                draw_batch.set(
+                    Point::new(point.x, point.y),
+                    ColorPair::new(LIGHT_YELLOW, BLACK),
+                    to_cp437(self.glyph()),
+                );
+            }
+            VisibilityKind::Remembered => {
+                draw_batch.set(
+                    Point::new(point.x, point.y),
+                    ColorPair::new(GRAY22, BLACK),
+                    to_cp437(self.glyph()),
+                );
+            }
+            _ => {
+                todo!("not implemented yet!");
+            }
+        }
     }
 }
 

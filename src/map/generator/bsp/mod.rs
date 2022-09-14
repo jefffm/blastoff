@@ -207,6 +207,9 @@ impl Spawner for Bsp {
     fn spawn(&self, map: &crate::map::Map, world: &mut hecs::World) {
         let center = self.rooms[0].center();
 
+        let mut viewshed = Viewshed::default().with_range(10);
+        viewshed.set_dirty();
+
         // Add the player
         world.spawn((
             Position::new(center),
@@ -214,7 +217,7 @@ impl Spawner for Bsp {
                 Glyph::new(to_cp437('@'), RGBA::from(WHITE), RGBA::from(BLACK)),
                 1,
             ),
-            Viewshed::default(),
+            viewshed,
             Player {},
         ));
 

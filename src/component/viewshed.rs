@@ -32,4 +32,9 @@ impl Viewshed {
     pub fn points(&self) -> impl Iterator<Item = &WorldPoint> {
         self.visible_tiles.iter()
     }
+
+    pub fn with_range(mut self, range: i32) -> Self {
+        self.range = range;
+        self
+    }
 }

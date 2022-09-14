@@ -101,7 +101,7 @@ pub fn game_turn_input(ecs: &mut World, resources: &mut Resources, ctx: &mut BTe
     }
 
     if !actions.is_empty() {
-        tracing::debug!("playing turn {:?}", actions);
+        tracing::trace!("playing turn {:?}", actions);
         resources.turn_history.play_turn(ecs, actions);
     }
     RunState::GameTurn

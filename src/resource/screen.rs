@@ -4,6 +4,8 @@ use hecs::World;
 use crate::camera::Glyph;
 use crate::component::{Position, Renderable};
 
+use crate::game::draw_ui;
+use crate::map::VisibilityKind;
 use crate::util::{ScreenPoint, ScreenRect, ViewportPoint, ViewportToScreen};
 
 use super::Resources;
@@ -31,7 +33,13 @@ impl Screen {
         self.transform.transform_point(point)
     }
 
-    pub fn draw_game(&self, world: &World, resources: &Resources, draw_batch: &mut DrawBatch) {
+    pub fn draw_game(
+        &self,
+        world: &World,
+        resources: &Resources,
+        ctx: &BTerm,
+        draw_batch: &mut DrawBatch,
+    ) {
         draw_batch.cls();
 
         let viewport = &resources.viewport;
@@ -40,10 +48,19 @@ impl Screen {
         // Use the viewport to find and render all visible Map tiles
         for viewport_point in viewport.points() {
             let world_point = viewport.to_world_point(viewport_point);
-            if map.is_visible(&world_point) {
-                if let Some(tile) = map.get(world_point) {
-                    let screen_point = self.to_screen_point(viewport_point);
-                    tile.render(draw_batch, screen_point);
+            // It's important to make sure the point is actually in the map
+            // before trying to make an index for it
+            if map.contains(world_point) {
+                if map.is_visible(&world_point) {
+                    if let Some(tile) = map.get(world_point) {
+                        let screen_point = self.to_screen_point(viewport_point);
+                        tile.render(draw_batch, screen_point, VisibilityKind::Torch);
+                    }
+                } else if map.is_revealed(&world_point) {
+                    if let Some(tile) = map.get(world_point) {
+                        let screen_point = self.to_screen_point(viewport_point);
+                        tile.render(draw_batch, screen_point, VisibilityKind::Remembered);
+                    }
                 }
             }
         }
@@ -64,7 +81,7 @@ impl Screen {
         }
 
         // Draw the UI overlay last
-        // draw_ui(&self.resources, ctx);
+        draw_ui(&resources, ctx, draw_batch);
 
         draw_batch.submit(0).expect("DrawBatch submit");
     }

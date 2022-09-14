@@ -83,9 +83,9 @@ where
     <T as TryInto<usize>>::Error: Debug,
 {
     fn to_index(&self, width: T) -> usize {
-        let x: usize = self.x.try_into().unwrap();
-        let y: usize = self.y.try_into().unwrap();
-        let w: usize = width.try_into().unwrap();
+        let x: usize = self.x.try_into().expect("unwrap x");
+        let y: usize = self.y.try_into().expect("unwrap y");
+        let w: usize = width.try_into().expect("unwrap width");
         (y * w) + x
     }
 }

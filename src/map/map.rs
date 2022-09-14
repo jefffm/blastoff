@@ -53,12 +53,17 @@ impl Map {
         }
     }
 
+    pub fn contains(&self, point: WorldPoint) -> bool {
+        self.rect.contains(point)
+    }
+
     pub fn reset_content(&mut self) {
         self.content =
             vec![Vec::<Entity>::new(); (self.get_height() * self.get_width()).try_into().unwrap()];
     }
 
     pub fn add_content(&mut self, point: &WorldPoint, entity: &Entity) {
+        // TODO: point.to_index can panic if a point is negative
         let idx = point.to_index(self.get_width());
         self.assert_idx_for_point(idx, point);
 
@@ -70,10 +75,16 @@ impl Map {
     }
 
     pub fn set_blocked(&mut self, point: &WorldPoint) {
+        let idx = point.to_index(self.get_width());
+        self.assert_idx_for_point(idx, point);
+
         self.blocked.insert(point.to_index(self.get_width()))
     }
 
     pub fn is_blocked(&self, point: &WorldPoint) -> bool {
+        let idx = point.to_index(self.get_width());
+        self.assert_idx_for_point(idx, point);
+
         self.blocked.contains(point.to_index(self.get_width()))
     }
 
@@ -82,11 +93,22 @@ impl Map {
     }
 
     pub fn set_visible(&mut self, point: &WorldPoint) {
-        self.visible.insert(point.to_index(self.get_width()))
+        let idx = point.to_index(self.get_width());
+        self.assert_idx_for_point(idx, point);
+
+        self.visible.insert(idx)
     }
 
     pub fn is_visible(&self, point: &WorldPoint) -> bool {
-        self.visible.contains(point.to_index(self.get_width()))
+        assert!(
+            self.rect.contains(*point),
+            "Point not in world! {:?}",
+            &point
+        );
+        let idx = point.to_index(self.get_width());
+        self.assert_idx_for_point(idx, point);
+
+        self.visible.contains(idx)
     }
 
     pub fn reset_revealed(&mut self) {
