@@ -98,7 +98,7 @@ impl Game {
 
                 // Create the loader
                 let mut loader = Loader::new(
-                    Bsp::new(WorldSize::new(100, 100)),
+                    Bsp::new(WorldSize::new(50, 50)),
                     &mut self.resources.rng,
                     &mut self.resources.mapgen_history,
                 );

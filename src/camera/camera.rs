@@ -1,6 +1,11 @@
 use crate::{
+    game::consts::{SCREEN_HEIGHT, SCREEN_WIDTH},
     map::Map,
-    util::{ScreenPoint, TransformExt, ViewportPoint, ViewportToScreen, WorldToViewport},
+    resource::Viewport,
+    util::{
+        ScreenPoint, TransformExt, ViewportPoint, ViewportRect, ViewportSize, ViewportToScreen,
+        WorldToViewport,
+    },
 };
 use bracket_lib::prelude::*;
 
@@ -14,11 +19,20 @@ pub fn render_debug_map(
 ) {
     let t1 = WorldToViewport::default();
     let t2 = ViewportToScreen::from_points(ViewportPoint::new(0, 0), ScreenPoint::new(0, 1));
+    let viewport = Viewport::new(
+        ViewportRect::new(
+            ViewportPoint::new(0, 0),
+            ViewportSize::new(SCREEN_HEIGHT as i32 - 2, SCREEN_WIDTH as i32 - 2),
+        ),
+        t1,
+    );
 
-    for (point, tile) in map.iter_tiles() {
-        let viewport_point = t1.transform_point(point);
-        let screen_point = t2.transform_point(viewport_point);
-        tile.render(draw_batch, screen_point);
+    for viewport_point in viewport.points() {
+        let world_point = viewport.to_world_point(viewport_point);
+        if let Some(tile) = map.get(world_point) {
+            let screen_point = t2.transform_point(viewport_point);
+            tile.render(draw_batch, screen_point);
+        }
     }
 
     draw_batch.print(Point::new(0, 0), format!("Index: {}", index));
