@@ -40,9 +40,11 @@ impl Screen {
         // Use the viewport to find and render all visible Map tiles
         for viewport_point in viewport.points() {
             let world_point = viewport.to_world_point(viewport_point);
-            if let Some(tile) = map.get(world_point) {
-                let screen_point = self.to_screen_point(viewport_point);
-                tile.render(draw_batch, screen_point);
+            if map.is_visible(&world_point) {
+                if let Some(tile) = map.get(world_point) {
+                    let screen_point = self.to_screen_point(viewport_point);
+                    tile.render(draw_batch, screen_point);
+                }
             }
         }
 

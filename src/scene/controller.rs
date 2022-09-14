@@ -55,6 +55,7 @@ impl Controller {
     ) -> RunState {
         if game::env().show_map_generation {
             if state.is_complete(history) {
+                // TODO: make it so that arrow keys pan around and enter allows us to continue
                 // If we're done, move on to the next state
                 RunState::GameTurn
             } else {

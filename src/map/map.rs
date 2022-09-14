@@ -1,3 +1,4 @@
+use bracket_lib::prelude::{Algorithm2D, BaseMap, Point};
 use euclid::{Rect, Size2D};
 use fixedbitset::FixedBitSet;
 use hecs::Entity;
@@ -146,6 +147,18 @@ impl Map {
             idx,
             self.tiles.len()
         );
+    }
+}
+
+impl BaseMap for Map {
+    fn is_opaque(&self, idx: usize) -> bool {
+        self.tiles[idx].get_kind() == &TileKind::Wall
+    }
+}
+
+impl Algorithm2D for Map {
+    fn dimensions(&self) -> Point {
+        Point::new(self.get_width(), self.get_height())
     }
 }
 

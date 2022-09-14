@@ -31,7 +31,7 @@ impl Default for GameEnv {
             tile_size: consts::TILE_SIZE,
             is_debug_mode: false,
             seed: None,
-            show_map_generation: true,
+            show_map_generation: false,
         }
     }
 }

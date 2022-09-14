@@ -7,6 +7,9 @@ pub use position::*;
 mod renderable;
 pub use renderable::*;
 
+mod viewshed;
+pub use viewshed::*;
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Camera {}
 

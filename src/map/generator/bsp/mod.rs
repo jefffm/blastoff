@@ -214,6 +214,7 @@ impl Spawner for Bsp {
                 Glyph::new(to_cp437('@'), RGBA::from(WHITE), RGBA::from(BLACK)),
                 1,
             ),
+            Viewshed::default(),
             Player {},
         ));
 

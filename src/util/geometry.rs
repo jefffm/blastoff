@@ -9,6 +9,7 @@
 
 use std::{convert::TryInto, fmt::Debug};
 
+use bracket_lib::prelude::Point;
 use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
 use serde::{Deserialize, Serialize};
 
@@ -86,6 +87,20 @@ where
         let y: usize = self.y.try_into().unwrap();
         let w: usize = width.try_into().unwrap();
         (y * w) + x
+    }
+}
+
+pub trait WorldPointExt {
+    fn to_bracket_point(&self) -> Point;
+    fn from_bracket_point(point: Point) -> Self;
+}
+impl WorldPointExt for WorldPoint {
+    fn to_bracket_point(&self) -> Point {
+        Point::new(self.x, self.y)
+    }
+
+    fn from_bracket_point(point: Point) -> Self {
+        Self::new(point.x, point.y)
     }
 }
 
@@ -169,7 +184,6 @@ mod tests {
             .flat_map(move |x| {
                 world
                     .y_range()
-                    
                     .map(move |y| WorldPoint::new(x, y).to_index(width))
             })
             .map(|idx| map[idx] = 1)

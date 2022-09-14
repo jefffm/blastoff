@@ -4,7 +4,7 @@ use hecs::{Entity, World};
 use tracing::debug;
 
 use crate::{
-    component::{Camera, Cardinal, Player, Position},
+    component::{Camera, Cardinal, Player, Position, Viewshed},
     game::{Action, RunState},
     map::Map,
     resource::Resources,
@@ -19,11 +19,16 @@ pub fn try_move_player(direction: Cardinal, world: &mut World, map: &Map) -> Vec
     let mut player_entity: Option<Entity> = None;
     let mut player_position: Option<WorldPoint> = None;
 
-    for (ent, (pos, _player)) in world.query::<(&Position, &Player)>().iter() {
+    // Move the player
+    for (ent, (pos, _player, player_viewshed)) in
+        world.query_mut::<(&Position, &Player, &mut Viewshed)>()
+    {
         player_entity = Some(ent);
         player_position = Some(pos.p);
+        player_viewshed.set_dirty();
     }
 
+    // Move the camera to match player position
     for (camera_entity, (c_pos, _camera)) in world.query::<(&mut Position, &Camera)>().iter() {
         if let Some((p_ent, p_pos)) = player_entity.zip(player_position) {
             let source_point = p_pos;
