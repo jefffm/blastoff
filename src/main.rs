@@ -25,10 +25,30 @@ pub mod scene;
 pub mod system;
 pub mod util;
 
+use clap::Parser;
+
+#[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
+struct Cli {
+    /// Turn debugging information on
+    #[clap(short, long, action = clap::ArgAction::Count)]
+    verbose: u8,
+
+    #[clap(short, long, action, default_value_t = false)]
+    mapgen_show: bool,
+}
+
 fn main() -> rltk::BResult<()> {
-    tracing_subscriber::fmt()
-        .with_max_level(Level::DEBUG)
-        .init();
+    let cli = Cli::parse();
+
+    let level = match cli.verbose {
+        0 => Level::DEBUG,
+        1.. => Level::TRACE,
+    };
+    tracing_subscriber::fmt().with_max_level(level).init();
+
+    game::env().show_map_generation = cli.mapgen_show;
+
     info!("linking resources");
     rltk::link_resource!(FONT_16X16_YUN, "resources/fonts/yun_16x16.png");
     rltk::link_resource!(FONT_16X16_REX, "resources/fonts/rex_16x16.png");

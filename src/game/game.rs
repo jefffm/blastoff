@@ -9,9 +9,10 @@ use crate::game::consts::{SCREEN_HEIGHT, SCREEN_WIDTH};
 use crate::game::TurnsHistory;
 use crate::map::Loader;
 
+use crate::camera::Screen;
 use crate::map::{Bsp, Simple};
 use crate::player;
-use crate::resource::{Resources, Screen, Viewport};
+use crate::resource::{Resources, Viewport};
 use crate::scene::Controller;
 use crate::scene::MainMenuSelection;
 use crate::scene::MapGenerationState;

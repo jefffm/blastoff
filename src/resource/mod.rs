@@ -1,8 +1,5 @@
 use bracket_lib::prelude::RandomNumberGenerator;
 
-mod screen;
-pub use screen::*;
-
 mod viewport;
 pub use viewport::*;
 
