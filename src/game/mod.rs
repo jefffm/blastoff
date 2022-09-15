@@ -2,8 +2,8 @@ pub mod consts;
 mod env;
 pub use env::*;
 
-mod game;
-pub use game::*;
+mod game_loop;
+pub use game_loop::*;
 
 mod run_state;
 pub use run_state::*;

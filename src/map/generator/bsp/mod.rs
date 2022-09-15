@@ -154,8 +154,8 @@ impl MapGenerator for Bsp {
     ) -> Map {
         let mut map = Map::init("bsp".into(), self.size, level);
 
-        let mut rects = Vec::new();
-        rects.push(WorldRect::new(WorldPoint::new(0, 0), self.size));
+        // Initialize with a single Rect
+        let mut rects = vec![WorldRect::new(WorldPoint::new(0, 0), self.size)];
 
         let first_rect = rects[0];
         add_subrects(&first_rect, &mut rects);

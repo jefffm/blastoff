@@ -1,8 +1,8 @@
 mod glyph;
 pub use glyph::*;
 
-mod camera;
-pub use camera::*;
+mod debug;
+pub use debug::*;
 
 mod screen;
 pub use screen::*;
