@@ -8,6 +8,7 @@ pub enum RunState {
     MapGeneration(MapGenerationState),
     GameAwaitingInput,
     GameTurn,
+    GameSystems,
     GameDraw,
     GameOver(GameOverSelection),
 }

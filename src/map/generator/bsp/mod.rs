@@ -219,6 +219,7 @@ impl Spawner for Bsp {
             ),
             viewshed,
             Player {},
+            Actor::new(0, 0, 20, ActorKind::Player),
         ));
 
         // Add the camera

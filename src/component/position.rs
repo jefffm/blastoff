@@ -17,4 +17,12 @@ impl Position {
     pub fn move_to(&mut self, point: WorldPoint) {
         self.p = point;
     }
+
+    pub fn point(&self) -> WorldPoint {
+        self.p
+    }
+
+    pub fn set_point(&mut self, point: WorldPoint) {
+        self.p = point
+    }
 }

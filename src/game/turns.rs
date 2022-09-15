@@ -1,15 +1,32 @@
+use bracket_lib::prelude::BTerm;
 use hecs::{Entity, World};
 use tracing::instrument;
 
 use crate::{
-    component::{Activated, Position},
+    component::{Activated, Actor, ActorKind, Cardinal, Player, Position},
+    resource::Resources,
     util::WorldPoint,
 };
 
+use super::RunState;
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Action {
-    Moves(Entity, WorldPoint, WorldPoint),
+    Moves(Entity, Cardinal),
+    Teleports(Entity, WorldPoint),
     Activates(Entity),
+    Noop,
+}
+
+impl Action {
+    pub fn cost(&self) -> i32 {
+        match self {
+            Action::Moves(_, _) => 1,
+            Action::Teleports(_, _) => 1,
+            Action::Activates(_) => 1,
+            Action::Noop => 0,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -40,20 +57,7 @@ impl TurnsHistory {
         }
     }
 
-    #[instrument(skip_all, level = "trace")]
-    pub fn play_turn(&mut self, ecs: &mut World, actions: Vec<Action>) {
-        for &action in actions.iter() {
-            match action {
-                Action::Moves(entity, _current, next) => {
-                    let mut pos = ecs.get::<&mut Position>(entity).unwrap();
-                    pos.move_to(next);
-                }
-                Action::Activates(entity) => {
-                    ecs.insert_one(entity, Activated {})
-                        .unwrap_or_else(|err| tracing::error!("{:?}", err));
-                }
-            }
-        }
+    pub fn add_turn(&mut self, actions: Vec<Action>) {
         self.history.push(actions);
         self.steps += 1;
     }

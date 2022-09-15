@@ -18,8 +18,8 @@ use crate::game::Game;
 pub mod camera;
 pub mod component;
 pub mod game;
+pub mod input;
 pub mod map;
-pub mod player;
 pub mod resource;
 pub mod scene;
 pub mod system;
@@ -42,8 +42,9 @@ fn main() -> rltk::BResult<()> {
     let cli = Cli::parse();
 
     let level = match cli.verbose {
-        0 => Level::DEBUG,
-        1.. => Level::TRACE,
+        0 => Level::INFO,
+        1 => Level::DEBUG,
+        2.. => Level::TRACE,
     };
     tracing_subscriber::fmt().with_max_level(level).init();
 

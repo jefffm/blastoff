@@ -4,25 +4,26 @@ use hecs::World;
 use rand::RngCore;
 use tracing::info;
 
-use crate::game;
+use crate::component::Player;
 use crate::game::consts::{SCREEN_HEIGHT, SCREEN_WIDTH};
 use crate::game::TurnsHistory;
 use crate::map::Loader;
+use crate::{game, input};
 
 use crate::camera::Screen;
 use crate::map::{Bsp, Simple};
-use crate::player;
 use crate::resource::{Resources, Viewport};
 use crate::scene::Controller;
 use crate::scene::MainMenuSelection;
 use crate::scene::MapGenerationState;
+use crate::scene::PauseMenuSelection;
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
     ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportRect, ViewportSize,
     ViewportToScreen, WorldSize, WorldToViewport,
 };
 
-use super::RunState;
+use super::{process_actors, RunState};
 
 pub struct Game {
     scheduler: Scheduler,
@@ -56,11 +57,13 @@ impl Game {
                 map: None,
                 mapgen_history: Vec::default(),
                 run_state: RunState::MainMenu(MainMenuSelection::NewGame),
+                turn_number: 0,
                 turn_history: TurnsHistory::default(),
                 viewport: Viewport::new(
                     ViewportRect::new(ViewportPoint::new(0, 0), ViewportSize::new(50, 50)),
                     WorldToViewport::default(),
                 ),
+                player_action: None,
             },
             screen: Screen::new(
                 ScreenRect::new(
@@ -118,22 +121,40 @@ impl Game {
                 &self.resources.mapgen_history,
             ),
             RunState::GameAwaitingInput => {
-                player::game_turn_input(&mut self.world, &mut self.resources, ctx)
+                match input::read(&mut self.world, &mut self.resources, ctx) {
+                    input::PlayerInput::Ui(action) => match action {
+                        input::UiAction::PauseMenu => {
+                            RunState::PauseMenu(PauseMenuSelection::Continue)
+                        }
+                    },
+                    input::PlayerInput::Game(action) => self.set_player_action(action),
+                    input::PlayerInput::Undefined => RunState::GameAwaitingInput,
+                }
             }
-            RunState::GameTurn => {
+            RunState::GameTurn => process_actors(&mut self.world, &mut self.resources),
+            RunState::GameSystems => {
                 self.run_systems();
                 RunState::GameDraw
             }
             RunState::GameDraw => {
                 self.screen
                     .draw_game(&self.world, &mut self.resources, ctx, draw_batch);
-                RunState::GameAwaitingInput
+                RunState::GameTurn
             }
             RunState::GameOver(selection) => self
                 .resources
                 .controller
                 .game_over(ctx, draw_batch, selection),
         }
+    }
+
+    fn set_player_action(&mut self, player_action: input::PlayerAction) -> RunState {
+        // Find the player component and set the next action on this player
+        // Move the player
+        for (_ent, player) in self.world.query_mut::<&mut Player>() {
+            self.resources.player_action = Some(player_action)
+        }
+        RunState::GameTurn
     }
 }
 
