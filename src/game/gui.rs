@@ -1,10 +1,14 @@
 use bracket_lib::prelude::*;
+use hecs::World;
 
-use crate::resource::Resources;
+use crate::{
+    component::{Actor, Player},
+    resource::Resources,
+};
 
 use super::consts::SCREEN_HEIGHT;
 
-pub fn draw_ui(resources: &Resources, ctx: &BTerm, draw_batch: &mut DrawBatch) {
+pub fn draw_ui(world: &World, resources: &Resources, ctx: &BTerm, draw_batch: &mut DrawBatch) {
     let map = resources.map.as_ref().unwrap();
     let _turn_history = &resources.turn_history;
     draw_batch.print(Point::new(1, 0), format!("Level : {}", map.get_level()));
@@ -14,4 +18,11 @@ pub fn draw_ui(resources: &Resources, ctx: &BTerm, draw_batch: &mut DrawBatch) {
         Point::new(20, SCREEN_HEIGHT - 2),
         format!("Fps: {:.2}", ctx.fps),
     );
+
+    for (_ent, (_player, actor)) in world.query::<(&Player, &Actor)>().iter() {
+        draw_batch.print(
+            Point::new(20, SCREEN_HEIGHT - 3),
+            format!("Energy: {:?}", actor.energy()),
+        );
+    }
 }

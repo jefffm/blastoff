@@ -71,34 +71,18 @@ fn main() -> rltk::BResult<()> {
         .with_font(font_14x14_rex, 14, 14)
         .with_font(font_12x12_rex, 12, 12)
         .with_font(font_8x8_rex, 8, 8)
-        .with_advanced_input(true)
+        .with_advanced_input(false)
+        .with_fullscreen(true)
         .with_fancy_console(
-            // world layer
             game::consts::SCREEN_WIDTH,
             game::consts::SCREEN_HEIGHT,
             font_16x16_yun,
         )
-        .with_fancy_console(
-            // particles layer
-            game::consts::SCREEN_WIDTH,
-            game::consts::SCREEN_HEIGHT,
-            font_16x16_yun,
-        )
-        .with_fancy_console(
-            // shader layer
-            game::consts::SCREEN_WIDTH,
-            game::consts::SCREEN_HEIGHT,
-            font_16x16_yun,
-        )
-        .with_fancy_console(
-            game::consts::SCREEN_WIDTH,
-            game::consts::SCREEN_HEIGHT,
-            font_16x16_yun,
-        ) // hud layer
         .with_title(format!("Roguemon v{}", VERSION))
-        .with_fps_cap(60.0)
         .with_tile_dimensions(tile_size, tile_size)
-        .with_vsync(true)
+        .with_fps_cap(120.0)
+        .with_automatic_console_resize(true)
+        .with_vsync(false)
         .build()?;
 
     info!("creating GameState");
