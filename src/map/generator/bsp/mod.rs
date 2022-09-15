@@ -4,7 +4,7 @@ use crate::camera::Glyph;
 use crate::component::*;
 use crate::{
     map::{Map, Spawner, TileKind},
-    util::{PointExt, WorldPoint, WorldRect, WorldSize, WorldVector},
+    util::{WorldPoint, WorldRect, WorldSize, WorldVector},
 };
 
 use super::MapGenerator;
@@ -122,13 +122,13 @@ fn apply_room_to_map(map: &mut Map, room: &WorldRect) {
     for x in room.x_range() {
         for y in room.y_range() {
             let point = WorldPoint::new(x, y);
-            map[&point] = TileKind::Floor.into();
+            map[&point] = TileKind::Floor;
         }
     }
 }
 
 fn draw_corridor(map: &mut Map, start: &WorldPoint, end: &WorldPoint) {
-    let mut cursor = start.clone();
+    let mut cursor = *start;
 
     while cursor != *end {
         if cursor.x < end.x {
@@ -141,7 +141,7 @@ fn draw_corridor(map: &mut Map, start: &WorldPoint, end: &WorldPoint) {
             cursor.y -= 1;
         }
 
-        map[&cursor] = TileKind::Floor.into();
+        map[&cursor] = TileKind::Floor;
     }
 }
 
@@ -204,7 +204,7 @@ impl MapGenerator for Bsp {
     }
 }
 impl Spawner for Bsp {
-    fn spawn(&self, map: &crate::map::Map, world: &mut hecs::World) {
+    fn spawn(&self, _map: &crate::map::Map, world: &mut hecs::World) {
         let center = self.rooms[0].center();
 
         let mut viewshed = Viewshed::default().with_range(10);

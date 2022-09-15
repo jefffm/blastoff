@@ -29,13 +29,13 @@ impl MapGenerator for Simple {
 
         // Make the boundaries walls
         for x in 0..MAP_WIDTH {
-            map[&WorldPoint::new(x, 0)] = TileKind::Wall.into();
-            map[&WorldPoint::new(x, MAP_HEIGHT - 1)] = TileKind::Wall.into();
+            map[&WorldPoint::new(x, 0)] = TileKind::Wall;
+            map[&WorldPoint::new(x, MAP_HEIGHT - 1)] = TileKind::Wall;
             mapgen_history.push(map.clone());
         }
         for y in 0..MAP_HEIGHT {
-            map[&WorldPoint::new(0, y)] = TileKind::Wall.into();
-            map[&WorldPoint::new(MAP_WIDTH - 1, y)] = TileKind::Wall.into();
+            map[&WorldPoint::new(0, y)] = TileKind::Wall;
+            map[&WorldPoint::new(MAP_WIDTH - 1, y)] = TileKind::Wall;
             mapgen_history.push(map.clone());
         }
 

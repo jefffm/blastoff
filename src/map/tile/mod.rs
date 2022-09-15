@@ -1,4 +1,4 @@
-use std::fmt;
+
 
 mod wall;
 pub use wall::*;
@@ -7,10 +7,9 @@ mod floor;
 pub use floor::*;
 
 use bracket_lib::prelude::{
-    to_cp437, ColorPair, DrawBatch, Point, BLACK, DARK_BLUE, GRAY1, GRAY22, GRAY46, LIGHT_YELLOW,
-    ORANGERED, RGBA, WHITE,
+    to_cp437, ColorPair, DrawBatch, Point, BLACK, GRAY22, GRAY46, LIGHT_YELLOW, RGBA, WHITE,
 };
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 use crate::util::ScreenPoint;
 pub enum VisibilityKind {

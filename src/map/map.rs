@@ -214,7 +214,7 @@ mod tests {
         for x in map.rect.x_range() {
             for y in map.rect.y_range() {
                 let point = &WorldPoint::new(x, y);
-                map[&point] = TileKind::Floor;
+                map[point] = TileKind::Floor;
                 map.set_blocked(point);
             }
         }

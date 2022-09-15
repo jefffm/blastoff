@@ -86,7 +86,7 @@ impl Screen {
         }
 
         // Draw the UI overlay last
-        draw_ui(&resources, ctx, draw_batch);
+        draw_ui(resources, ctx, draw_batch);
 
         draw_batch.submit(0).expect("DrawBatch submit");
     }

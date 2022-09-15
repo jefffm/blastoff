@@ -1,5 +1,5 @@
 use bracket_lib::prelude::{field_of_view, Point};
-use hecs::{Entity, Without, World};
+use hecs::{Entity, World};
 use std::collections::HashSet;
 
 use crate::{

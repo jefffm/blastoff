@@ -11,7 +11,7 @@ use crate::map::Loader;
 use crate::{game, input};
 
 use crate::camera::Screen;
-use crate::map::{Bsp, Simple};
+use crate::map::{Bsp};
 use crate::resource::{Resources, Viewport};
 use crate::scene::Controller;
 use crate::scene::MainMenuSelection;
@@ -151,7 +151,7 @@ impl Game {
     fn set_player_action(&mut self, player_action: input::PlayerAction) -> RunState {
         // Find the player component and set the next action on this player
         // Move the player
-        for (_ent, player) in self.world.query_mut::<&mut Player>() {
+        for (_ent, _player) in self.world.query_mut::<&mut Player>() {
             self.resources.player_action = Some(player_action)
         }
         RunState::GameTurn
