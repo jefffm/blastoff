@@ -5,7 +5,7 @@ use rand::RngCore;
 use tracing::info;
 
 use crate::component::{Actor, ActorKind, Player};
-use crate::game::consts::{SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::game::consts::{SCREEN_HEIGHT, SCREEN_WIDTH, VIEWPORT_HEIGHT, VIEWPORT_WIDTH};
 use crate::game::TurnsHistory;
 use crate::map::Loader;
 use crate::{game, input};
@@ -60,7 +60,10 @@ impl Game {
                 turn_number: 0,
                 turn_history: TurnsHistory::default(),
                 viewport: Viewport::new(
-                    ViewportRect::new(ViewportPoint::new(0, 0), ViewportSize::new(50, 50)),
+                    ViewportRect::new(
+                        ViewportPoint::new(0, 0),
+                        ViewportSize::new(VIEWPORT_WIDTH, VIEWPORT_HEIGHT),
+                    ),
                     WorldToViewport::default(),
                 ),
             },
