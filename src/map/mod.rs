@@ -78,6 +78,13 @@ impl Map {
         self.content[idx].push(*entity);
     }
 
+    pub fn get_content(&self, point: &WorldPoint) -> &Vec<Entity> {
+        let idx = point.to_index(self.get_width());
+        self.assert_idx_for_point(idx, point);
+
+        &self.content[idx]
+    }
+
     pub fn reset_blocked(&mut self) {
         self.blocked.clear()
     }

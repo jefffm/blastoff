@@ -57,7 +57,7 @@ impl Controller {
             if state.is_complete(history) {
                 // TODO: make it so that arrow keys pan around and enter allows us to continue
                 // If we're done, move on to the next state
-                RunState::GameTurn
+                RunState::GameSystems
             } else {
                 // If we have more frames to render for map generation, pass the
                 // state onto the next tick.
@@ -66,7 +66,7 @@ impl Controller {
                 RunState::MapGeneration(state)
             }
         } else {
-            RunState::GameTurn
+            RunState::GameSystems
         }
     }
 

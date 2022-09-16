@@ -1,6 +1,6 @@
 use crate::camera::Glyph;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Renderable {
     pub glyph: Glyph,
     pub render_order: u32,

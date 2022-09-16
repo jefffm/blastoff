@@ -60,6 +60,30 @@ impl Screen {
                             },
                         );
                     }
+
+                    let mut data = map
+                        .get_content(&world_point)
+                        .iter()
+                        .map(|entity| {
+                            let mut query = world
+                                .query_one::<(&Position, &Renderable)>(*entity)
+                                .unwrap();
+
+                            match query.get() {
+                                Some((pos, render)) => Some((*pos, *render)),
+                                None => None,
+                            }
+                        })
+                        .filter(|x| x.is_some())
+                        .collect::<Option<Vec<(Position, Renderable)>>>()
+                        .unwrap();
+
+                    data.sort_by(|(_, r1), (_, r2)| r1.render_order.cmp(&r2.render_order));
+                    for (pos, render) in data.iter() {
+                        let viewport_point = viewport.to_viewport_point(pos.p);
+                        let screen_point = self.to_screen_point(viewport_point);
+                        self.draw(draw_batch, &render.glyph, &screen_point);
+                    }
                 } else if map.is_revealed(&world_point) {
                     if let Some(tile) = map.get(world_point) {
                         let screen_point = self.to_screen_point(viewport_point);
@@ -68,21 +92,6 @@ impl Screen {
                     }
                 }
             }
-        }
-
-        // Use the ECS to find and draw every renderable component
-        let mut data = world
-            .query::<(&Position, &Renderable)>()
-            .iter()
-            .map(|(_ent, (&pos, render))| (pos, render.clone()))
-            .collect::<Vec<_>>();
-
-        // Implement render ordering
-        data.sort_by(|(_, r1), (_, r2)| r1.render_order.cmp(&r2.render_order));
-        for (pos, render) in data.iter() {
-            let viewport_point = viewport.to_viewport_point(pos.p);
-            let screen_point = self.to_screen_point(viewport_point);
-            self.draw(draw_batch, &render.glyph, &screen_point);
         }
 
         // Draw the UI overlay last

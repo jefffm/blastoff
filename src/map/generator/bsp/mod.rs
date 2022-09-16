@@ -225,6 +225,19 @@ impl Spawner for Bsp {
         // Add the camera
         world.spawn((Position::new(center), Camera {}));
 
+        // Add a monster
+        let mut monster_viewshed = Viewshed::default().with_range(10);
+        monster_viewshed.set_dirty();
+        world.spawn((
+            Position::new(self.rooms[1].center()),
+            Renderable::new(
+                Glyph::new(to_cp437('k'), RGBA::from(RED), RGBA::from(BLACK)),
+                1,
+            ),
+            monster_viewshed,
+            Actor::new(0, 0, 20, ActorKind::Computer(None)),
+        ));
+
         tracing::debug!("spawn complete");
     }
 }

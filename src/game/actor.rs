@@ -138,7 +138,7 @@ impl<'a> ActionProcessor<'a> {
                 Action::Moves(entity, direction) => self.move_entity(entity, direction),
                 Action::Teleports(entity, point) => self.teleport_entity(entity, point),
                 Action::Activates(_) => todo!(),
-                Action::Noop => todo!(),
+                Action::Noop => {}
             }
         }
     }

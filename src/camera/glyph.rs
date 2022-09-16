@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::util::ScreenPoint;
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq, Clone, Copy)]
 pub struct Glyph {
     pub glyph: u16,
     pub fg: RGBA,
@@ -16,12 +16,6 @@ impl Glyph {
         Self { glyph, fg, bg }
     }
     pub fn render(&self, ctx: &mut BTerm, point: &ScreenPoint) {
-        ctx.set(
-            point.x,
-            point.y,
-            self.fg,
-            self.bg,
-            self.glyph,
-        )
+        ctx.set(point.x, point.y, self.fg, self.bg, self.glyph)
     }
 }
