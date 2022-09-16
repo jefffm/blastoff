@@ -69,10 +69,7 @@ impl Screen {
                                 .query_one::<(&Position, &Renderable)>(*entity)
                                 .unwrap();
 
-                            match query.get() {
-                                Some((pos, render)) => Some((*pos, *render)),
-                                None => None,
-                            }
+                            query.get().map(|(pos, render)| (*pos, *render))
                         })
                         .filter(|x| x.is_some())
                         .collect::<Option<Vec<(Position, Renderable)>>>()

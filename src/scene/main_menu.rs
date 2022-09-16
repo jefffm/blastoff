@@ -1,8 +1,7 @@
 use bracket_lib::prelude::*;
-use hecs::World;
 use std::fmt;
 
-use crate::{game::consts::TITLE_HEADER, resource::Resources};
+use crate::game::consts::TITLE_HEADER;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MainMenuSelection {
