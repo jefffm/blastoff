@@ -82,7 +82,7 @@ fn main() -> rltk::BResult<()> {
         .with_tile_dimensions(tile_size, tile_size)
         .with_fps_cap(60.0)
         .with_automatic_console_resize(true)
-        .with_vsync(false)
+        .with_vsync(true)
         .build()?;
 
     info!("creating GameState");
