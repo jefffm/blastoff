@@ -17,97 +17,73 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
     let mut actors: Vec<(Entity, &mut Actor)> =
         world.query_mut::<&mut Actor>().into_iter().collect();
 
-    // Sort actors by
-    actors.sort_by(|(_, a), (_, b)| a.energy().cmp(&b.energy()));
+    // Sort actors by their priority (ascending). This is a function of energy remaining + how many times they've been skipped
+    actors.sort_by(|(_, a), (_, b)| a.priority().cmp(&b.priority()));
+    // ...but we actually want descending order
+    actors.reverse();
 
     tracing::trace!("found {:?} actors", actors.len());
 
-    // Find the minimum turn number. We're only going to process the minimum turn number each iteration.
-    // Eventually, the minimum turn number will catch up and all entities will get another turn.
-    resources.turn_number = match actors.is_empty() {
-        true => 0,
-        false => {
-            let (_, actor) = actors
-                .iter()
-                .min_by(|(_, a), (_, b)| a.turns().cmp(&b.turns()))
-                .expect("actor minimum");
-            actor.turns()
-        }
-    };
-
-    tracing::trace!("turn number {:?}", resources.turn_number);
-
     let mut needs_player_input = false;
 
-    for (entity, actor) in actors {
+    // Iterate over actors in priority-descending order
+    'outer: for (entity, actor) in actors {
         tracing::debug!("Processing actor for turn {:?}", resources.turn_number);
 
         // Filter to only actors in the current turn
-        if actor.turns() <= resources.turn_number {
-            // Increment the actor's turn counter (even if no action is taken/possible)
-            match actor.energy() {
-                0.. => {
-                    let action: Option<Action> = match actor.kind() {
-                        // Handle Actors controlled by the player
-                        ActorKind::Player(inbox) => match inbox {
-                            // If the player-controlled Actor entity has an action, use it
-                            Some(next_action) => {
-                                let next_action = match next_action {
-                                    input::PlayerAction::MoveWest => {
-                                        Action::Moves(entity, Cardinal::W)
-                                    }
-                                    input::PlayerAction::MoveEast => {
-                                        Action::Moves(entity, Cardinal::E)
-                                    }
-                                    input::PlayerAction::MoveNorth => {
-                                        Action::Moves(entity, Cardinal::N)
-                                    }
-                                    input::PlayerAction::MoveSouth => {
-                                        Action::Moves(entity, Cardinal::S)
-                                    }
-                                    input::PlayerAction::PassTurn => Action::Noop,
-                                };
-                                // Reset the player actor
-                                actor.set_kind(ActorKind::Player(None));
+        // Increment the actor's turn counter (even if no action is taken/possible)
+        actor.take_turn();
+        actor.recover_energy();
+        while actor.energy() > 0 {
+            let action: Option<Action> = match actor.kind() {
+                // Handle Actors controlled by the player
+                ActorKind::Player(inbox) => match inbox {
+                    // If the player-controlled Actor entity has an action, use it
+                    Some(next_action) => {
+                        let next_action = match next_action {
+                            input::PlayerAction::MoveWest => Action::Moves(entity, Cardinal::W),
+                            input::PlayerAction::MoveEast => Action::Moves(entity, Cardinal::E),
+                            input::PlayerAction::MoveNorth => Action::Moves(entity, Cardinal::N),
+                            input::PlayerAction::MoveSouth => Action::Moves(entity, Cardinal::S),
+                            input::PlayerAction::PassTurn => Action::Noop,
+                        };
+                        // Reset the player actor
+                        actor.set_kind(ActorKind::Player(None));
 
-                                Some(next_action)
-                            }
-                            // If the player-controlled Actor does not have an action,
-                            // skip over this entity without incrementing its turn counter
-                            None => {
-                                needs_player_input = true;
-                                None
-                            }
-                        },
-                        ActorKind::Computer(inbox) => match inbox {
-                            Some(next_action) => {
-                                let next_action = *next_action;
-                                actor.set_kind(ActorKind::Computer(None));
-
-                                Some(next_action)
-                            }
-                            None => {
-                                // Wait for the AI system to set something for this entity
-                                None
-                            }
-                        },
-                    };
-
-                    match action {
-                        Some(action) => {
-                            // TODO: the cost of an action should vary based on equipment, ability, and status
-                            actor.use_energy(action.cost());
-                            actor.take_turn();
-                            actions.push(action)
-                        }
-                        // Actor has energy, but is unable to process an action without input (from systems or player input)
-                        None => continue,
+                        Some(next_action)
                     }
-                }
-                _ => {
-                    actor.recover_energy();
+                    // If the player-controlled Actor does not have an action,
+                    // skip over this entity without incrementing its turn counter
+                    None => {
+                        needs_player_input = true;
+                        actor.increase_priority();
+                        break 'outer;
+                    }
+                },
+                ActorKind::Computer(inbox) => match inbox {
+                    Some(next_action) => {
+                        let next_action = *next_action;
+                        actor.set_kind(ActorKind::Computer(None));
+
+                        Some(next_action)
+                    }
+                    None => {
+                        // Wait for the AI system to set something for this entity
+                        actor.increase_priority();
+                        break 'outer;
+                    }
+                },
+            };
+
+            match action {
+                Some(action) => {
+                    // TODO: the cost of an action should vary based on equipment, ability, and status
+                    actor.use_energy(action.cost());
                     actor.take_turn();
+                    actions.push(action)
                 }
+                // Actor has energy, but is unable to process an action without input (from systems or player input)
+                None => break,
             }
         }
     }

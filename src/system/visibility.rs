@@ -31,9 +31,13 @@ pub fn visibility_system(world: &mut World, resources: &mut Resources) {
     }
 
     // Update the player viewshed only if it has changed
-    for (player_ent, (viewshed, _player)) in world.query_mut::<(&Viewshed, &Player)>() {
-        if updated_ents.contains(&player_ent) {
-            map.reset_visible();
+    let mut query = world.query::<(&Viewshed, &Player)>();
+    let players: Vec<_> = query.iter().collect();
+    let update_player_viewsheds = players.iter().any(|(ent, _)| updated_ents.contains(&ent));
+
+    if update_player_viewsheds {
+        map.reset_visible();
+        for (_, (viewshed, _)) in players {
             for point in viewshed.points() {
                 map.set_visible(point);
                 map.set_revealed(point);

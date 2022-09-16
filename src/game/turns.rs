@@ -1,13 +1,6 @@
+use hecs::Entity;
 
-use hecs::{Entity};
-
-
-use crate::{
-    component::{Cardinal},
-    util::WorldPoint,
-};
-
-
+use crate::{component::Cardinal, util::WorldPoint};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Action {
@@ -20,9 +13,9 @@ pub enum Action {
 impl Action {
     pub fn cost(&self) -> i32 {
         match self {
-            Action::Moves(_, _) => 1,
-            Action::Teleports(_, _) => 1,
-            Action::Activates(_) => 1,
+            Action::Moves(_, _) => 80,
+            Action::Teleports(_, _) => 160,
+            Action::Activates(_) => 100,
             Action::Noop => 0,
         }
     }

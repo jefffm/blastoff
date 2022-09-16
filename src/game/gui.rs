@@ -14,15 +14,9 @@ pub fn draw_ui(world: &World, resources: &Resources, ctx: &BTerm, draw_batch: &m
     draw_batch.print(Point::new(1, 0), format!("Level : {}", map.get_level()));
     // ctx.print(1, 2, format!("Steps : {}", turn_history.steps));
     // ctx.print(1, 3, format!("Energy: {}", turn_history.energy_used));
-    draw_batch.print(
-        Point::new(20, SCREEN_HEIGHT - 2),
-        format!("Fps: {:.2}", ctx.fps),
-    );
+    draw_batch.print(Point::new(20, 0), format!("Fps: {:.2}", ctx.fps));
 
     for (_ent, (_player, actor)) in world.query::<(&Player, &Actor)>().iter() {
-        draw_batch.print(
-            Point::new(20, SCREEN_HEIGHT - 3),
-            format!("Energy: {:?}", actor.energy()),
-        );
+        draw_batch.print(Point::new(50, 0), format!("Energy: {:?}", actor.energy()));
     }
 }

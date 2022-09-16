@@ -4,16 +4,27 @@ use crate::{game::Action, input};
 pub struct Actor {
     turns: u32,
     energy: i32,
+    max_energy: i32,
     speed: i32,
+    priority: i32,
     kind: ActorKind,
 }
 
 impl Actor {
-    pub fn new(turns: u32, energy: i32, speed: i32, kind: ActorKind) -> Self {
+    pub fn new(
+        turns: u32,
+        energy: i32,
+        max_energy: i32,
+        speed: i32,
+        priority: i32,
+        kind: ActorKind,
+    ) -> Self {
         Self {
             turns,
             energy,
+            max_energy,
             speed,
+            priority,
             kind,
         }
     }
@@ -22,9 +33,18 @@ impl Actor {
         self.energy
     }
 
+    /// Turn priority is energy * priority
+    pub fn priority(&self) -> i32 {
+        self.energy * self.priority
+    }
+
+    pub fn increase_priority(&mut self) {
+        self.priority += 1
+    }
+
     /// Recover energy up to a maximum of zero
     pub fn recover_energy(&mut self) {
-        self.energy = std::cmp::min(self.energy + self.speed, 0);
+        self.energy = std::cmp::min(self.energy + self.speed, self.max_energy);
     }
 
     pub fn speed(&self) -> i32 {
@@ -44,7 +64,8 @@ impl Actor {
     }
 
     pub fn take_turn(&mut self) {
-        self.turns += 1
+        self.turns += 1;
+        self.priority = 0;
     }
 
     pub fn turns(&self) -> u32 {

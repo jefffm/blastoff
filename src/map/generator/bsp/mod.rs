@@ -219,7 +219,7 @@ impl Spawner for Bsp {
             ),
             viewshed,
             Player {},
-            Actor::new(0, 0, 20, ActorKind::Player(None)),
+            Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),
         ));
 
         // Add the camera
@@ -235,7 +235,7 @@ impl Spawner for Bsp {
                 1,
             ),
             monster_viewshed,
-            Actor::new(0, 0, 20, ActorKind::Computer(None)),
+            Actor::new(0, 100, 100, 10, 0, ActorKind::Computer(None)),
         ));
 
         tracing::debug!("spawn complete");

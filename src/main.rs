@@ -71,8 +71,8 @@ fn main() -> rltk::BResult<()> {
         .with_font(font_14x14_rex, 14, 14)
         .with_font(font_12x12_rex, 12, 12)
         .with_font(font_8x8_rex, 8, 8)
-        .with_advanced_input(false)
-        .with_fullscreen(true)
+        .with_advanced_input(true)
+        .with_fullscreen(false)
         .with_fancy_console(
             game::consts::SCREEN_WIDTH,
             game::consts::SCREEN_HEIGHT,
