@@ -130,10 +130,10 @@ impl Game {
         match state {
             // game loop
             RunState::Game(_) => {
-                self.run_systems();
-
                 // Set the return value
-                self.process_actors()
+                let result = self.process_actors();
+                self.run_systems();
+                result
             }
             RunState::Initialization => {
                 info!("Initializing level");
