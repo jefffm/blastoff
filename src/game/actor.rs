@@ -32,9 +32,7 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
 
         // Filter to only actors in the current turn
         // Increment the actor's turn counter (even if no action is taken/possible)
-        actor.take_turn();
-        actor.recover_energy();
-        while actor.energy() > 0 {
+        if actor.energy() > 0 {
             let action: Option<Action> = match actor.kind() {
                 // Handle Actors controlled by the player
                 ActorKind::Player(inbox) => match inbox {
@@ -86,6 +84,7 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
                 None => break,
             }
         }
+        actor.recover_energy();
     }
 
     ActionProcessor::new(world, resources).process_actions(&actions);
