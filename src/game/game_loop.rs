@@ -15,17 +15,17 @@ use crate::{game, input};
 use crate::camera::Screen;
 use crate::map::Bsp;
 use crate::resource::{Resources, Viewport};
-use crate::scene::Controller;
-use crate::scene::MainMenuSelection;
 use crate::scene::MapGenerationState;
 use crate::scene::PauseMenuSelection;
+use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
+use crate::scene::{Controller, GameOverSelection};
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
     ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportRect, ViewportSize,
     ViewportToScreen, WorldSize, WorldToViewport,
 };
 
-use super::{process_actors, RunState};
+use super::{process_actors, PlayGame, RunState};
 
 pub struct Game {
     scheduler: Scheduler,
@@ -58,7 +58,7 @@ impl Game {
                 controller: Controller::default(),
                 map: None,
                 mapgen_history: Vec::default(),
-                run_state: RunState::MainMenu(MainMenuSelection::NewGame),
+                run_state: Some(RunState::MainMenu(MainMenuSelection::NewGame)),
                 turn_number: 0,
                 turn_history: TurnsHistory::default(),
                 viewport: Viewport::new(
@@ -83,21 +83,58 @@ impl Game {
         self.scheduler.execute(&mut self.world, &mut self.resources);
     }
 
-    pub fn handle_state(
-        &mut self,
-        state: RunState,
-        ctx: &mut BTerm,
-        draw_batch: &mut DrawBatch,
-    ) -> RunState {
+    fn process_actors(&mut self) -> RunState {
+        process_actors(&mut self.world, &mut self.resources)
+    }
+
+    fn set_player_action(&mut self, player_action: input::PlayerAction) -> RunState {
+        // Find the player component and set the next action on this player
+        for (_ent, (_player, actor)) in self.world.query_mut::<(&Player, &mut Actor)>() {
+            actor.set_kind(ActorKind::Player(Some(player_action)));
+        }
+        RunState::Game(PlayGame::Ticking)
+    }
+
+    fn input(&mut self, ctx: &mut BTerm, state: RunState) -> RunState {
         match state {
-            RunState::MainMenu(selection) => self
-                .resources
-                .controller
-                .main_menu(ctx, draw_batch, selection, false),
-            RunState::PauseMenu(selection) => self
-                .resources
-                .controller
-                .pause_menu(ctx, draw_batch, selection),
+            RunState::MainMenu(selection) => input::read_mainmenu(selection, ctx),
+            RunState::PauseMenu(selection) => input::read_pausemenu(selection, ctx),
+            RunState::GameOver(selection) => input::read_gameover(selection, ctx),
+            RunState::Game(_) => {
+                match input::read_game(&mut self.world, &mut self.resources, ctx) {
+                    input::PlayerInput::Ui(action) => match action {
+                        input::UiAction::MainMenu => RunState::MainMenu(MainMenuSelection::NewGame),
+                        input::UiAction::PauseMenu => {
+                            RunState::PauseMenu(PauseMenuSelection::Continue)
+                        }
+                        input::UiAction::GameOverMenu => {
+                            RunState::GameOver(GameOverSelection::MainMenu)
+                        }
+                    },
+                    input::PlayerInput::Game(action) => match state {
+                        // Skip player input when the engine asks us to
+                        RunState::Game(PlayGame::NeedPlayerInput) => self.set_player_action(action),
+                        _ => RunState::Game(PlayGame::Ticking),
+                    },
+                    input::PlayerInput::Undefined => state,
+                }
+            }
+            _ => {
+                tracing::error!("No input handling available for state {:?}", state);
+                state
+            }
+        }
+    }
+
+    fn update(&mut self, ctx: &BTerm, state: RunState) -> RunState {
+        match state {
+            // game loop
+            RunState::Game(_) => {
+                self.run_systems();
+
+                // Set the return value
+                self.process_actors()
+            }
             RunState::Initialization => {
                 info!("Initializing level");
                 info!("Map generation");
@@ -118,60 +155,67 @@ impl Game {
                 // View Map generation (if enabled)
                 RunState::MapGeneration(MapGenerationState::default())
             }
-            RunState::MapGeneration(map_state) => self.resources.controller.map_generation(
-                ctx,
-                draw_batch,
-                map_state,
-                &self.resources.mapgen_history,
-            ),
-            RunState::GameAwaitingInput => {
-                match input::read(&mut self.world, &mut self.resources, ctx) {
-                    input::PlayerInput::Ui(action) => match action {
-                        input::UiAction::PauseMenu => {
-                            RunState::PauseMenu(PauseMenuSelection::Continue)
-                        }
-                    },
-                    input::PlayerInput::Game(action) => self.set_player_action(action),
-                    input::PlayerInput::Undefined => RunState::GameAwaitingInput,
+            RunState::MapGeneration(mut map_state) => {
+                if game::env().show_map_generation {
+                    if map_state.is_complete(&self.resources.mapgen_history) {
+                        // TODO: make it so that arrow keys pan around and enter allows us to continue
+                        // If we're done, move on to the next state
+                        RunState::Game(PlayGame::Ticking)
+                    } else {
+                        // If we have more frames to render for map generation, pass the
+                        // state onto the next tick.
+                        map_state.update(ctx);
+                        RunState::MapGeneration(map_state)
+                    }
+                } else {
+                    RunState::Game(PlayGame::Ticking)
                 }
             }
-            RunState::GameTurn => process_actors(&mut self.world, &mut self.resources),
-            RunState::GameSystems => {
-                self.run_systems();
-                RunState::GameDraw
-            }
-            RunState::GameDraw => {
+
+            // Skip update for all other states
+            _ => state,
+        }
+    }
+
+    /// Mutable self because rendering uses the rng
+    fn draw(&mut self, ctx: &mut BTerm, state: &RunState) {
+        let draw_batch = &mut DrawBatch::new();
+        match state {
+            // menus
+            RunState::MainMenu(selection) => draw_main_menu(selection, draw_batch),
+            RunState::PauseMenu(selection) => draw_pause_menu(selection, draw_batch),
+            RunState::GameOver(selection) => draw_game_over(selection, draw_batch),
+
+            // game loop
+            RunState::Game(_) => {
                 self.screen
-                    .draw_game(&self.world, &mut self.resources, ctx, draw_batch);
-                RunState::GameTurn
+                    .draw_game(&self.world, &mut self.resources, ctx, draw_batch)
             }
-            RunState::GameOver(selection) => self
-                .resources
-                .controller
-                .game_over(ctx, draw_batch, selection),
-        }
-    }
 
-    fn set_player_action(&mut self, player_action: input::PlayerAction) -> RunState {
-        // Find the player component and set the next action on this player
-        for (_ent, (_player, actor)) in self.world.query_mut::<(&Player, &mut Actor)>() {
-            actor.set_kind(ActorKind::Player(Some(player_action)));
-        }
-        RunState::GameTurn
-    }
-}
+            RunState::MapGeneration(map_state) => {
+                map_state.draw(ctx, draw_batch, &self.resources.mapgen_history);
+            }
 
-impl GameState for Game {
-    fn tick(&mut self, ctx: &mut BTerm) {
-        // TODO: remove unnecessary clone
-        let state = self.resources.run_state.clone();
-        tracing::trace!("State: {:?}", state);
-
-        let mut draw_batch = DrawBatch::new();
-
-        let new_state = self.handle_state(state, ctx, &mut draw_batch);
-
-        self.resources.run_state = new_state;
+            _ => {
+                tracing::error!("No draw available for state {:?}", state);
+            }
+        };
         rltk::render_draw_buffer(ctx).expect("Render Draw Buffer");
     }
 }
+
+impl rltk::GameState for Game {
+    fn tick(&mut self, ctx: &mut BTerm) {
+        let state = self.resources.take_state();
+        tracing::trace!("State: {:?}", state);
+
+        let input_result = self.input(ctx, state);
+        let update_result = self.update(ctx, input_result);
+        self.draw(ctx, &update_result);
+
+        self.resources.replace_state(update_result);
+    }
+}
+
+pub struct GameHandler {}
+impl GameHandler {}

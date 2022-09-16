@@ -18,13 +18,17 @@ impl fmt::Display for GameOverSelection {
 }
 
 impl GameOverSelection {
-    fn print(&self, y: i32, selection: GameOverSelection, draw_batch: &mut DrawBatch) {
-        let fg = if &selection == self {
+    fn print(&self, y: i32, selection: &GameOverSelection, draw_batch: &mut DrawBatch) {
+        let fg = if selection == self {
             RGB::named(WHITE)
         } else {
             RGB::named(GRAY)
         };
         draw_batch.print_color_centered(y, self.to_string(), ColorPair::new(fg, BLACK));
+    }
+
+    pub fn entries(&self) -> Vec<GameOverSelection> {
+        vec![GameOverSelection::MainMenu, GameOverSelection::Quit]
     }
 }
 
@@ -34,11 +38,7 @@ pub enum GameOverResult {
     Selected { selected: GameOverSelection },
 }
 
-pub fn game_over(
-    ctx: &mut BTerm,
-    draw_batch: &mut DrawBatch,
-    selection: GameOverSelection,
-) -> GameOverResult {
+pub fn draw_game_over(selection: &GameOverSelection, draw_batch: &mut DrawBatch) {
     draw_batch.cls();
     draw_batch.print_color_centered(
         11,
@@ -46,39 +46,9 @@ pub fn game_over(
         ColorPair::new(RGB::named(DARK_RED), RGB::named(BLACK)),
     );
 
-    let entries = vec![GameOverSelection::MainMenu, GameOverSelection::Quit];
-    for (i, entry) in entries.iter().enumerate() {
+    for (i, entry) in selection.entries().iter().enumerate() {
         entry.print(14 + i as i32, selection, draw_batch);
     }
 
     draw_batch.submit(0).expect("DrawBatch submit");
-
-    match ctx.key {
-        None => GameOverResult::NoSelection {
-            selected: selection,
-        },
-        Some(key) => match key {
-            VirtualKeyCode::Escape => GameOverResult::NoSelection {
-                selected: GameOverSelection::Quit,
-            },
-            VirtualKeyCode::Up => {
-                let idx = entries.iter().position(|&x| x == selection).unwrap();
-                GameOverResult::NoSelection {
-                    selected: entries[(idx + entries.len() - 1) % entries.len()],
-                }
-            }
-            VirtualKeyCode::Down => {
-                let idx = entries.iter().position(|&x| x == selection).unwrap();
-                GameOverResult::NoSelection {
-                    selected: entries[(idx + 1) % entries.len()],
-                }
-            }
-            VirtualKeyCode::Return => GameOverResult::Selected {
-                selected: selection,
-            },
-            _ => GameOverResult::NoSelection {
-                selected: selection,
-            },
-        },
-    }
 }

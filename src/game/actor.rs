@@ -8,6 +8,8 @@ use crate::{
     util::{WorldPoint, WorldVector},
 };
 
+use super::PlayGame;
+
 /// The Actor System implements energy-based turn actions using Actor components
 pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState {
     tracing::trace!("processing actors");
@@ -91,9 +93,9 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
     resources.turn_history.add_turn(actions);
 
     if needs_player_input {
-        RunState::GameAwaitingInput
+        RunState::Game(PlayGame::NeedPlayerInput)
     } else {
-        RunState::GameSystems
+        RunState::Game(PlayGame::Ticking)
     }
 }
 

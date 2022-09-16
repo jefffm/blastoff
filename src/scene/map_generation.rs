@@ -9,7 +9,7 @@ pub struct MapGenerationState {
 }
 
 impl MapGenerationState {
-    pub fn tick(&mut self, ctx: &mut BTerm) {
+    pub fn update(&mut self, ctx: &BTerm) {
         self.timer += ctx.frame_time_ms;
 
         if self.timer > 50.0 {
@@ -22,7 +22,7 @@ impl MapGenerationState {
         self.index >= history.len()
     }
 
-    pub fn render(&self, ctx: &BTerm, draw_batch: &mut DrawBatch, history: &[Map]) {
+    pub fn draw(&self, ctx: &BTerm, draw_batch: &mut DrawBatch, history: &[Map]) {
         camera::render_debug_map(ctx, draw_batch, &history[self.index], true, self.index);
     }
 }

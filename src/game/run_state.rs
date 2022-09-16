@@ -6,9 +6,13 @@ pub enum RunState {
     PauseMenu(PauseMenuSelection),
     Initialization,
     MapGeneration(MapGenerationState),
-    GameAwaitingInput,
-    GameTurn,
-    GameSystems,
-    GameDraw,
+    Game(PlayGame),
     GameOver(GameOverSelection),
+}
+
+// If the RunState is a GameState, we need to do INPUT, UPDATE, and DRAW every frame
+#[derive(Debug, Clone, PartialEq)]
+pub enum PlayGame {
+    Ticking,
+    NeedPlayerInput,
 }
