@@ -1,6 +1,5 @@
 use bracket_lib::prelude as rltk;
 use bracket_lib::prelude::*;
-bracket_lib::prelude::add_wasm_support!();
 use tracing::info;
 
 use tracing::Level;
