@@ -21,12 +21,24 @@ impl Behavior {
     }
 }
 
+/// Behaviors are used to determine what an actor will do given the available
+/// perceptual information.
+///
+/// Eventually these should also take into account factional info to determine hositily
 #[derive(Clone, Debug, PartialEq)]
 pub enum BehaviorKind {
     Wander,
     Pace(ActionCycle),
-    Follow(Entity),
-    Attack(Entity),
+    AttackPlayer,
+    AttackNearest,
+    AttackOrPursue(Entity),
+    AttackOrStandGround(Entity),
+    AttackOrFlee(Entity),
+    FollowOmniscient(Entity),
+    FollowOrWander(Entity),
+    FollowPlayer,
+    FollowPlayerOmniscient,
+    FollowNearest,
 }
 
 #[derive(Clone, Debug, PartialEq)]

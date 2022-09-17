@@ -115,7 +115,8 @@ impl<'a> ActionProcessor<'a> {
     fn process_actions(&mut self, actions: &[Action]) {
         for action in actions {
             match action {
-                Action::Moves(entity, direction) => self.move_entity(entity, direction),
+                Action::Moves(entity, direction) => self.move_entity(entity, direction.to_vector()),
+                Action::MovesBy(entity, vector) => self.move_entity(entity, vector),
                 Action::Teleports(entity, point) => self.teleport_entity(entity, point),
                 Action::Activates(_) => todo!(),
                 Action::Noop => {}
@@ -123,7 +124,7 @@ impl<'a> ActionProcessor<'a> {
         }
     }
 
-    fn move_entity(&mut self, entity: &Entity, direction: &Cardinal) {
+    fn move_entity(&mut self, entity: &Entity, vector: &WorldVector) {
         let (position, viewshed) = self
             .world
             .query_one_mut::<(&mut Position, &mut Viewshed)>(*entity)
@@ -134,8 +135,8 @@ impl<'a> ActionProcessor<'a> {
         // TODO: clean up "off by one" point clamping for player movement
         let map = self.resources.map.as_ref().expect("map");
         let map_rect = map.get_rect();
-        let dest_point = (source_point + direction.to_vector())
-            .clamp(map_rect.min(), map_rect.max() - WorldVector::new(1, 1));
+        let dest_point =
+            (source_point + *vector).clamp(map_rect.min(), map_rect.max() - WorldVector::new(1, 1));
 
         // TODO: move this logic somewhere (Map method?)
         if !map.is_blocked(&dest_point) && map[&dest_point].handler().is_passable() {

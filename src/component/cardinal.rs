@@ -1,5 +1,14 @@
 use crate::util::WorldVector;
 
+static SW: WorldVector = WorldVector::new(-1, 1);
+static W: WorldVector = WorldVector::new(-1, 0);
+static NW: WorldVector = WorldVector::new(-1, -1);
+static N: WorldVector = WorldVector::new(0, -1);
+static NE: WorldVector = WorldVector::new(1, -1);
+static E: WorldVector = WorldVector::new(1, 0);
+static SE: WorldVector = WorldVector::new(1, 1);
+static S: WorldVector = WorldVector::new(0, 1);
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Cardinal {
     N,
@@ -12,28 +21,29 @@ pub enum Cardinal {
     SW,
 }
 impl Cardinal {
-    pub fn to_vector(&self) -> WorldVector {
+    pub fn to_vector(&self) -> &'static WorldVector {
         match self {
-            Cardinal::SW => WorldVector::new(-1, 1),
-            Cardinal::W => WorldVector::new(-1, 0),
-            Cardinal::NW => WorldVector::new(-1, -1),
-            Cardinal::N => WorldVector::new(0, -1),
-            Cardinal::NE => WorldVector::new(1, -1),
-            Cardinal::E => WorldVector::new(1, 0),
-            Cardinal::SE => WorldVector::new(1, 1),
-            Cardinal::S => WorldVector::new(0, 1),
+            Cardinal::SW => &SW,
+            Cardinal::W => &W,
+            Cardinal::NW => &NW,
+            Cardinal::N => &N,
+            Cardinal::NE => &NE,
+            Cardinal::E => &E,
+            Cardinal::SE => &SE,
+            Cardinal::S => &S,
         }
     }
-    pub fn inv(&self) -> Cardinal {
+
+    pub fn inv(&self) -> Self {
         match self {
-            Cardinal::N => Cardinal::S,
-            Cardinal::S => Cardinal::N,
-            Cardinal::E => Cardinal::W,
-            Cardinal::W => Cardinal::E,
-            Cardinal::NE => Cardinal::SW,
-            Cardinal::NW => Cardinal::SE,
-            Cardinal::SW => Cardinal::NE,
-            Cardinal::SE => Cardinal::NW,
+            Self::N => Self::S,
+            Self::S => Self::N,
+            Self::E => Self::W,
+            Self::W => Self::E,
+            Self::NE => Self::SW,
+            Self::NW => Self::SE,
+            Self::SW => Self::NE,
+            Self::SE => Self::NW,
         }
     }
 }

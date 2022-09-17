@@ -67,26 +67,39 @@ impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
     }
 }
 
-pub trait PointExt<T, U>
-where
-    T: TryInto<usize>,
-    <T as TryInto<usize>>::Error: Debug,
-{
+pub trait PointExt<T, U> {
     /// Helper to get the Vec index for any given WorldPoint (assuming the
     /// vector is height * width for this instance of Map).
     fn to_index(&self, width: T) -> usize;
+    fn from_index(idx: usize, width: T) -> Point2D<T, U>;
+    fn get_vector(self, other: Self) -> Vector2D<T, U>;
 }
 
 impl<T, U> PointExt<T, U> for Point2D<T, U>
 where
-    T: TryInto<usize> + Copy,
+    T: Copy,
+    T: TryFrom<usize>,
+    <T as TryFrom<usize>>::Error: Debug,
+    T: TryInto<usize>,
     <T as TryInto<usize>>::Error: Debug,
+    T: std::ops::Div<T> + std::ops::Div<Output = T>,
+    T: std::ops::Sub<T> + std::ops::Sub<Output = T>,
+    T: std::ops::Rem<T> + std::ops::Rem<Output = T>,
 {
     fn to_index(&self, width: T) -> usize {
         let x: usize = self.x.try_into().expect("unwrap x");
         let y: usize = self.y.try_into().expect("unwrap y");
         let w: usize = width.try_into().expect("unwrap width");
         (y * w) + x
+    }
+
+    fn from_index(idx: usize, width: T) -> Point2D<T, U> {
+        let idx: T = idx.try_into().unwrap();
+        Self::new(idx % width, idx / width)
+    }
+
+    fn get_vector(self, other: Self) -> Vector2D<T, U> {
+        (self - other.to_vector()).to_vector()
     }
 }
 
@@ -188,5 +201,12 @@ mod tests {
             })
             .map(|idx| map[idx] = 1)
             .collect::<Vec<_>>();
+    }
+
+    fn points_to_vector() {
+        let start = WorldPoint::new(0, 0);
+        let end = WorldPoint::new(1, 1);
+
+        assert_eq!(start.get_vector(end), WorldVector::new(1, 1));
     }
 }

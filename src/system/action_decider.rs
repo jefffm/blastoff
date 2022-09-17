@@ -4,12 +4,8 @@ use crate::{
     component::{Actor, ActorKind, Behavior, BehaviorKind, Cardinal, Position, Viewshed},
     game::Action,
     resource::Resources,
+    util::{PointExt, WorldPoint},
 };
-
-pub struct BehaviorAction {
-    behavior: BehaviorKind,
-    action: Action,
-}
 
 pub struct Intention {
     entity: Entity,
@@ -17,18 +13,44 @@ pub struct Intention {
 }
 
 impl Intention {
-    pub fn next(&self, world: &mut World, resources: &mut Resources) -> BehaviorAction {
+    pub fn next(
+        &self,
+        world: &World,
+        resources: &mut Resources,
+        point: &WorldPoint,
+        viewshed: &Viewshed,
+    ) -> (BehaviorKind, Action) {
         match self.behavior {
-            BehaviorKind::Wander => BehaviorAction {
-                behavior: BehaviorKind::Wander,
-                action: self.wander(resources),
-            },
-            BehaviorKind::Follow(target) => BehaviorAction {
-                behavior: BehaviorKind::Follow(target),
-                action: self.follow(world, target),
-            },
-            _ => todo!(),
+            BehaviorKind::Wander => (BehaviorKind::Wander, self.wander(resources)),
+            BehaviorKind::FollowOrWander(target) => {
+                let target_point = self.target_point(world, target);
+                if viewshed.contains(&target_point) {
+                    if let Some(path_next) = self.path_next(resources, point, &target_point) {
+                        return (
+                            BehaviorKind::FollowOrWander(target),
+                            Action::MovesBy(self.entity, point.get_vector(path_next)),
+                        );
+                    }
+                }
+                // If we've lost sight of the target, wander around until we find the target again
+                (BehaviorKind::FollowOrWander(target), self.wander(resources))
+            }
+            // BehaviorKind::AttackOrPursue(Entity) => {},
+            // BehaviorKind::AttackOrStandGround(Entity) => {},
+            // BehaviorKind::AttackOrFlee(Entity) => {},
+            // BehaviorKind::FollowOmniscient(Entity) => {},
+            ref unimplemented => todo!("Action Decider not implemented for {:?}", &unimplemented),
         }
+    }
+
+    pub fn path_next(
+        &self,
+        resources: &mut Resources,
+        start: &WorldPoint,
+        end: &WorldPoint,
+    ) -> Option<WorldPoint> {
+        let map = resources.map.as_mut().unwrap();
+        map.a_star_search(start, end).map(|path| path[1])
     }
 
     /// Pick a random direction and walk there
@@ -43,19 +65,10 @@ impl Intention {
         possible_actions[idx as usize]
     }
 
-    pub fn follow(&self, world: &World, target: Entity) -> Action {
-        // TODO: pass entity viewshed from above
-        let mut q1 = world.query_one::<&Viewshed>(self.entity).unwrap();
-        let viewshed = q1.get().unwrap();
-
+    pub fn target_point(&self, world: &World, target: Entity) -> WorldPoint {
         let mut q2 = world.query_one::<&Position>(target).unwrap();
         let target = q2.get().unwrap();
-
-        if viewshed.contains(&target.point()) {
-            // TODO use a-star path to move to next direction
-            todo!()
-        }
-        Action::Noop
+        target.point()
     }
 }
 
@@ -80,12 +93,20 @@ pub fn action_decider_system(world: &mut World, resources: &mut Resources) {
 
     // Process each intention to resolve next action and behavior
     for intention in intentions {
-        let next = intention.next(world, resources);
-        let (actor, behavior) = world
-            .query_one_mut::<(&mut Actor, &mut Behavior)>(intention.entity)
+        let (behavior_kind, action) = {
+            let mut q1 = world
+                .query_one::<(&Position, &Viewshed)>(intention.entity)
+                .unwrap();
+            let (position, viewshed) = q1.get().unwrap();
+            let point = position.point();
+            intention.next(world, resources, &point, viewshed)
+        };
+
+        let (behavior, actor) = world
+            .query_one_mut::<(&mut Behavior, &mut Actor)>(intention.entity)
             .expect("actor");
 
-        actor.set_kind(ActorKind::Computer(Some(next.action)));
-        behavior.set_kind(next.behavior)
+        behavior.set_kind(behavior_kind);
+        actor.set_kind(ActorKind::Computer(Some(action)));
     }
 }

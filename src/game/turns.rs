@@ -1,10 +1,14 @@
 use hecs::Entity;
 
-use crate::{component::Cardinal, util::WorldPoint};
+use crate::{
+    component::Cardinal,
+    util::{WorldPoint, WorldVector},
+};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Action {
     Moves(Entity, Cardinal),
+    MovesBy(Entity, WorldVector),
     Teleports(Entity, WorldPoint),
     Activates(Entity),
     Noop,
@@ -14,6 +18,7 @@ impl Action {
     pub fn cost(&self) -> i32 {
         match self {
             Action::Moves(_, _) => 80,
+            Action::MovesBy(_, _) => 80,
             Action::Teleports(_, _) => 160,
             Action::Activates(_) => 100,
             Action::Noop => 0,

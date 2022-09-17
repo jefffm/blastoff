@@ -10,17 +10,21 @@ pub use loader::*;
 mod spawner;
 pub use spawner::*;
 
-use bracket_lib::prelude::{Algorithm2D, BaseMap, Point};
+use bracket_lib::prelude::{a_star_search, Algorithm2D, BaseMap, NavigationPath, Point};
 use euclid::{Rect, Size2D};
 use fixedbitset::FixedBitSet;
 use hecs::Entity;
+use pathfinding::prelude::astar;
 use serde::{Deserialize, Serialize};
 use std::{
     convert::TryInto,
     ops::{Index, IndexMut},
 };
 
-use crate::util::{PointExt, WorldPoint, WorldSize, WorldSpace};
+use crate::{
+    component::Cardinal,
+    util::{PointExt, WorldPoint, WorldSize, WorldSpace},
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Map {
@@ -59,6 +63,51 @@ impl Map {
             content,
             level,
         }
+    }
+
+    pub fn a_star_search(
+        &mut self,
+        start: &WorldPoint,
+        end: &WorldPoint,
+    ) -> Option<Vec<WorldPoint>> {
+        let path = a_star_search(
+            start.to_index(self.get_width()),
+            end.to_index(self.get_width()),
+            self,
+        );
+
+        if path.success && path.steps.len() > 1 {
+            Some(
+                path.steps
+                    .iter()
+                    .map(|idx| WorldPoint::from_index(*idx, self.get_width()))
+                    .collect(),
+            )
+        } else {
+            None
+        }
+    }
+
+    pub fn astar_path(&self, start: &WorldPoint, end: &WorldPoint) -> Option<Vec<WorldPoint>> {
+        astar(start, |p| self.neighbors(p), |p| 1, |p| p == end).map(|(result, _)| result)
+    }
+
+    // Return a Vec of all points surrounding another point
+    pub fn neighbors(&self, point: &WorldPoint) -> Vec<(WorldPoint, i32)> {
+        vec![
+            Cardinal::SW,
+            Cardinal::W,
+            Cardinal::NW,
+            Cardinal::N,
+            Cardinal::NE,
+            Cardinal::E,
+            Cardinal::SE,
+            Cardinal::S,
+        ]
+        .iter()
+        .map(|vector| *point + *vector.to_vector())
+        .map(|p| (p, 1))
+        .collect()
     }
 
     pub fn contains(&self, point: WorldPoint) -> bool {
@@ -245,6 +294,27 @@ mod tests {
         assert!(
             map.is_blocked(&WorldPoint::new(49, 49)),
             "expect (49, 49) to be the actual maximum usable point"
+        );
+    }
+
+    #[test]
+    fn path() {
+        let mut map = Map::new(String::from("test"), 5, 5, vec![TileKind::Floor; 25], 1);
+
+        let start = WorldPoint::new(0, 0);
+        let end = WorldPoint::new(4, 0);
+
+        let path = map.astar_path(&start, &end).expect("path");
+
+        assert_eq!(
+            path,
+            [
+                WorldPoint::new(0, 0),
+                WorldPoint::new(1, 1),
+                WorldPoint::new(2, 0),
+                WorldPoint::new(3, 1),
+                WorldPoint::new(4, 0)
+            ]
         );
     }
 }
