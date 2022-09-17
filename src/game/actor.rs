@@ -30,7 +30,7 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
 
     // Iterate over actors in priority-descending order
     'outer: for (entity, actor) in actors {
-        tracing::debug!("Processing actor for turn {:?}", resources.turn_number);
+        tracing::trace!("Processing actor for turn {:?}", resources.turn_number);
 
         // Filter to only actors in the current turn
         // Increment the actor's turn counter (even if no action is taken/possible)
@@ -55,6 +55,7 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
                     // If the player-controlled Actor does not have an action,
                     // skip over this entity without incrementing its turn counter
                     None => {
+                        tracing::trace!("Need player input for turn {:?}", resources.turn_number);
                         needs_player_input = true;
                         actor.increase_priority();
                         break 'outer;
@@ -62,12 +63,14 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
                 },
                 ActorKind::Computer(inbox) => match inbox {
                     Some(next_action) => {
+                        tracing::trace!("AI has action {:?}", next_action);
                         let next_action = *next_action;
                         actor.set_kind(ActorKind::Computer(None));
 
                         Some(next_action)
                     }
                     None => {
+                        tracing::trace!("Need AI input for turn {:?}", resources.turn_number);
                         // Wait for the AI system to set something for this entity
                         actor.increase_priority();
                         break 'outer;

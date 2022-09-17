@@ -13,7 +13,8 @@ pub use viewshed::*;
 mod actor;
 pub use actor::*;
 
-
+mod behavior;
+pub use behavior::*;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Camera {}

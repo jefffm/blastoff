@@ -19,6 +19,15 @@ impl Action {
             Action::Noop => 0,
         }
     }
+
+    pub fn get_actor(&self) -> Option<&Entity> {
+        match self {
+            Action::Moves(ent, _) => Some(ent),
+            Action::Teleports(ent, _) => Some(ent),
+            Action::Activates(ent) => Some(ent),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

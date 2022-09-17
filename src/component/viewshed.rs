@@ -37,4 +37,8 @@ impl Viewshed {
         self.range = range;
         self
     }
+
+    pub fn contains(&self, point: &WorldPoint) -> bool {
+        self.visible_tiles.iter().any(|tile| tile == point)
+    }
 }

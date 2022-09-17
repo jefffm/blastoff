@@ -236,6 +236,7 @@ impl Spawner for Bsp {
             ),
             monster_viewshed,
             Actor::new(0, 100, 100, 10, 0, ActorKind::Computer(None)),
+            Behavior::new(BehaviorKind::Wander),
         ));
 
         tracing::debug!("spawn complete");
