@@ -5,7 +5,7 @@ authors = ["Jeff Lynn <jmlynn@protonmail.com>"]
 edition = "2021"
 
 [dependencies]
-bracket-lib = { git = "https://github.com/amethyst/bracket-lib", features = [
+bracket-lib = { git = "https://github.com/patchfx/bracket-lib", branch = "fix-tile-leaks-on-cls", features = [
     "serde",
 ] }
 tracing = "0.1"

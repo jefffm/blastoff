@@ -45,9 +45,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.63"
+version = "1.0.65"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a26fa4d7e3f2eebadf743988fc8aec9fa9a9e82611acafd77c1462ed6262440a"
+checksum = "98161a4e3e2184da77bb14f02184cdd111e83bbbcc9979dfee3c44b9a85f5602"
 
 [[package]]
 name = "atty"
@@ -81,7 +81,7 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 [[package]]
 name = "bracket-algorithm-traits"
 version = "0.8.2"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "bracket-geometry",
  "smallvec",
@@ -90,7 +90,7 @@ dependencies = [
 [[package]]
 name = "bracket-color"
 version = "0.8.2"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "lazy_static",
  "parking_lot 0.12.1",
@@ -100,7 +100,7 @@ dependencies = [
 [[package]]
 name = "bracket-embedding"
 version = "0.8.0"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "lazy_static",
  "parking_lot 0.12.1",
@@ -109,7 +109,7 @@ dependencies = [
 [[package]]
 name = "bracket-geometry"
 version = "0.8.3"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "serde",
  "ultraviolet",
@@ -118,7 +118,7 @@ dependencies = [
 [[package]]
 name = "bracket-lib"
 version = "0.8.2"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "bracket-algorithm-traits",
  "bracket-color",
@@ -132,7 +132,7 @@ dependencies = [
 [[package]]
 name = "bracket-noise"
 version = "0.8.2"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "bracket-random",
 ]
@@ -140,7 +140,7 @@ dependencies = [
 [[package]]
 name = "bracket-pathfinding"
 version = "0.8.4"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "bracket-algorithm-traits",
  "bracket-geometry",
@@ -151,7 +151,7 @@ dependencies = [
 [[package]]
 name = "bracket-random"
 version = "0.8.3"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "getrandom",
  "js-sys",
@@ -166,7 +166,7 @@ dependencies = [
 [[package]]
 name = "bracket-rex"
 version = "0.8.0"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "bracket-color",
  "bracket-embedding",
@@ -177,7 +177,7 @@ dependencies = [
 [[package]]
 name = "bracket-terminal"
 version = "0.8.5"
-source = "git+https://github.com/amethyst/bracket-lib#34ba81211c8583d29dca8decef57a2ecd8269a8b"
+source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "anyhow",
  "bracket-color",
