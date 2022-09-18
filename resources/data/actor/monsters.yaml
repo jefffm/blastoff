@@ -1,0 +1,18 @@
+---
+- name: Kobold
+  glyph: "k"
+  fg:
+    r: 1.0
+    g: 1.0
+    b: 1.0
+    a: 1.0
+  bg:
+    r: 1.0
+    g: 1.0
+    b: 1.0
+    a: 1.0
+  view_range: 10
+  energy_capacity: 100
+  movement_cost: 20
+  actor: !Computer { None }
+  behavior: !FollowNearest

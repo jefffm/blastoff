@@ -16,6 +16,7 @@ use crate::game::Game;
 
 pub mod camera;
 pub mod component;
+pub mod data;
 pub mod game;
 pub mod input;
 pub mod map;
