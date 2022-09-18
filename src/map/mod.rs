@@ -10,8 +10,8 @@ pub use loader::*;
 mod spawner;
 pub use spawner::*;
 
-use bracket_lib::prelude::{a_star_search, Algorithm2D, BaseMap, NavigationPath, Point};
-use euclid::{Rect, Size2D};
+use bracket_lib::prelude::{Algorithm2D, BaseMap, Point};
+use euclid::{Point2D, Rect, Size2D};
 use fixedbitset::FixedBitSet;
 use hecs::Entity;
 use pathfinding::prelude::astar;
@@ -65,31 +65,20 @@ impl Map {
         }
     }
 
-    pub fn a_star_search(
-        &mut self,
-        start: &WorldPoint,
-        end: &WorldPoint,
-    ) -> Option<Vec<WorldPoint>> {
-        let path = a_star_search(
-            start.to_index(self.get_width()),
-            end.to_index(self.get_width()),
-            self,
-        );
-
-        if path.success && path.steps.len() > 1 {
-            Some(
-                path.steps
-                    .iter()
-                    .map(|idx| WorldPoint::from_index(*idx, self.get_width()))
-                    .collect(),
-            )
-        } else {
-            None
-        }
-    }
-
     pub fn astar_path(&self, start: &WorldPoint, end: &WorldPoint) -> Option<Vec<WorldPoint>> {
-        astar(start, |p| self.neighbors(p), |p| 1, |p| p == end).map(|(result, _)| result)
+        astar(
+            start,
+            |p| self.neighbors(p),
+            |p| {
+                // TODO: move this into geometry PointExt
+                let p1 = Point2D::<f32, WorldSpace>::new(start.x as f32, start.y as f32);
+                let p2 = Point2D::<f32, WorldSpace>::new(end.x as f32, end.y as f32);
+                let distance = p1.distance_to(p2);
+                distance.round() as i32
+            },
+            |p| p == end,
+        )
+        .map(|(result, _cost)| result)
     }
 
     // Return a Vec of all points surrounding another point
@@ -106,6 +95,7 @@ impl Map {
         ]
         .iter()
         .map(|vector| *point + *vector.to_vector())
+        .filter(|p| !self.is_blocked(p))
         .map(|p| (p, 1))
         .collect()
     }
@@ -146,10 +136,27 @@ impl Map {
     }
 
     pub fn is_blocked(&self, point: &WorldPoint) -> bool {
-        let idx = point.to_index(self.get_width());
-        self.assert_idx_for_point(idx, point);
+        // If it's not in the rect, it's blocked
+        if self.rect.contains(*point) {
+            let idx = point.to_index(self.get_width());
+            self.assert_idx_for_point(idx, point);
 
-        self.blocked.contains(point.to_index(self.get_width()))
+            // If it's blocked via map bitset, it's blocked
+            if self.blocked.contains(point.to_index(self.get_width())) {
+                return true;
+            }
+
+            // If it's blocked via the tile, it's blocked
+            let tile = self.tiles[idx].handler();
+            if !tile.is_passable() {
+                return true;
+            }
+
+            // If it's in the map rect and not otherwise blocked,
+            // it is NOT blocked
+            return false;
+        }
+        true
     }
 
     pub fn reset_visible(&mut self) {
@@ -298,23 +305,42 @@ mod tests {
     }
 
     #[test]
-    fn path() {
-        let mut map = Map::new(String::from("test"), 5, 5, vec![TileKind::Floor; 25], 1);
+    fn path_open() {
+        let map = Map::new(String::from("test"), 5, 5, vec![TileKind::Floor; 25], 1);
 
         let start = WorldPoint::new(0, 0);
         let end = WorldPoint::new(4, 0);
 
+        let path = map
+            .astar_path(&start, &end)
+            .expect("expecting a valid path");
+
+        assert_eq!(path.len(), 5);
+    }
+
+    #[test]
+    fn path_closed() {
+        let mut tiles = vec![TileKind::Floor; 25];
+
+        // Create a wall dividing the square down the middle
+        for y in 0..3 {
+            let point = WorldPoint::new(2, y);
+            tiles[point.to_index(5)] = TileKind::Wall;
+        }
+
+        let map = Map::new(String::from("test"), 5, 5, tiles, 1);
+
+        let start = WorldPoint::new(0, 0);
+        let end = WorldPoint::new(4, 0);
+
+        assert_eq!(map[&WorldPoint::new(2, 0)], TileKind::Wall);
+        assert!(!map[&WorldPoint::new(2, 0)].handler().is_passable());
+        assert!(map.is_blocked(&WorldPoint::new(2, 0)));
+        assert!(map.is_blocked(&WorldPoint::new(2, 1)));
+        assert!(map.is_blocked(&WorldPoint::new(2, 2)));
+
         let path = map.astar_path(&start, &end).expect("path");
 
-        assert_eq!(
-            path,
-            [
-                WorldPoint::new(0, 0),
-                WorldPoint::new(1, 1),
-                WorldPoint::new(2, 0),
-                WorldPoint::new(3, 1),
-                WorldPoint::new(4, 0)
-            ]
-        );
+        assert_eq!(path.len(), 7);
     }
 }

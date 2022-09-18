@@ -39,6 +39,42 @@ impl Viewshed {
     }
 
     pub fn contains(&self, point: &WorldPoint) -> bool {
-        self.visible_tiles.iter().any(|tile| tile == point)
+        self.points().any(|tile| tile == point)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn viewshed() {
+        let mut viewshed = Viewshed::default();
+        viewshed.init();
+
+        assert!(!viewshed.contains(&WorldPoint::new(6, 14)));
+
+        let points: Vec<_> = [
+            (6, 14),
+            (8, 13),
+            (11, 22),
+            (11, 11),
+            (13, 9),
+            (10, 20),
+            (10, 13),
+            (14, 11),
+            (10, 14),
+            (13, 7),
+            (9, 17),
+            (9, 11),
+            (7, 4),
+        ]
+        .into_iter()
+        .map(move |(x, y)| WorldPoint::new(x, y))
+        .collect();
+
+        viewshed.set(points);
+
+        assert!(viewshed.contains(&WorldPoint::new(6, 14)));
     }
 }

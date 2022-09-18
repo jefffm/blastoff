@@ -138,8 +138,7 @@ impl<'a> ActionProcessor<'a> {
         let dest_point =
             (source_point + *vector).clamp(map_rect.min(), map_rect.max() - WorldVector::new(1, 1));
 
-        // TODO: move this logic somewhere (Map method?)
-        if !map.is_blocked(&dest_point) && map[&dest_point].handler().is_passable() {
+        if !map.is_blocked(&dest_point) {
             viewshed.set_dirty();
             position.set_point(dest_point);
         }

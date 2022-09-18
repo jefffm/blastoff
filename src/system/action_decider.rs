@@ -28,6 +28,7 @@ impl Intention {
                     if let Some(path_next) = self.path_next(resources, point, &target_point) {
                         return (
                             BehaviorKind::FollowOrWander(target),
+                            // TODO: I think this vector might be not good...?
                             Action::MovesBy(self.entity, point.get_vector(path_next)),
                         );
                     }
@@ -35,6 +36,7 @@ impl Intention {
                 // If we've lost sight of the target, wander around until we find the target again
                 (BehaviorKind::FollowOrWander(target), self.wander(resources))
             }
+            BehaviorKind::FollowNearest => (BehaviorKind::FollowNearest, self.wander(resources)),
             // BehaviorKind::AttackOrPursue(Entity) => {},
             // BehaviorKind::AttackOrStandGround(Entity) => {},
             // BehaviorKind::AttackOrFlee(Entity) => {},
@@ -50,7 +52,16 @@ impl Intention {
         end: &WorldPoint,
     ) -> Option<WorldPoint> {
         let map = resources.map.as_mut().unwrap();
-        map.a_star_search(start, end).map(|path| path[1])
+        let result = map.astar_path(start, end);
+        if let Some(path) = result {
+            if path.len() > 1 {
+                Some(path[1])
+            } else {
+                None
+            }
+        } else {
+            None
+        }
     }
 
     /// Pick a random direction and walk there

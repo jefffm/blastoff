@@ -32,6 +32,7 @@ pub type ViewportRect = Rect<i32, ViewportSpace>;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WorldSpace;
 
+pub type WorldFloatPoint = Point2D<f32, WorldSpace>;
 pub type WorldPoint = Point2D<i32, WorldSpace>;
 pub type WorldVector = Vector2D<i32, WorldSpace>;
 pub type WorldSize = Size2D<i32, WorldSpace>;
@@ -75,31 +76,21 @@ pub trait PointExt<T, U> {
     fn get_vector(self, other: Self) -> Vector2D<T, U>;
 }
 
-impl<T, U> PointExt<T, U> for Point2D<T, U>
-where
-    T: Copy,
-    T: TryFrom<usize>,
-    <T as TryFrom<usize>>::Error: Debug,
-    T: TryInto<usize>,
-    <T as TryInto<usize>>::Error: Debug,
-    T: std::ops::Div<T> + std::ops::Div<Output = T>,
-    T: std::ops::Sub<T> + std::ops::Sub<Output = T>,
-    T: std::ops::Rem<T> + std::ops::Rem<Output = T>,
-{
-    fn to_index(&self, width: T) -> usize {
+impl<U> PointExt<i32, U> for Point2D<i32, U> {
+    fn to_index(&self, width: i32) -> usize {
         let x: usize = self.x.try_into().expect("unwrap x");
         let y: usize = self.y.try_into().expect("unwrap y");
         let w: usize = width.try_into().expect("unwrap width");
         (y * w) + x
     }
 
-    fn from_index(idx: usize, width: T) -> Point2D<T, U> {
-        let idx: T = idx.try_into().unwrap();
+    fn from_index(idx: usize, width: i32) -> Point2D<i32, U> {
+        let idx: i32 = idx.try_into().unwrap();
         Self::new(idx % width, idx / width)
     }
 
-    fn get_vector(self, other: Self) -> Vector2D<T, U> {
-        (self - other.to_vector()).to_vector()
+    fn get_vector(self, other: Self) -> Vector2D<i32, U> {
+        other - self
     }
 }
 
@@ -203,6 +194,7 @@ mod tests {
             .collect::<Vec<_>>();
     }
 
+    #[test]
     fn points_to_vector() {
         let start = WorldPoint::new(0, 0);
         let end = WorldPoint::new(1, 1);

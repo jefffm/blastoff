@@ -17,6 +17,10 @@ pub fn behavior_system(world: &mut World, resources: &mut Resources) {
                 // Find the first Actor entity with a Position in our viewshed and start following it
                 for point in viewshed.points() {
                     for map_entity in map.get_content(point) {
+                        if map_entity == &entity {
+                            continue;
+                        }
+
                         let mut query =
                             world.query_one::<(&Position, &Actor)>(*map_entity).unwrap();
                         if query.get().is_some() {
