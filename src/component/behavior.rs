@@ -1,4 +1,5 @@
 use hecs::Entity;
+use serde::Deserialize;
 
 use crate::game::Action;
 
@@ -27,18 +28,30 @@ impl Behavior {
 /// Eventually these should also take into account factional info to determine hositily
 #[derive(Clone, Debug, PartialEq)]
 pub enum BehaviorKind {
+    Initial(InitialBehavior),
+    Derived(DerivedBehavior),
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize)]
+pub enum InitialBehavior {
     Wander,
-    Pace(ActionCycle),
     AttackPlayer,
     AttackNearest,
+    FollowPlayer,
+    FollowPlayerOmniscient,
+    FollowNearest,
+}
+
+/// Derived behavior applies to specific entities or other data known only at runtime.
+/// These behaviors are only used after processing an InitialBehavior.
+#[derive(Clone, Debug, PartialEq)]
+pub enum DerivedBehavior {
     AttackOrPursue(Entity),
     AttackOrStandGround(Entity),
     AttackOrFlee(Entity),
     FollowOmniscient(Entity),
     FollowOrWander(Entity),
-    FollowPlayer,
-    FollowPlayerOmniscient,
-    FollowNearest,
+    Pace(ActionCycle),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -70,6 +83,7 @@ impl Iterator for ActionCycle {
 mod tests {
     use super::*;
 
+    #[test]
     fn test_action_cycle() {
         let mut seq = ActionCycle::new(vec![Action::Noop, Action::Noop, Action::Noop]);
         assert_eq!(seq.idx(), 0);

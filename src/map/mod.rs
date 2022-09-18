@@ -71,7 +71,7 @@ impl Map {
             |p| self.neighbors(p),
             |p| {
                 // TODO: move this into geometry PointExt
-                let p1 = Point2D::<f32, WorldSpace>::new(start.x as f32, start.y as f32);
+                let p1 = Point2D::<f32, WorldSpace>::new(p.x as f32, p.y as f32);
                 let p2 = Point2D::<f32, WorldSpace>::new(end.x as f32, end.y as f32);
                 let distance = p1.distance_to(p2);
                 distance.round() as i32

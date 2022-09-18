@@ -236,7 +236,7 @@ impl Spawner for Bsp {
             ),
             monster_viewshed,
             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
-            Behavior::new(BehaviorKind::FollowNearest),
+            Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
         ));
 
         tracing::debug!("spawn complete");

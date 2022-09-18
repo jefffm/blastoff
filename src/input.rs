@@ -38,7 +38,7 @@ pub enum PlayerAction {
 }
 
 pub fn read_game(_world: &mut World, _resources: &mut Resources, ctx: &mut BTerm) -> PlayerInput {
-    match (ctx.key) {
+    match ctx.key {
         None => PlayerInput::Undefined,
         Some(key) => match (key, ctx.control, ctx.alt, ctx.shift) {
             (VirtualKeyCode::Left, _, _, false) => PlayerInput::Game(PlayerAction::MoveWest),

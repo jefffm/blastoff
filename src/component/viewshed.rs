@@ -38,6 +38,11 @@ impl Viewshed {
         self
     }
 
+    pub fn with_init(mut self) -> Self {
+        self.init();
+        self
+    }
+
     pub fn contains(&self, point: &WorldPoint) -> bool {
         self.points().any(|tile| tile == point)
     }

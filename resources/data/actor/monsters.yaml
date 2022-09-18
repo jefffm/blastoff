@@ -14,5 +14,5 @@
   view_range: 10
   energy_capacity: 100
   movement_cost: 20
-  actor: !Computer { None }
   behavior: !FollowNearest
+  #is_player: false  # default
