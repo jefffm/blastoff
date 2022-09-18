@@ -17,6 +17,7 @@ pub struct Actor {
     glyph: char,
     fg: RGBA,
     bg: RGBA,
+    #[serde(default)]
     zorder: u32,
     view_range: i32,
     energy_capacity: i32,
@@ -76,9 +77,10 @@ mod tests {
 
     #[test]
     fn spawn() {
-        let yaml = r###"\
+        let yaml = r###"
 ---
-- name: Kobold
+- !Actor
+  name: Kobold
   glyph: "k"
   fg:
     r: 1.0
