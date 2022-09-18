@@ -44,6 +44,18 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
                             input::PlayerAction::MoveEast => Action::Moves(entity, Cardinal::E),
                             input::PlayerAction::MoveNorth => Action::Moves(entity, Cardinal::N),
                             input::PlayerAction::MoveSouth => Action::Moves(entity, Cardinal::S),
+                            input::PlayerAction::MoveNorthWest => {
+                                Action::Moves(entity, Cardinal::NW)
+                            }
+                            input::PlayerAction::MoveNorthEast => {
+                                Action::Moves(entity, Cardinal::NE)
+                            }
+                            input::PlayerAction::MoveSouthWest => {
+                                Action::Moves(entity, Cardinal::SW)
+                            }
+                            input::PlayerAction::MoveSouthEast => {
+                                Action::Moves(entity, Cardinal::SE)
+                            }
                             input::PlayerAction::PassTurn => Action::Noop,
                         };
                         // Reset the player actor

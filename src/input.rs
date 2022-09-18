@@ -26,23 +26,42 @@ pub enum UiAction {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PlayerAction {
-    MoveWest,
     MoveEast,
+    MoveWest,
     MoveNorth,
+    MoveNorthEast,
+    MoveNorthWest,
     MoveSouth,
+    MoveSouthEast,
+    MoveSouthWest,
     PassTurn,
 }
 
 pub fn read_game(_world: &mut World, _resources: &mut Resources, ctx: &mut BTerm) -> PlayerInput {
-    match ctx.key {
+    match (ctx.key) {
         None => PlayerInput::Undefined,
-        Some(key) => match key {
-            VirtualKeyCode::Left => PlayerInput::Game(PlayerAction::MoveWest),
-            VirtualKeyCode::Right => PlayerInput::Game(PlayerAction::MoveEast),
-            VirtualKeyCode::Up => PlayerInput::Game(PlayerAction::MoveNorth),
-            VirtualKeyCode::Down => PlayerInput::Game(PlayerAction::MoveSouth),
-            VirtualKeyCode::Space => PlayerInput::Game(PlayerAction::PassTurn),
-            VirtualKeyCode::Escape => PlayerInput::Ui(UiAction::PauseMenu),
+        Some(key) => match (key, ctx.control, ctx.alt, ctx.shift) {
+            (VirtualKeyCode::Left, _, _, false) => PlayerInput::Game(PlayerAction::MoveWest),
+            (VirtualKeyCode::Left, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthWest),
+            (VirtualKeyCode::Right, _, _, false) => PlayerInput::Game(PlayerAction::MoveEast),
+            (VirtualKeyCode::Right, _, _, true) => PlayerInput::Game(PlayerAction::MoveNorthEast),
+            (VirtualKeyCode::Up, _, _, false) => PlayerInput::Game(PlayerAction::MoveNorth),
+            (VirtualKeyCode::Up, _, _, true) => PlayerInput::Game(PlayerAction::MoveNorthWest),
+            (VirtualKeyCode::Down, _, _, false) => PlayerInput::Game(PlayerAction::MoveSouth),
+            (VirtualKeyCode::Down, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthEast),
+            (VirtualKeyCode::Key1, _, _, _) => todo!("label NPCs"),
+            (VirtualKeyCode::Key2, _, _, _) => todo!("label Hostiles"),
+            (VirtualKeyCode::Key3, _, _, _) => todo!("label Items"),
+            (VirtualKeyCode::Key4, _, _, _) => todo!("label something"),
+            (VirtualKeyCode::Key5, _, _, _) => todo!("label something else"),
+            (VirtualKeyCode::A, _, _, _) => todo!("skills"),
+            (VirtualKeyCode::E, _, _, _) => todo!("equipment"),
+            (VirtualKeyCode::I, _, _, _) => todo!("inventory"),
+            (VirtualKeyCode::X, _, _, _) => todo!("character"),
+            (VirtualKeyCode::L, _, _, _) => todo!("look"),
+            (VirtualKeyCode::F, _, _, _) => todo!("ranged fire mode"),
+            (VirtualKeyCode::Space, _, _, _) => PlayerInput::Game(PlayerAction::PassTurn),
+            (VirtualKeyCode::Escape, _, _, _) => PlayerInput::Ui(UiAction::PauseMenu),
             other => {
                 tracing::debug!("unhandled keypress: {:?}", other);
                 PlayerInput::Undefined
