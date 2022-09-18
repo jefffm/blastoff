@@ -65,6 +65,7 @@ impl Spawnable for Actor {
                 1,
                 ActorKind::Player(None),
             );
+
             let behavior = self.behavior;
             world.spawn((position, renderable, viewshed, actor, behavior))
         }
@@ -78,6 +79,7 @@ mod tests {
     #[test]
     fn spawn() {
         let yaml = r###"
+        
 ---
 - !Actor
   name: Kobold

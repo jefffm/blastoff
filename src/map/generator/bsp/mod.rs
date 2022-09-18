@@ -1,6 +1,7 @@
 use bracket_lib::prelude::*;
 
 use crate::camera::Glyph;
+use crate::color::{RGBA8Ext, COMMON, FIRE};
 use crate::component::*;
 use crate::{
     map::{Map, Spawner, TileKind},
@@ -214,7 +215,11 @@ impl Spawner for Bsp {
         world.spawn((
             Position::new(center),
             Renderable::new(
-                Glyph::new(to_cp437('@'), RGBA::from(WHITE), RGBA::from(BLACK)),
+                Glyph::new(
+                    to_cp437('@'),
+                    COMMON.four.to_bracket_rgba(),
+                    COMMON.one.to_bracket_rgba(),
+                ),
                 1,
             ),
             viewshed,
@@ -231,7 +236,11 @@ impl Spawner for Bsp {
         world.spawn((
             Position::new(self.rooms[1].center()),
             Renderable::new(
-                Glyph::new(to_cp437('k'), RGBA::from(RED), RGBA::from(BLACK)),
+                Glyph::new(
+                    to_cp437('@'),
+                    FIRE.four.to_bracket_rgba(),
+                    COMMON.one.to_bracket_rgba(),
+                ),
                 1,
             ),
             monster_viewshed,

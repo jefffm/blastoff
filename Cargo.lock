@@ -1308,6 +1308,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
 
 [[package]]
+name = "rgb"
+version = "0.8.33"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3b221de559e4a29df3b957eec92bc0de6bc8eaf6ca9cfed43e5e1d67ff65a34"
+dependencies = [
+ "bytemuck",
+]
+
+[[package]]
 name = "roguemon"
 version = "0.1.0"
 dependencies = [
@@ -1320,6 +1329,7 @@ dependencies = [
  "pathfinding",
  "rand",
  "rand_core",
+ "rgb",
  "serde",
  "serde_json",
  "serde_yaml",

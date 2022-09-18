@@ -24,31 +24,31 @@ pub fn draw_ui(world: &World, resources: &Resources, ctx: &BTerm, draw_batch: &m
 
     // TODO: create relative coordinate systems for the two ui rects
 
-    // box around top
-    draw_batch.draw_hollow_box(
-        Rect::with_size(0, 0, SCREEN_WIDTH, TOP_BOX_HEIGHT),
-        ColorPair::new(RGB::from(DARKSLATEBLUE), RGB::from(BLACK)),
-    );
+    // // box around top
+    // draw_batch.draw_hollow_box(
+    //     Rect::with_size(0, 0, SCREEN_WIDTH, TOP_BOX_HEIGHT),
+    //     ColorPair::new(RGB::from(DARKSLATEBLUE), RGB::from(BLACK)),
+    // );
 
-    // box around viewport
-    draw_batch.draw_hollow_box(
-        Rect::with_size(
-            VIEWPORT_SCREEN_POINT.x,
-            VIEWPORT_SCREEN_POINT.y,
-            VIEWPORT_WIDTH,
-            VIEWPORT_HEIGHT - 1,
-        ),
-        ColorPair::new(RGB::from(DARKGOLDENROD1), RGB::from(BLACK)),
-    );
+    // // box around viewport
+    // draw_batch.draw_hollow_box(
+    //     Rect::with_size(
+    //         VIEWPORT_SCREEN_POINT.x,
+    //         VIEWPORT_SCREEN_POINT.y,
+    //         VIEWPORT_WIDTH,
+    //         VIEWPORT_HEIGHT - 1,
+    //     ),
+    //     ColorPair::new(RGB::from(DARKGOLDENROD1), RGB::from(BLACK)),
+    // );
 
-    // box around sidebar
-    draw_batch.draw_hollow_box(
-        Rect::with_size(
-            VIEWPORT_WIDTH + 1,
-            VIEWPORT_SCREEN_POINT.y,
-            SCREEN_WIDTH as i32 - VIEWPORT_WIDTH - 2,
-            VIEWPORT_HEIGHT - 1,
-        ),
-        ColorPair::new(RGB::from(DARKGREEN), RGB::from(BLACK)),
-    );
+    // // box around sidebar
+    // draw_batch.draw_hollow_box(
+    //     Rect::with_size(
+    //         VIEWPORT_WIDTH + 1,
+    //         VIEWPORT_SCREEN_POINT.y,
+    //         SCREEN_WIDTH as i32 - VIEWPORT_WIDTH - 2,
+    //         VIEWPORT_HEIGHT - 1,
+    //     ),
+    //     ColorPair::new(RGB::from(DARKGREEN), RGB::from(BLACK)),
+    // );
 }

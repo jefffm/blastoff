@@ -15,6 +15,7 @@ rltk::embedded_resource!(FONT_8X8_REX, "../resources/fonts/rex_8x8.png");
 use crate::game::Game;
 
 pub mod camera;
+pub mod color;
 pub mod component;
 pub mod data;
 pub mod game;

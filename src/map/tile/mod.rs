@@ -1,17 +1,17 @@
-
-
 mod wall;
+use rgb::RGBA8;
 pub use wall::*;
 
 mod floor;
 pub use floor::*;
 
-use bracket_lib::prelude::{
-    to_cp437, ColorPair, DrawBatch, Point, BLACK, GRAY22, GRAY46, LIGHT_YELLOW, RGBA, WHITE,
-};
+use bracket_lib::prelude::{to_cp437, ColorPair, DrawBatch, Point};
 use serde::{Deserialize, Serialize};
 
-use crate::util::ScreenPoint;
+use crate::{
+    color::{RGBA8Ext, COMMON, EMPTY},
+    util::ScreenPoint,
+};
 pub enum VisibilityKind {
     Torch { brightness: u32 },
     DiscoBall { value: u32 },
@@ -46,11 +46,15 @@ pub trait TileHandler {
     fn glyph(&self) -> char;
     fn color_pair(&self) -> ColorPair {
         // Default implementation
-        ColorPair::new(LIGHT_YELLOW, BLACK)
+        ColorPair::new(self.fg().to_bracket_rgba(), self.bg().to_bracket_rgba())
     }
 
     fn is_passable(&self) -> bool;
     fn is_opaque(&self) -> bool;
+    fn fg(&self) -> RGBA8;
+    fn bg(&self) -> RGBA8 {
+        EMPTY
+    }
 
     fn render(
         &self,
@@ -63,17 +67,14 @@ pub trait TileHandler {
                 // TODO: use torch brightness to modify rendering brightness
                 draw_batch.set(
                     Point::new(point.x, point.y),
-                    ColorPair::new(
-                        RGBA::from(GRAY46).lerp(RGBA::from(LIGHT_YELLOW), 1.0 / brightness as f32),
-                        BLACK,
-                    ),
+                    self.color_pair(),
                     to_cp437(self.glyph()),
                 );
             }
             VisibilityKind::Remembered => {
                 draw_batch.set(
                     Point::new(point.x, point.y),
-                    ColorPair::new(GRAY22, BLACK),
+                    ColorPair::new(COMMON.two.to_bracket_rgba(), self.bg().to_bracket_rgba()),
                     to_cp437(self.glyph()),
                 );
             }
@@ -81,8 +82,11 @@ pub trait TileHandler {
                 draw_batch.set(
                     Point::new(point.x, point.y),
                     ColorPair::new(
-                        RGBA::from(BLACK).lerp(RGBA::from(WHITE), 1.0 / value as f32),
-                        BLACK,
+                        COMMON
+                            .one
+                            .to_bracket_rgba()
+                            .lerp(COMMON.four.to_bracket_rgba(), 1.0 / value as f32),
+                        self.bg().to_bracket_rgba(),
                     ),
                     to_cp437(self.glyph()),
                 );

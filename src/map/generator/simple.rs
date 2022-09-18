@@ -3,6 +3,8 @@ use hecs::World;
 use tracing::debug;
 
 use crate::camera::Glyph;
+use crate::color::RGBA8Ext;
+use crate::color::COMMON;
 use crate::component::*;
 use crate::map::Map;
 use crate::map::MapGenerator;
@@ -51,7 +53,11 @@ impl Spawner for Simple {
         world.spawn((
             Position::new(center),
             Renderable::new(
-                Glyph::new(to_cp437('@'), RGBA::from(WHITE), RGBA::from(BLACK)),
+                Glyph::new(
+                    to_cp437('@'),
+                    COMMON.four.to_bracket_rgba(),
+                    COMMON.one.to_bracket_rgba(),
+                ),
                 1,
             ),
             Player {},
