@@ -33,7 +33,8 @@ where
     /// Generates the map and returns the Spawner
     pub fn load(&mut self, level: u32, world: &mut World) -> Map {
         let map = self.inner.generate(self.rng, self.mapgen_history, level);
-        self.inner.spawn(&map, world);
+
+        self.inner.spawn(&map, world, self.rng);
 
         map
     }

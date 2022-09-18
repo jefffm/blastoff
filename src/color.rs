@@ -137,7 +137,7 @@ pub const WATER: Palette = Palette {
     },
 };
 
-pub const Plant: Palette = Palette {
+pub const PLANT: Palette = Palette {
     /// dark green
     one: RGBA8 {
         r: 19,

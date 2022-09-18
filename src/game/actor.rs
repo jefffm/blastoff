@@ -156,12 +156,18 @@ impl<'a> ActionProcessor<'a> {
 
         // Check if we're bumping into another actor. If they're hostile, melee attack instead. If they're friendly, swap spots with them(?)
         let mut position_swap = false;
-        for entity in map.get_content(&dest_point) {
-            if let Ok((_actor, position)) =
-                self.world.query_one_mut::<(&Actor, &mut Position)>(*entity)
-            {
+        let query = self.world.query_mut::<(&Actor, &mut Position)>();
+        for (other_entity, (_actor, position)) in query.into_iter() {
+            if dest_point == position.point() {
                 // if this isn't a player, prevent the move from happening
                 if !is_player {
+                    tracing::trace!(
+                        "NPC would collide with {:?}. Skipping move for {:?} from {:?} to {:?}",
+                        &other_entity,
+                        &entity,
+                        &source_point,
+                        &dest_point
+                    );
                     return;
                 }
                 position.set_point(source_point);

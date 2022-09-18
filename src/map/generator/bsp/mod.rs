@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 
 use crate::camera::Glyph;
-use crate::color::{RGBA8Ext, COMMON, FIRE};
+use crate::color::{Palette, RGBA8Ext, COMMON, FIRE, PLANT, WATER};
 use crate::component::*;
 use crate::{
     map::{Map, Spawner, TileKind},
@@ -205,7 +205,7 @@ impl MapGenerator for Bsp {
     }
 }
 impl Spawner for Bsp {
-    fn spawn(&self, _map: &crate::map::Map, world: &mut hecs::World) {
+    fn spawn(&self, map: &Map, world: &mut hecs::World, rng: &mut RandomNumberGenerator) {
         let center = self.rooms[0].center();
 
         let mut viewshed = Viewshed::default().with_range(10);
@@ -218,7 +218,7 @@ impl Spawner for Bsp {
                 Glyph::new(
                     to_cp437('@'),
                     COMMON.four.to_bracket_rgba(),
-                    COMMON.one.to_bracket_rgba(),
+                    Palette::empty().to_bracket_rgba(),
                 ),
                 1,
             ),
@@ -230,24 +230,151 @@ impl Spawner for Bsp {
         // Add the camera
         world.spawn((Position::new(center), Camera {}));
 
-        // Add a monster
-        let mut monster_viewshed = Viewshed::default().with_range(10);
-        monster_viewshed.set_dirty();
-        world.spawn((
-            Position::new(self.rooms[1].center()),
-            Renderable::new(
-                Glyph::new(
-                    to_cp437('@'),
-                    FIRE.four.to_bracket_rgba(),
-                    COMMON.one.to_bracket_rgba(),
-                ),
-                1,
-            ),
-            monster_viewshed,
-            Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
-            Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
-        ));
+        for room_idx in 1..self.rooms.len() {
+            let is_populated = rng.roll_dice(1, 5) == 1;
+            if is_populated {
+                let room_types = vec![RoomKind::Water, RoomKind::Fire, RoomKind::Plant];
+                let idx = rng.roll_dice(1, room_types.len() as i32) - 1;
+                match room_types[idx as usize] {
+                    RoomKind::Fire => {
+                        // Add a monster
+                        let mut monster_viewshed = Viewshed::default().with_range(10);
+                        monster_viewshed.set_dirty();
+                        world.spawn((
+                            Position::new(self.rooms[room_idx].center()),
+                            Renderable::new(
+                                Glyph::new(
+                                    to_cp437('$'),
+                                    FIRE.four.to_bracket_rgba(),
+                                    Palette::empty().to_bracket_rgba(),
+                                ),
+                                1,
+                            ),
+                            monster_viewshed,
+                            Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
+                            Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
+                        ));
+
+                        let rect = self.rooms[room_idx];
+                        let xrange = rect.x_range();
+                        let yrange = rect.y_range();
+
+                        let rect_points = xrange
+                            .flat_map(move |x| yrange.clone().map(move |y| WorldPoint::new(x, y)));
+
+                        for point in rect_points {
+                            if rng.roll_dice(1, 3) == 1 {
+                                // Add a (????) every once in a while for fireworld
+                                world.spawn((
+                                    Position::new(point),
+                                    Renderable::new(
+                                        Glyph::new(
+                                            to_cp437('^'),
+                                            FIRE.four.to_bracket_rgba(),
+                                            COMMON.two.to_bracket_rgba(),
+                                        ),
+                                        2,
+                                    ),
+                                ));
+                            }
+                        }
+                    }
+                    RoomKind::Water => {
+                        // Add a monster
+                        let mut monster_viewshed = Viewshed::default().with_range(10);
+                        monster_viewshed.set_dirty();
+                        world.spawn((
+                            Position::new(self.rooms[room_idx].center()),
+                            Renderable::new(
+                                Glyph::new(
+                                    to_cp437('&'),
+                                    WATER.four.to_bracket_rgba(),
+                                    Palette::empty().to_bracket_rgba(),
+                                ),
+                                1,
+                            ),
+                            monster_viewshed,
+                            Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
+                            Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
+                        ));
+
+                        let rect = self.rooms[room_idx];
+                        let xrange = rect.x_range();
+                        let yrange = rect.y_range();
+
+                        let rect_points = xrange
+                            .flat_map(move |x| yrange.clone().map(move |y| WorldPoint::new(x, y)));
+
+                        for point in rect_points {
+                            if rng.roll_dice(1, 3) == 1 {
+                                // Add a puddle every once in a while for water
+                                world.spawn((
+                                    Position::new(point),
+                                    Renderable::new(
+                                        Glyph::new(
+                                            to_cp437('~'),
+                                            WATER.one.to_bracket_rgba(),
+                                            WATER.two.to_bracket_rgba(),
+                                        ),
+                                        2,
+                                    ),
+                                ));
+                            }
+                        }
+                    }
+                    RoomKind::Plant => {
+                        // Add a monster
+                        let mut monster_viewshed = Viewshed::default().with_range(10);
+                        monster_viewshed.set_dirty();
+                        world.spawn((
+                            Position::new(self.rooms[room_idx].center()),
+                            Renderable::new(
+                                Glyph::new(
+                                    to_cp437('%'),
+                                    PLANT.four.to_bracket_rgba(),
+                                    Palette::empty().to_bracket_rgba(),
+                                ),
+                                1,
+                            ),
+                            monster_viewshed,
+                            Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
+                            Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
+                        ));
+
+                        let rect = self.rooms[room_idx];
+                        let xrange = rect.x_range();
+                        let yrange = rect.y_range();
+
+                        let rect_points = xrange
+                            .flat_map(move |x| yrange.clone().map(move |y| WorldPoint::new(x, y)));
+
+                        for point in rect_points {
+                            if rng.roll_dice(1, 3) == 1 {
+                                // Add a puddle every once in a while for water
+                                world.spawn((
+                                    Position::new(point),
+                                    Renderable::new(
+                                        Glyph::new(
+                                            to_cp437('{'),
+                                            PLANT.three.to_bracket_rgba(),
+                                            PLANT.one.to_bracket_rgba(),
+                                        ),
+                                        2,
+                                    ),
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         tracing::debug!("spawn complete");
     }
+}
+
+enum RoomKind {
+    Fire,
+    Water,
+    Plant,
 }
