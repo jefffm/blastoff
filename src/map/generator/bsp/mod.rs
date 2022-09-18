@@ -220,7 +220,7 @@ impl Spawner for Bsp {
                     COMMON.four.to_bracket_rgba(),
                     Palette::empty().to_bracket_rgba(),
                 ),
-                1,
+                5,
             ),
             viewshed,
             Player {},
@@ -248,7 +248,7 @@ impl Spawner for Bsp {
                                     FIRE.four.to_bracket_rgba(),
                                     Palette::empty().to_bracket_rgba(),
                                 ),
-                                1,
+                                2,
                             ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
@@ -273,7 +273,7 @@ impl Spawner for Bsp {
                                             FIRE.four.to_bracket_rgba(),
                                             COMMON.two.to_bracket_rgba(),
                                         ),
-                                        2,
+                                        1,
                                     ),
                                 ));
                             }
@@ -291,7 +291,7 @@ impl Spawner for Bsp {
                                     WATER.four.to_bracket_rgba(),
                                     Palette::empty().to_bracket_rgba(),
                                 ),
-                                1,
+                                2,
                             ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
@@ -316,7 +316,7 @@ impl Spawner for Bsp {
                                             WATER.one.to_bracket_rgba(),
                                             WATER.two.to_bracket_rgba(),
                                         ),
-                                        2,
+                                        1,
                                     ),
                                 ));
                             }
@@ -334,7 +334,7 @@ impl Spawner for Bsp {
                                     PLANT.four.to_bracket_rgba(),
                                     Palette::empty().to_bracket_rgba(),
                                 ),
-                                1,
+                                2,
                             ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
@@ -359,7 +359,7 @@ impl Spawner for Bsp {
                                             PLANT.three.to_bracket_rgba(),
                                             PLANT.one.to_bracket_rgba(),
                                         ),
-                                        2,
+                                        1,
                                     ),
                                 ));
                             }
