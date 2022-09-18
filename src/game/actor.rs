@@ -1,7 +1,7 @@
 use hecs::{Entity, World};
 
 use crate::{
-    component::{Actor, ActorKind, Cardinal, Position, Viewshed},
+    component::{Actor, ActorKind, Cardinal, Player, Position, Viewshed},
     game::{Action, RunState},
     input,
     resource::Resources,
@@ -12,7 +12,6 @@ use super::PlayGame;
 
 /// The Actor System implements energy-based turn actions using Actor components
 pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState {
-    tracing::trace!("processing actors");
     let mut actions: Vec<Action> = vec![];
 
     // Collect mut references to all the actors
@@ -125,12 +124,17 @@ impl<'a> ActionProcessor<'a> {
     }
 
     fn move_entity(&mut self, entity: &Entity, vector: &WorldVector) {
-        let (position, viewshed) = self
-            .world
-            .query_one_mut::<(&mut Position, &mut Viewshed)>(*entity)
-            .expect("move entity exists");
+        let source_point = {
+            let mut query = self.world.query_one::<&Position>(*entity).unwrap();
+            let position = query.get().unwrap();
 
-        let source_point = position.point();
+            position.point()
+        };
+
+        let is_player = {
+            let mut query = self.world.query_one::<&Player>(*entity).unwrap();
+            query.get().is_some()
+        };
 
         // TODO: clean up "off by one" point clamping for player movement
         let map = self.resources.map.as_ref().expect("map");
@@ -138,12 +142,31 @@ impl<'a> ActionProcessor<'a> {
         let dest_point =
             (source_point + *vector).clamp(map_rect.min(), map_rect.max() - WorldVector::new(1, 1));
 
-        if !map.is_blocked(&dest_point) {
+        // Check if we're bumping into another actor. If they're hostile, melee attack instead. If they're friendly, swap spots with them(?)
+        let mut position_swap = false;
+        for entity in map.get_content(&dest_point) {
+            if let Ok((_actor, position)) =
+                self.world.query_one_mut::<(&Actor, &mut Position)>(*entity)
+            {
+                // if this isn't a player, prevent the move from happening
+                if !is_player {
+                    return;
+                }
+                position.set_point(source_point);
+                position_swap = true;
+                break;
+            }
+        }
+
+        if position_swap || !map.is_blocked(&dest_point) {
+            // No entities in the way. Anything else?
+            let (position, viewshed) = self
+                .world
+                .query_one_mut::<(&mut Position, &mut Viewshed)>(*entity)
+                .unwrap();
             viewshed.set_dirty();
             position.set_point(dest_point);
         }
-
-        // TODO: create camera system to sync the camera with player movement
     }
 
     fn teleport_entity(&mut self, entity: &Entity, point: &WorldPoint) {
