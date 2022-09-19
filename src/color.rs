@@ -1,5 +1,4 @@
 use bracket_lib::terminal::RGBA as BracketRGBA;
-use pathfinding::num_traits::ToPrimitive;
 use rgb::RGBA8;
 
 // Each Palette uses five colors

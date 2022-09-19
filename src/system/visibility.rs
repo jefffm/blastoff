@@ -1,4 +1,3 @@
-use bracket_lib::prelude::BaseMap;
 use hecs::{Entity, World};
 use std::collections::HashSet;
 use symmetric_shadowcasting::compute_fov;
@@ -6,7 +5,7 @@ use symmetric_shadowcasting::compute_fov;
 use crate::{
     component::{Player, Position, Viewshed},
     resource::Resources,
-    util::{WorldFloatPoint, WorldPoint, WorldPointExt},
+    util::{WorldFloatPoint, WorldPoint},
 };
 
 // Update the viewport to be centered on the Camera position

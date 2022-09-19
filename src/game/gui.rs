@@ -6,8 +6,6 @@ use crate::{
     resource::Resources,
 };
 
-use super::consts::*;
-
 /// UI:
 pub fn draw_ui(world: &World, resources: &Resources, ctx: &BTerm, draw_batch: &mut DrawBatch) {
     let map = resources.map.as_ref().unwrap();

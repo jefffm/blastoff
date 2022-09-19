@@ -10,7 +10,6 @@ pub use loader::*;
 mod spawner;
 pub use spawner::*;
 
-use bracket_lib::prelude::{Algorithm2D, BaseMap, Point};
 use euclid::{Point2D, Rect, Size2D};
 use fixedbitset::FixedBitSet;
 use hecs::Entity;
@@ -247,18 +246,6 @@ impl Map {
         self.assert_idx_for_point(idx, point);
 
         self.tiles[idx].handler().is_opaque()
-    }
-}
-
-impl BaseMap for Map {
-    fn is_opaque(&self, idx: usize) -> bool {
-        self.tiles[idx].handler().is_opaque()
-    }
-}
-
-impl Algorithm2D for Map {
-    fn dimensions(&self) -> Point {
-        Point::new(self.get_width(), self.get_height())
     }
 }
 
