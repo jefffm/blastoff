@@ -144,7 +144,7 @@ source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cl
 dependencies = [
  "bracket-algorithm-traits",
  "bracket-geometry",
- "num-rational",
+ "num-rational 0.4.1",
  "smallvec",
 ]
 
@@ -723,7 +723,7 @@ dependencies = [
  "byteorder",
  "color_quant",
  "jpeg-decoder",
- "num-rational",
+ "num-rational 0.4.1",
  "num-traits",
  "png",
 ]
@@ -997,6 +997,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "225d3389fb3509a24c93f5c29eb6bde2586b98d9f016636dff58d7c6f7569cd9"
 dependencies = [
  "autocfg",
+ "num-traits",
+]
+
+[[package]]
+name = "num-rational"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12ac428b1cb17fce6f731001d307d351ec70a6d202fc2e60f7d4c5e42d8f4f07"
+dependencies = [
+ "autocfg",
+ "num-integer",
  "num-traits",
 ]
 
@@ -1333,6 +1344,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "symmetric-shadowcasting",
  "tracing",
  "tracing-subscriber",
 ]
@@ -1493,6 +1505,15 @@ name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
+
+[[package]]
+name = "symmetric-shadowcasting"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3e02e143b05db491fe44cde54cc4b68c196674dbf3dc413f2a26f18dd2e86c8"
+dependencies = [
+ "num-rational 0.3.2",
+]
 
 [[package]]
 name = "syn"

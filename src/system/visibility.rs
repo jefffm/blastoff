@@ -1,11 +1,12 @@
-use bracket_lib::prelude::{field_of_view, Point};
+use bracket_lib::prelude::BaseMap;
 use hecs::{Entity, World};
 use std::collections::HashSet;
+use symmetric_shadowcasting::compute_fov;
 
 use crate::{
     component::{Player, Position, Viewshed},
     resource::Resources,
-    util::{WorldPoint, WorldPointExt},
+    util::{WorldFloatPoint, WorldPoint, WorldPointExt},
 };
 
 // Update the viewport to be centered on the Camera position
@@ -18,13 +19,29 @@ pub fn visibility_system(world: &mut World, resources: &mut Resources) {
         if viewshed.dirty() {
             viewshed.init();
 
-            // All FOV points should be mapped into WorldPoints
-            let points = field_of_view(Point::new(pos.p.x, pos.p.y), viewshed.range(), &*map)
-                .iter()
-                .map(move |point| WorldPoint::from_bracket_point(*point))
-                .collect();
+            let point = pos.point();
+            let origin = (point.x as isize, point.y as isize);
+            let range = viewshed.range();
 
-            viewshed.set(points);
+            let in_range = |other: &WorldPoint| {
+                let p1 = WorldFloatPoint::new(point.x as f32, point.y as f32);
+                let p2 = WorldFloatPoint::new(other.x as f32, other.y as f32);
+                let distance = p1.distance_to(p2);
+                distance <= range as f32
+            };
+
+            // TODO: add something to PointExt to convert into this isize tuple
+            let mut is_blocking = |(x, y)| {
+                let point = WorldPoint::new(x as i32, y as i32);
+                map.is_opaque_point(&point)
+            };
+            let mut mark_visible = |(x, y)| {
+                let point = WorldPoint::new(x as i32, y as i32);
+                if in_range(&point) && map.contains(point) {
+                    viewshed.insert(point)
+                }
+            };
+            compute_fov(origin, &mut is_blocking, &mut mark_visible);
 
             updated_ents.insert(entity);
         }

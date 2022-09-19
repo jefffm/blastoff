@@ -13,6 +13,10 @@ impl Viewshed {
         self.visible_tiles.clear();
     }
 
+    pub fn insert(&mut self, point: WorldPoint) {
+        self.visible_tiles.push(point)
+    }
+
     pub fn set(&mut self, points: Vec<WorldPoint>) {
         self.visible_tiles = points;
     }

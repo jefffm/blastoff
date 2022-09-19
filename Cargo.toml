@@ -6,6 +6,7 @@ edition = "2021"
 
 [dependencies]
 rgb = "0.8"
+symmetric-shadowcasting = "0.2"
 pathfinding = "3.0"
 bracket-lib = { git = "https://github.com/patchfx/bracket-lib", branch = "fix-tile-leaks-on-cls", features = [
     "serde",

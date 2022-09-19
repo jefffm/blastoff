@@ -241,6 +241,13 @@ impl Map {
             self.tiles.len()
         );
     }
+
+    pub fn is_opaque_point(&self, point: &WorldPoint) -> bool {
+        let idx = point.to_index(self.get_width());
+        self.assert_idx_for_point(idx, point);
+
+        self.tiles[idx].handler().is_opaque()
+    }
 }
 
 impl BaseMap for Map {
