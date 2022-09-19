@@ -4,7 +4,7 @@ use crate::camera::Glyph;
 use crate::color::{Palette, RGBA8Ext, COMMON, FIRE, PLANT, WATER};
 use crate::component::*;
 use crate::{
-    map::{Map, Spawner, TileKind},
+    map::{Map, Spawner, Tile},
     util::{WorldPoint, WorldRect, WorldSize, WorldVector},
 };
 
@@ -110,7 +110,7 @@ fn is_possible(rect: &WorldRect, map: &Map) -> bool {
             }
 
             // If any point in the new rectangle is already carved out for a room, abort
-            if map[&point] != TileKind::Wall {
+            if map[&point] != Tile::Wall {
                 return false;
             }
         }
@@ -123,7 +123,7 @@ fn apply_room_to_map(map: &mut Map, room: &WorldRect) {
     for x in room.x_range() {
         for y in room.y_range() {
             let point = WorldPoint::new(x, y);
-            map[&point] = TileKind::Floor;
+            map[&point] = Tile::Floor;
         }
     }
 }
@@ -142,7 +142,7 @@ fn draw_corridor(map: &mut Map, start: &WorldPoint, end: &WorldPoint) {
             cursor.y -= 1;
         }
 
-        map[&cursor] = TileKind::Floor;
+        map[&cursor] = Tile::Floor;
     }
 }
 

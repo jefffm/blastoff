@@ -1,28 +1,23 @@
 use bracket_lib::prelude as rltk;
 use bracket_lib::prelude::*;
 use hecs::World;
-use rand::RngCore;
 use tracing::info;
 
 use crate::component::{Actor, ActorKind, Player};
-use crate::game::consts::{
-    SCREEN_HEIGHT, SCREEN_WIDTH, VIEWPORT_HEIGHT, VIEWPORT_SCREEN_POINT, VIEWPORT_WIDTH,
-};
-use crate::game::TurnsHistory;
+use crate::game::consts::{SCREEN_HEIGHT, SCREEN_WIDTH, VIEWPORT_SCREEN_POINT};
 use crate::map::Loader;
 use crate::{game, input};
 
 use crate::camera::Screen;
 use crate::map::Bsp;
-use crate::resource::{Resources, Viewport};
+use crate::resource::Resources;
+use crate::scene::GameOverSelection;
 use crate::scene::MapGenerationState;
 use crate::scene::PauseMenuSelection;
 use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
-use crate::scene::{Controller, GameOverSelection};
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
-    ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportRect, ViewportSize,
-    ViewportToScreen, WorldSize, WorldToViewport,
+    ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportToScreen, WorldSize,
 };
 
 use super::{process_actors, PlayGame, RunState};
@@ -34,41 +29,12 @@ pub struct Game {
     screen: Screen,
 }
 
-impl Default for Game {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Game {
-    pub fn new() -> Self {
-        let rng_seed = if let Some(seed_param) = game::env().seed {
-            seed_param
-        } else {
-            rand::thread_rng().next_u64()
-        };
-
-        info!("using rng seed: {}", rng_seed);
-
+    pub fn new(resources: Resources) -> Self {
         Self {
             scheduler: build_systems(),
             world: World::default(),
-            resources: Resources {
-                rng: rltk::RandomNumberGenerator::seeded(rng_seed),
-                controller: Controller::default(),
-                map: None,
-                mapgen_history: Vec::default(),
-                run_state: Some(RunState::MainMenu(MainMenuSelection::NewGame)),
-                turn_number: 0,
-                turn_history: TurnsHistory::default(),
-                viewport: Viewport::new(
-                    ViewportRect::new(
-                        ViewportPoint::new(0, 0),
-                        ViewportSize::new(VIEWPORT_WIDTH, VIEWPORT_HEIGHT),
-                    ),
-                    WorldToViewport::default(),
-                ),
-            },
+            resources,
             screen: Screen::new(
                 ScreenRect::new(
                     ScreenPoint::new(0, 0),
@@ -95,13 +61,13 @@ impl Game {
         RunState::Game(PlayGame::Ticking)
     }
 
-    fn input(&mut self, ctx: &mut BTerm, state: RunState) -> RunState {
+    fn input(&mut self, state: RunState) -> RunState {
         match state {
-            RunState::MainMenu(selection) => input::read_mainmenu(selection, ctx),
-            RunState::PauseMenu(selection) => input::read_pausemenu(selection, ctx),
-            RunState::GameOver(selection) => input::read_gameover(selection, ctx),
+            RunState::MainMenu(selection) => input::read_mainmenu(selection),
+            RunState::PauseMenu(selection) => input::read_pausemenu(selection),
+            RunState::GameOver(selection) => input::read_gameover(selection),
             RunState::Game(_) => {
-                match input::read_game(&mut self.world, &mut self.resources, ctx) {
+                match input::read_game(&mut self.world, &mut self.resources) {
                     input::PlayerInput::Ui(action) => match action {
                         input::UiAction::MainMenu => RunState::MainMenu(MainMenuSelection::NewGame),
                         input::UiAction::PauseMenu => {
@@ -178,44 +144,34 @@ impl Game {
     }
 
     /// Mutable self because rendering uses the rng
-    fn draw(&mut self, ctx: &mut BTerm, state: &RunState) {
-        let draw_batch = &mut DrawBatch::new();
+    fn draw(&mut self, state: &RunState) {
         match state {
             // menus
-            RunState::MainMenu(selection) => draw_main_menu(selection, draw_batch),
-            RunState::PauseMenu(selection) => draw_pause_menu(selection, draw_batch),
-            RunState::GameOver(selection) => draw_game_over(selection, draw_batch),
+            RunState::MainMenu(selection) => draw_main_menu(selection),
+            RunState::PauseMenu(selection) => draw_pause_menu(selection),
+            RunState::GameOver(selection) => draw_game_over(selection),
 
             // game loop
-            RunState::Game(_) => {
-                self.screen
-                    .draw_game(&self.world, &mut self.resources, ctx, draw_batch)
-            }
+            RunState::Game(_) => self.screen.draw_game(&self.world, &mut self.resources),
 
             RunState::MapGeneration(map_state) => {
-                map_state.draw(ctx, draw_batch, &self.resources.mapgen_history);
+                map_state.draw(&self.resources.mapgen_history);
             }
 
             _ => {
                 tracing::error!("No draw available for state {:?}", state);
             }
         };
-        rltk::render_draw_buffer(ctx).expect("Render Draw Buffer");
     }
-}
 
-impl rltk::GameState for Game {
-    fn tick(&mut self, ctx: &mut BTerm) {
+    pub fn tick(&mut self) {
         let state = self.resources.take_state();
         tracing::trace!("State: {:?}", state);
 
-        let input_result = self.input(ctx, state);
-        let update_result = self.update(ctx, input_result);
-        self.draw(ctx, &update_result);
+        let input_result = self.input(state);
+        let update_result = self.update(input_result);
+        self.draw(&update_result);
 
         self.resources.replace_state(update_result);
     }
 }
-
-pub struct GameHandler {}
-impl GameHandler {}

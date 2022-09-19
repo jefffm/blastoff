@@ -21,22 +21,30 @@ pub enum VisibilityKind {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum TileKind {
+pub enum Tile {
     Floor,
     Wall,
 }
 
-impl Default for TileKind {
+impl Default for Tile {
     fn default() -> Self {
         Self::Floor
     }
 }
 
-impl TileKind {
+impl Tile {
     pub fn handler(&self) -> Box<dyn TileHandler> {
         match self {
             Self::Floor => Box::new(Floor {}),
             Self::Wall => Box::new(Wall {}),
+        }
+    }
+
+    pub fn value(&self) -> (f32, f32) {
+        // TODO: look at the actual tileset to see
+        match self {
+            Self::Floor => (0.0, 0.0),
+            Self::Wall => (0.0, 0.0),
         }
     }
 }

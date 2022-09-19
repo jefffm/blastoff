@@ -1,18 +1,10 @@
-use bracket_lib::prelude as rltk;
-use bracket_lib::prelude::*;
+use bracket_lib::random::RandomNumberGenerator;
+use macroquad::texture::load_texture;
+use macroquad::window::next_frame;
 use tracing::info;
-
 use tracing::Level;
 
 const VERSION: &str = "0.0.1";
-
-rltk::embedded_resource!(FONT_16X16_YUN, "../resources/fonts/yun_16x16.png");
-rltk::embedded_resource!(FONT_16X16_REX, "../resources/fonts/rex_16x16.png");
-rltk::embedded_resource!(FONT_14X14_REX, "../resources/fonts/rex_14x14.png");
-rltk::embedded_resource!(FONT_12X12_REX, "../resources/fonts/rex_12x12.png");
-rltk::embedded_resource!(FONT_8X8_REX, "../resources/fonts/rex_8x8.png");
-
-use crate::game::Game;
 
 pub mod camera;
 pub mod color;
@@ -26,7 +18,13 @@ pub mod scene;
 pub mod system;
 pub mod util;
 
+use game::{consts, Game, RunState, TurnsHistory};
+use resource::{Resources, Viewport};
+use scene::{Controller, MainMenuSelection};
+use util::{TileAtlas, ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
+
 use clap::Parser;
+use rand::RngCore;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -39,7 +37,8 @@ struct Cli {
     mapgen_show: bool,
 }
 
-fn main() -> rltk::BResult<()> {
+#[macroquad::main("Roguemon")]
+async fn main() {
     let cli = Cli::parse();
 
     let level = match cli.verbose {
@@ -52,43 +51,46 @@ fn main() -> rltk::BResult<()> {
     game::env().show_map_generation = cli.mapgen_show;
 
     info!("linking resources");
-    rltk::link_resource!(FONT_16X16_YUN, "resources/fonts/yun_16x16.png");
-    rltk::link_resource!(FONT_16X16_REX, "resources/fonts/rex_16x16.png");
-    rltk::link_resource!(FONT_14X14_REX, "resources/fonts/rex_14x14.png");
-    rltk::link_resource!(FONT_12X12_REX, "resources/fonts/rex_12x12.png");
-    rltk::link_resource!(FONT_8X8_REX, "resources/fonts/rex_8x8.png");
-    let font_16x16_yun = "fonts/yun_16x16.png";
-    let font_16x16_rex = "fonts/rex_16x16.png";
-    let font_14x14_rex = "fonts/rex_14x14.png";
-    let font_12x12_rex = "fonts/rex_12x12.png";
-    let font_8x8_rex = "fonts/rex_8x8.png";
+    // Load assets.
+    let texture = load_texture("assets/Tiles.png")
+        .await
+        .expect("loading tileset");
+
+    // Construct TileAtlas.
+    let atlas = TileAtlas::new(texture, 32., 32.);
 
     info!("creating context");
-    let tile_size = game::consts::TILE_SIZE;
-    let context = rltk::BTermBuilder::new()
-        .with_dimensions(game::consts::SCREEN_WIDTH, game::consts::SCREEN_HEIGHT)
-        .with_font(font_16x16_yun, 16, 16)
-        .with_font(font_16x16_rex, 16, 16)
-        .with_font(font_14x14_rex, 14, 14)
-        .with_font(font_12x12_rex, 12, 12)
-        .with_font(font_8x8_rex, 8, 8)
-        .with_advanced_input(true)
-        .with_fullscreen(false)
-        .with_fancy_console(
-            game::consts::SCREEN_WIDTH,
-            game::consts::SCREEN_HEIGHT,
-            font_16x16_yun,
-        )
-        .with_title(format!("Roguemon v{}", VERSION))
-        .with_tile_dimensions(tile_size, tile_size)
-        .with_fps_cap(60.0)
-        .with_automatic_console_resize(true)
-        .with_vsync(true)
-        .build()?;
-
     info!("creating GameState");
-    let gs = Game::new();
+
+    let rng_seed = if let Some(seed_param) = game::env().seed {
+        seed_param
+    } else {
+        rand::thread_rng().next_u64()
+    };
+    info!("using rng seed: {}", rng_seed);
+
+    let resources = Resources {
+        rng: RandomNumberGenerator::seeded(rng_seed),
+        controller: Controller::default(),
+        map: None,
+        mapgen_history: Vec::default(),
+        run_state: Some(RunState::MainMenu(MainMenuSelection::NewGame)),
+        turn_number: 0,
+        turn_history: TurnsHistory::default(),
+        viewport: Viewport::new(
+            ViewportRect::new(
+                ViewportPoint::new(0, 0),
+                ViewportSize::new(consts::VIEWPORT_WIDTH, consts::VIEWPORT_HEIGHT),
+            ),
+            WorldToViewport::default(),
+        ),
+    };
+
+    let gs = Game::new(resources);
 
     info!("starting main_loop");
-    rltk::main_loop(context, gs)
+    loop {
+        gs.tick();
+        next_frame().await
+    }
 }
