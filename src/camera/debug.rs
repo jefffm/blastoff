@@ -7,10 +7,10 @@ use crate::{
         WorldToViewport,
     },
 };
-use bracket_lib::prelude::*;
+
 
 // Create default transforms and render the map as absolute coordinates
-pub fn render_debug_map(screen: &mut [u8], map: &Map, _show_boundaries: bool, index: usize) {
+pub fn render_debug_map(screen: &mut [u8], map: &Map, _show_boundaries: bool, _index: usize) {
     let t1 = WorldToViewport::default();
     let t2 = ViewportToScreen::from_points(ViewportPoint::new(0, 0), ScreenPoint::new(0, 1));
     let viewport = Viewport::new(

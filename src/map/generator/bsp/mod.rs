@@ -205,7 +205,7 @@ impl MapGenerator for Bsp {
     }
 }
 impl Spawner for Bsp {
-    fn spawn(&self, map: &Map, world: &mut hecs::World, rng: &mut RandomNumberGenerator) {
+    fn spawn(&self, _map: &Map, world: &mut hecs::World, rng: &mut RandomNumberGenerator) {
         let center = self.rooms[0].center();
 
         let mut viewshed = Viewshed::default().with_range(10);

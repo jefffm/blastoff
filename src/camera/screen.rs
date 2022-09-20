@@ -1,4 +1,4 @@
-use bracket_lib::prelude::*;
+
 use hecs::World;
 
 use crate::camera::Glyph;
@@ -6,7 +6,7 @@ use crate::component::{Position, Renderable};
 use crate::game::draw_ui;
 use crate::map::VisibilityKind;
 use crate::resource::Resources;
-use crate::util::{clear, ScreenPoint, ScreenRect, ViewportPoint, ViewportToScreen};
+use crate::util::{clear, ScreenPoint, ViewportPoint, ViewportToScreen};
 
 // Viewport tracks the current onscreen rect
 pub struct Screen {
@@ -18,7 +18,7 @@ impl Screen {
         Self { transform }
     }
 
-    fn draw(&self, screen: &mut [u8], glyph: &Glyph, point: &ScreenPoint) {
+    fn draw(&self, _screen: &mut [u8], _glyph: &Glyph, _point: &ScreenPoint) {
         // draw_batch.set(
         //     Point::new(point.x, point.y),
         //     ColorPair::new(glyph.fg, glyph.bg),

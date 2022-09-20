@@ -63,10 +63,10 @@ pub trait TileHandler {
         EMPTY
     }
 
-    fn render(&self, screen: &mut [u8], point: ScreenPoint, visibility_kind: VisibilityKind) {
+    fn render(&self, _screen: &mut [u8], _point: ScreenPoint, visibility_kind: VisibilityKind) {
         // TODO: use blit for each of these
         match visibility_kind {
-            VisibilityKind::Torch { brightness } => {
+            VisibilityKind::Torch { brightness: _ } => {
                 // TODO: use torch brightness to modify rendering brightness
                 // draw_batch.set(
                 //     Point::new(point.x, point.y),
@@ -81,7 +81,7 @@ pub trait TileHandler {
                 //     to_cp437(self.glyph()),
                 // );
             }
-            VisibilityKind::DiscoBall { value } => {
+            VisibilityKind::DiscoBall { value: _ } => {
                 // draw_batch.set(
                 //     Point::new(point.x, point.y),
                 //     ColorPair::new(

@@ -1,4 +1,4 @@
-use bracket_lib::prelude::{BTerm, VirtualKeyCode};
+use bracket_lib::prelude::{VirtualKeyCode};
 use hecs::World;
 
 use crate::{

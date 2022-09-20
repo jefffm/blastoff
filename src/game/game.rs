@@ -1,4 +1,4 @@
-use bracket_lib::prelude::*;
+
 use hecs::World;
 use pixels::Pixels;
 use tracing::info;
@@ -20,7 +20,7 @@ use crate::scene::PauseMenuSelection;
 use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
-    ScreenPoint, ScreenRect, ScreenSize, TransformExt, ViewportPoint, ViewportToScreen, WorldSize,
+    TransformExt, ViewportPoint, ViewportToScreen, WorldSize,
 };
 
 use super::{process_actors, PlayGame, RunState};
@@ -189,9 +189,9 @@ impl Game {
 
         match &self.state {
             // menus
-            RunState::MainMenu(selection) => draw_main_menu(screen, &selection),
-            RunState::PauseMenu(selection) => draw_pause_menu(screen, &selection),
-            RunState::GameOver(selection) => draw_game_over(screen, &selection),
+            RunState::MainMenu(selection) => draw_main_menu(screen, selection),
+            RunState::PauseMenu(selection) => draw_pause_menu(screen, selection),
+            RunState::GameOver(selection) => draw_game_over(screen, selection),
 
             // game loop
             RunState::Game(_) => self

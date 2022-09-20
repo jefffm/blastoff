@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use std::fmt;
 
-use crate::{game::consts::TITLE_HEADER, util::clear};
+use crate::{util::clear};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MainMenuSelection {
@@ -22,8 +22,8 @@ impl fmt::Display for MainMenuSelection {
 }
 
 impl MainMenuSelection {
-    fn print(&self, screen: &mut [u8], y: i32, selection: &MainMenuSelection) {
-        let fg = if selection == self {
+    fn print(&self, _screen: &mut [u8], _y: i32, selection: &MainMenuSelection) {
+        let _fg = if selection == self {
             RGB::named(WHITE)
         } else {
             RGB::named(GRAY)

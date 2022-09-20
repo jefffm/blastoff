@@ -6,8 +6,8 @@ use crate::{
 };
 
 /// UI:
-pub fn draw_ui(screen: &mut [u8], world: &World, resources: &Resources) {
-    let map = resources.map.as_ref().unwrap();
+pub fn draw_ui(_screen: &mut [u8], world: &World, resources: &Resources) {
+    let _map = resources.map.as_ref().unwrap();
     let _turn_history = &resources.turn_history;
     // print(Point::new(1, 0), format!("Level : {}", map.get_level()));
     // ctx.print(1, 2, format!("Steps : {}", turn_history.steps));
@@ -15,7 +15,7 @@ pub fn draw_ui(screen: &mut [u8], world: &World, resources: &Resources) {
     // print(Point::new(20, 0), format!("Fps: {:.2}", ctx.fps));
 
     // Implement text printing for UI
-    for (_ent, (_player, actor)) in world.query::<(&Player, &Actor)>().iter() {
+    for (_ent, (_player, _actor)) in world.query::<(&Player, &Actor)>().iter() {
         // print(Point::new(50, 0), format!("Energy: {:?}", actor.energy()));
         // print(Point::new(50, 1), format!("Turns: {:?}", actor.turns()));
     }

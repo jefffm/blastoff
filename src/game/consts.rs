@@ -1,8 +1,7 @@
 use std::time::Duration;
 
 use crate::util::{
-    PixelPoint, PixelRect, PixelSize, PixelToScreen, ScreenPoint, ScreenRect, ScreenSize,
-    ScreenToPixel,
+    PixelPoint, PixelRect, PixelSize, ScreenPoint, ScreenRect, ScreenSize,
 };
 
 pub const SCREEN_HEIGHT: i32 = 56;

@@ -1,4 +1,4 @@
-use bracket_lib::prelude::*;
+
 
 use crate::game::RunState;
 use crate::game::{self, PlayGame};
@@ -11,7 +11,7 @@ impl Controller {
     pub fn map_generation(
         &self,
         screen: &mut [u8],
-        mut state: MapGenerationState,
+        state: MapGenerationState,
         history: &Vec<Map>,
     ) -> RunState {
         if game::env().show_map_generation {

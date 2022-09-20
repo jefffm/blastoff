@@ -20,8 +20,8 @@ impl fmt::Display for PauseMenuSelection {
 }
 
 impl PauseMenuSelection {
-    fn print(&self, screen: &mut [u8], y: i32, selection: &PauseMenuSelection) {
-        let fg = if selection == self {
+    fn print(&self, _screen: &mut [u8], _y: i32, selection: &PauseMenuSelection) {
+        let _fg = if selection == self {
             RGB::named(WHITE)
         } else {
             RGB::named(GRAY)

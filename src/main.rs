@@ -1,18 +1,15 @@
 use bracket_lib::random::RandomNumberGenerator;
 use game_loop::{game_loop, Time, TimeTrait as _};
-use gilrs::{Button, GamepadId, Gilrs};
+
 use pixels::{Error, Pixels, SurfaceTexture};
-use std::fs::File;
+
 use std::io::Cursor;
-use std::{env, time::Duration};
+use std::{time::Duration};
 use tracing::info;
 use tracing::Level;
 use winit::{
-    dpi::LogicalSize, event::VirtualKeyCode, event_loop::EventLoop, window::WindowBuilder,
+    dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder,
 };
-use winit_input_helper::WinitInputHelper;
-
-const VERSION: &str = "0.0.1";
 
 pub mod camera;
 pub mod color;
@@ -34,7 +31,7 @@ use util::{SpriteAtlas, ViewportPoint, ViewportRect, ViewportSize, WorldToViewpo
 use clap::Parser;
 use rand::RngCore;
 
-use crate::game::consts::PIXEL_RECT;
+use crate::game::consts::{PIXEL_RECT, TITLE_HEADER};
 use crate::util::SpriteSize;
 
 #[derive(Parser)]
@@ -110,7 +107,7 @@ fn main() -> Result<(), Error> {
             consts::SCREEN_RECT.height() as f64 * 3.0,
         );
         WindowBuilder::new()
-            .with_title("pixel invaders")
+            .with_title(TITLE_HEADER)
             .with_inner_size(scaled_size)
             .with_min_inner_size(size)
             .build(&event_loop)
@@ -130,17 +127,6 @@ fn main() -> Result<(), Error> {
     let game = Game::new(resources, canvas);
 
     info!("starting main_loop");
-
-    /*
-        let state = self.resources.take_state();
-        tracing::trace!("State: {:?}", state);
-
-        let input_result = self.input(state);
-        let update_result = self.update(input_result);
-        self.draw(&update_result);
-
-        self.resources.replace_state(update_result);
-    */
 
     game_loop(
         event_loop,

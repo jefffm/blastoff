@@ -27,7 +27,7 @@ pub fn bayer_ordered_dithering(img: DynamicImage, level: BayerLevel) -> DynamicI
             0
         }
     }
-    return DynamicImage::from(subimg);
+    DynamicImage::from(subimg)
 }
 
 fn generate_bayer_matrix(level: BayerLevel) -> Vec<u8> {
@@ -39,7 +39,7 @@ fn generate_bayer_matrix(level: BayerLevel) -> Vec<u8> {
         }
     }
 
-    return bayer_matrix;
+    bayer_matrix
 }
 
 fn generate_bayer_threshold_value(i: u8, j: u8, level: BayerLevel) -> u8 {
@@ -74,7 +74,7 @@ fn generate_bayer_threshold_value(i: u8, j: u8, level: BayerLevel) -> u8 {
         BayerLevel::Three => 1,
     };
 
-    return (interleaved * multipler) as u8;
+    (interleaved * multipler) as u8
 }
 
 #[cfg(test)]
