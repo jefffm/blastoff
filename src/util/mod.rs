@@ -1,8 +1,8 @@
 mod geometry;
 pub use geometry::*;
 
-mod tile_atlas;
-pub use tile_atlas::*;
+mod sprite_atlas;
+pub use sprite_atlas::*;
 
 mod sprite;
 pub use sprite::*;

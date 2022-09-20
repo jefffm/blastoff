@@ -1,16 +1,15 @@
 mod wall;
-use euclid::{Point2D, UnknownUnit};
 use rgb::RGBA8;
 pub use wall::*;
 
 mod floor;
 pub use floor::*;
 
-use bracket_lib::prelude::{to_cp437, ColorPair, DrawBatch, Point};
+use bracket_lib::prelude::ColorPair;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    color::{RGBA8Ext, COMMON, EMPTY},
+    color::{RGBA8Ext, EMPTY},
     util::{ScreenPoint, SpritePoint},
 };
 pub enum VisibilityKind {

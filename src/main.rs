@@ -69,20 +69,13 @@ fn main() -> Result<(), Error> {
 
     info!("linking resources");
 
-    // Load assets.
-    let decoder = png::Decoder::new(Cursor::new(include_bytes!(
-        "../assets/tileset/monochrome-transparent.png"
-    )));
-    let mut reader = decoder.read_info().unwrap();
-    // Allocate the output buffer.
-    let mut buf = vec![0; reader.output_buffer_size()];
-    // Read the next frame. An APNG might contain multiple frames.
-    let info = reader.next_frame(&mut buf).unwrap();
-    // // Grab the bytes of the image.
-    // let bytes = &buf[..info.buffer_size()];
-
     // Construct SpriteAtlas
-    let atlas = SpriteAtlas::new(buf, SpriteSize::new(8, 8));
+    let atlas = SpriteAtlas::from_png(
+        Cursor::new(include_bytes!(
+            "../assets/tileset/monochrome-transparent.png"
+        )),
+        SpriteSize::new(8, 8),
+    );
 
     info!("creating context");
     info!("creating GameState");

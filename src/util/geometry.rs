@@ -238,4 +238,19 @@ mod tests {
 
         assert_eq!(start.get_vector(end), WorldVector::new(1, 1));
     }
+
+    #[test]
+    fn point_to_idx_testing() {
+        let width = 2;
+        let height = 2;
+        let sprite_rect = SpriteRect::new(SpritePoint::new(0, 0), SpriteSize::new(width, height));
+
+        let buf = vec![0; sprite_rect.area() as usize];
+        assert_eq!(buf.len(), 4);
+
+        assert_eq!(sprite_rect.min(), SpritePoint::new(0, 0));
+        assert_eq!(sprite_rect.max(), SpritePoint::new(width, height));
+
+        assert_eq!(sprite_rect.min().to_index(width), 0);
+    }
 }

@@ -6,13 +6,13 @@ use crate::game::consts::{PIXEL_RECT, SCREEN_HEIGHT_PIXELS, SCREEN_WIDTH_PIXELS}
 use super::{PixelPoint, PixelSize};
 
 #[derive(Debug)]
-pub struct SpriteRef<'a> {
+pub struct Sprite {
     size: PixelSize,
-    pixels: &'a [u8],
+    pixels: Vec<u8>,
 }
 
-impl<'a> SpriteRef<'a> {
-    pub fn new(size: PixelSize, pixels: &'a [u8]) -> Self {
+impl Sprite {
+    pub fn new(size: PixelSize, pixels: Vec<u8>) -> Self {
         Self { size, pixels }
     }
 }
@@ -24,7 +24,7 @@ pub trait Drawable {
     fn pixels(&self) -> &[u8];
 }
 
-impl<'a> Drawable for SpriteRef<'a> {
+impl Drawable for Sprite {
     fn width(&self) -> usize {
         self.size.width as usize
     }
@@ -33,7 +33,7 @@ impl<'a> Drawable for SpriteRef<'a> {
         self.size.height as usize
     }
 
-    fn pixels(&self) -> &'a [u8] {
+    fn pixels(&self) -> &[u8] {
         &self.pixels
     }
 }
@@ -45,7 +45,7 @@ where
 {
     assert!(PIXEL_RECT.contains(*dest));
 
-    let pixels = sprite.pixels();
+    let new_pixels = sprite.pixels();
     let width = sprite.width() * 4;
 
     let mut s = 0;
@@ -55,12 +55,15 @@ where
             + y * SCREEN_WIDTH_PIXELS as usize * 4;
 
         // Merge pixels from sprite into screen
-        let zipped = screen[i..i + width].iter_mut().zip(&pixels[s..s + width]);
+        let zipped = screen[i..i + width]
+            .chunks_exact_mut(4)
+            .zip(new_pixels[s..s + width].chunks_exact(4));
         // TODO: implement dither transparency (instead of alpha blending). See https://github.com/PhalanxHead/dithering/blob/main/src/dither_tools/bayer_dithering.rs
-        for (left, &right) in zipped {
-            if right > 0 {
-                *left = right;
-            }
+        for (left, right) in zipped {
+            left[0] = right[0]; // R
+            left[1] = right[1]; // G
+            left[2] = right[2]; // B
+            left[3] = right[3]; // A
         }
 
         s += width;

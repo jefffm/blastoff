@@ -1,4 +1,7 @@
 //! Implementation from https://github.com/PhalanxHead/dithering
+//!
+//! Some other options: https://github.com/makeworld-the-better-one/dither/blob/master/ordered_ditherers.go#L3
+//!
 
 use clap::ArgEnum;
 use image::{imageops, DynamicImage};
