@@ -6,39 +6,32 @@ use crate::component::{Position, Renderable};
 use crate::game::draw_ui;
 use crate::map::VisibilityKind;
 use crate::resource::Resources;
-use crate::util::{ScreenPoint, ScreenRect, ViewportPoint, ViewportToScreen};
+use crate::util::{clear, ScreenPoint, ScreenRect, ViewportPoint, ViewportToScreen};
 
 // Viewport tracks the current onscreen rect
 pub struct Screen {
-    rect: ScreenRect,
     transform: ViewportToScreen,
 }
 
 impl Screen {
-    pub fn new(rect: ScreenRect, transform: ViewportToScreen) -> Self {
-        Self { rect, transform }
+    pub fn new(transform: ViewportToScreen) -> Self {
+        Self { transform }
     }
 
-    fn draw(&self, draw_batch: &mut DrawBatch, glyph: &Glyph, point: &ScreenPoint) {
-        draw_batch.set(
-            Point::new(point.x, point.y),
-            ColorPair::new(glyph.fg, glyph.bg),
-            glyph.glyph,
-        );
+    fn draw(&self, screen: &mut [u8], glyph: &Glyph, point: &ScreenPoint) {
+        // draw_batch.set(
+        //     Point::new(point.x, point.y),
+        //     ColorPair::new(glyph.fg, glyph.bg),
+        //     glyph.glyph,
+        // );
     }
 
     pub fn to_screen_point(&self, point: ViewportPoint) -> ScreenPoint {
         self.transform.transform_point(point)
     }
 
-    pub fn draw_game(
-        &self,
-        world: &World,
-        resources: &mut Resources,
-        ctx: &BTerm,
-        draw_batch: &mut DrawBatch,
-    ) {
-        draw_batch.cls();
+    pub fn draw_game(&self, screen: &mut [u8], world: &World, resources: &mut Resources) {
+        clear(screen);
 
         let viewport = &resources.viewport;
         let map = resources.map.as_ref().unwrap();
@@ -53,7 +46,7 @@ impl Screen {
                     if let Some(tile) = map.get(world_point) {
                         let screen_point = self.to_screen_point(viewport_point);
                         tile.handler().render(
-                            draw_batch,
+                            screen,
                             screen_point,
                             VisibilityKind::Torch {
                                 brightness: resources.rng.roll_dice(1, 40) as u32,
@@ -79,21 +72,19 @@ impl Screen {
                     for (pos, render) in data.iter() {
                         let viewport_point = viewport.to_viewport_point(pos.p);
                         let screen_point = self.to_screen_point(viewport_point);
-                        self.draw(draw_batch, &render.glyph, &screen_point);
+                        self.draw(screen, &render.glyph, &screen_point);
                     }
                 } else if map.is_revealed(&world_point) {
                     if let Some(tile) = map.get(world_point) {
                         let screen_point = self.to_screen_point(viewport_point);
                         tile.handler()
-                            .render(draw_batch, screen_point, VisibilityKind::Remembered);
+                            .render(screen, screen_point, VisibilityKind::Remembered);
                     }
                 }
             }
         }
 
         // Draw the UI overlay last
-        draw_ui(world, resources, ctx, draw_batch);
-
-        draw_batch.submit(0).expect("DrawBatch submit");
+        draw_ui(screen, world, resources);
     }
 }

@@ -1,4 +1,5 @@
 mod wall;
+use euclid::{Point2D, UnknownUnit};
 use rgb::RGBA8;
 pub use wall::*;
 
@@ -10,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     color::{RGBA8Ext, COMMON, EMPTY},
-    util::ScreenPoint,
+    util::{ScreenPoint, SpritePoint},
 };
 pub enum VisibilityKind {
     Torch { brightness: u32 },
@@ -40,11 +41,10 @@ impl Tile {
         }
     }
 
-    pub fn value(&self) -> (f32, f32) {
-        // TODO: look at the actual tileset to see
+    pub fn value(&self) -> SpritePoint {
         match self {
-            Self::Floor => (0.0, 0.0),
-            Self::Wall => (0.0, 0.0),
+            Self::Floor => SpritePoint::new(7, 0),
+            Self::Wall => SpritePoint::new(5, 1),
         }
     }
 }
@@ -64,40 +64,36 @@ pub trait TileHandler {
         EMPTY
     }
 
-    fn render(
-        &self,
-        draw_batch: &mut DrawBatch,
-        point: ScreenPoint,
-        visibility_kind: VisibilityKind,
-    ) {
+    fn render(&self, screen: &mut [u8], point: ScreenPoint, visibility_kind: VisibilityKind) {
+        // TODO: use blit for each of these
         match visibility_kind {
             VisibilityKind::Torch { brightness } => {
                 // TODO: use torch brightness to modify rendering brightness
-                draw_batch.set(
-                    Point::new(point.x, point.y),
-                    self.color_pair(),
-                    to_cp437(self.glyph()),
-                );
+                // draw_batch.set(
+                //     Point::new(point.x, point.y),
+                //     self.color_pair(),
+                //     to_cp437(self.glyph()),
+                // );
             }
             VisibilityKind::Remembered => {
-                draw_batch.set(
-                    Point::new(point.x, point.y),
-                    ColorPair::new(COMMON.two.to_bracket_rgba(), self.bg().to_bracket_rgba()),
-                    to_cp437(self.glyph()),
-                );
+                // draw_batch.set(
+                //     Point::new(point.x, point.y),
+                //     ColorPair::new(COMMON.two.to_bracket_rgba(), self.bg().to_bracket_rgba()),
+                //     to_cp437(self.glyph()),
+                // );
             }
             VisibilityKind::DiscoBall { value } => {
-                draw_batch.set(
-                    Point::new(point.x, point.y),
-                    ColorPair::new(
-                        COMMON
-                            .one
-                            .to_bracket_rgba()
-                            .lerp(COMMON.four.to_bracket_rgba(), 1.0 / value as f32),
-                        self.bg().to_bracket_rgba(),
-                    ),
-                    to_cp437(self.glyph()),
-                );
+                // draw_batch.set(
+                //     Point::new(point.x, point.y),
+                //     ColorPair::new(
+                //         COMMON
+                //             .one
+                //             .to_bracket_rgba()
+                //             .lerp(COMMON.four.to_bracket_rgba(), 1.0 / value as f32),
+                //         self.bg().to_bracket_rgba(),
+                //     ),
+                //     to_cp437(self.glyph()),
+                // );
             }
             _ => {
                 todo!("not implemented yet!");

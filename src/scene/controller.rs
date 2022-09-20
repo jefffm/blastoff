@@ -10,8 +10,7 @@ pub struct Controller {}
 impl Controller {
     pub fn map_generation(
         &self,
-        ctx: &mut BTerm,
-        draw_batch: &mut DrawBatch,
+        screen: &mut [u8],
         mut state: MapGenerationState,
         history: &Vec<Map>,
     ) -> RunState {
@@ -23,8 +22,9 @@ impl Controller {
             } else {
                 // If we have more frames to render for map generation, pass the
                 // state onto the next tick.
-                state.draw(ctx, draw_batch, history);
-                state.update(ctx);
+                state.draw(screen, history);
+                // TODO: fix update for mapgen debugger
+                // state.update(ctx);
                 RunState::MapGeneration(state)
             }
         } else {

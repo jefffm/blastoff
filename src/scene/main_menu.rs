@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use std::fmt;
 
-use crate::game::consts::TITLE_HEADER;
+use crate::{game::consts::TITLE_HEADER, util::clear};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MainMenuSelection {
@@ -22,13 +22,13 @@ impl fmt::Display for MainMenuSelection {
 }
 
 impl MainMenuSelection {
-    fn print(&self, y: i32, selection: &MainMenuSelection, draw_batch: &mut DrawBatch) {
+    fn print(&self, screen: &mut [u8], y: i32, selection: &MainMenuSelection) {
         let fg = if selection == self {
             RGB::named(WHITE)
         } else {
             RGB::named(GRAY)
         };
-        draw_batch.print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
+        // print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
     }
 
     pub fn entries(&self, can_continue: bool) -> Vec<Self> {
@@ -45,20 +45,21 @@ pub enum MainMenuResult {
     NoSelection { selected: MainMenuSelection },
     Selected { selected: MainMenuSelection },
 }
-pub fn draw_main_menu(selection: &MainMenuSelection, draw_batch: &mut DrawBatch) {
+pub fn draw_main_menu(screen: &mut [u8], selection: &MainMenuSelection) {
     let can_continue: bool = false;
 
-    draw_batch.cls();
-    draw_batch.print_color_centered(
-        11,
-        TITLE_HEADER,
-        ColorPair::new(RGB::named(WHITE), RGB::named(BLACK)),
-    );
+    clear(screen);
+
+    // TODO: load up bitmap fonts like
+
+    // print_color_centered(
+    //     11,
+    //     TITLE_HEADER,
+    //     ColorPair::new(RGB::named(WHITE), RGB::named(BLACK)),
+    // );
 
     let entries = selection.entries(can_continue);
     for (i, entry) in entries.iter().enumerate() {
-        entry.print(14 + i as i32, selection, draw_batch);
+        entry.print(screen, 14 + i as i32, selection);
     }
-
-    draw_batch.submit(0).expect("DrawBatch submit");
 }

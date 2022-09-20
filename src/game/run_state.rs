@@ -8,6 +8,7 @@ pub enum RunState {
     MapGeneration(MapGenerationState),
     Game(PlayGame),
     GameOver(GameOverSelection),
+    Exiting,
 }
 
 // If the RunState is a GameState, we need to do INPUT, UPDATE, and DRAW every frame

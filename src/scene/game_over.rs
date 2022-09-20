@@ -1,6 +1,8 @@
 use bracket_lib::prelude::*;
 use std::fmt;
 
+use crate::util::clear;
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum GameOverSelection {
     MainMenu = 0,
@@ -18,13 +20,13 @@ impl fmt::Display for GameOverSelection {
 }
 
 impl GameOverSelection {
-    fn print(&self, y: i32, selection: &GameOverSelection, draw_batch: &mut DrawBatch) {
+    fn print(&self, screen: &mut [u8], y: i32, selection: &GameOverSelection) {
         let fg = if selection == self {
             RGB::named(WHITE)
         } else {
             RGB::named(GRAY)
         };
-        draw_batch.print_color_centered(y, self.to_string(), ColorPair::new(fg, BLACK));
+        // print_color_centered(y, self.to_string(), ColorPair::new(fg, BLACK));
     }
 
     pub fn entries(&self) -> Vec<GameOverSelection> {
@@ -38,17 +40,15 @@ pub enum GameOverResult {
     Selected { selected: GameOverSelection },
 }
 
-pub fn draw_game_over(selection: &GameOverSelection, draw_batch: &mut DrawBatch) {
-    draw_batch.cls();
-    draw_batch.print_color_centered(
-        11,
-        "You are Dead",
-        ColorPair::new(RGB::named(DARK_RED), RGB::named(BLACK)),
-    );
+pub fn draw_game_over(screen: &mut [u8], selection: &GameOverSelection) {
+    clear(screen);
+    // print_color_centered(
+    //     11,
+    //     "You are Dead",
+    //     ColorPair::new(RGB::named(DARK_RED), RGB::named(BLACK)),
+    // );
 
     for (i, entry) in selection.entries().iter().enumerate() {
-        entry.print(14 + i as i32, selection, draw_batch);
+        entry.print(screen, 14 + i as i32, selection);
     }
-
-    draw_batch.submit(0).expect("DrawBatch submit");
 }

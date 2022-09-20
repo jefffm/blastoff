@@ -22,7 +22,7 @@ impl MapGenerationState {
         self.index >= history.len()
     }
 
-    pub fn draw(&self, ctx: &BTerm, draw_batch: &mut DrawBatch, history: &[Map]) {
-        camera::render_debug_map(ctx, draw_batch, &history[self.index], true, self.index);
+    pub fn draw(&self, screen: &mut [u8], history: &[Map]) {
+        camera::render_debug_map(screen, &history[self.index], true, self.index);
     }
 }

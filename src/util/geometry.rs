@@ -14,6 +14,25 @@ use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct SpriteSpace;
+
+pub type SpritePoint = Point2D<i32, SpriteSpace>;
+pub type SpriteSize = Size2D<i32, SpriteSpace>;
+pub type SpriteRect = Rect<i32, SpriteSpace>;
+
+pub type SpriteToPixel = Transform2D<i32, SpriteSpace, PixelSpace>;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PixelSpace;
+
+pub type PixelPoint = Point2D<i32, PixelSpace>;
+pub type PixelSize = Size2D<i32, PixelSpace>;
+pub type PixelRect = Rect<i32, PixelSpace>;
+
+pub type PixelToScreen = Transform2D<i32, PixelSpace, ScreenSpace>;
+pub type ScreenToPixel = Transform2D<i32, ScreenSpace, PixelSpace>;
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ScreenSpace;
 
 pub type ScreenPoint = Point2D<i32, ScreenSpace>;
@@ -58,7 +77,7 @@ where
 impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
     fn from_points(src_point: Point2D<i32, Src>, dest_point: Point2D<i32, Dest>) -> Self {
         let translation = Self::create_translation(src_point, dest_point);
-        Self::new(1, 0, 0, 1, translation.x, translation.y)
+        Self::translation(translation.x, translation.y)
     }
 
     fn update_transform(&mut self, src_point: Point2D<i32, Src>, dest_point: Point2D<i32, Dest>) {
@@ -172,6 +191,25 @@ mod tests {
     #[test]
     fn translation_tallmap() {
         run_translation_tests(create_viewport(50, 50), create_world(6, 75))
+    }
+
+    #[test]
+    fn transform_translation_with_scale() {
+        let pixel = PixelRect::new(PixelPoint::new(0, 0), PixelSize::new(8, 8));
+        let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(8, 8));
+
+        // coordinates mapped 1:1, but 8x8 pixels == 1x1 screen tiles
+        let p2s = PixelToScreen::from_points(pixel.origin, screen.origin).then_scale(8, 8);
+        let s2p = p2s.inverse().unwrap();
+
+        assert_eq!(
+            s2p.transform_point(ScreenPoint::new(1, 0)),
+            PixelPoint::new(8, 0)
+        );
+        assert_eq!(
+            s2p.transform_point(ScreenPoint::new(2, 0)),
+            PixelPoint::new(16, 0)
+        );
     }
 
     #[test]

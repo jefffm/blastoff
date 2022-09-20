@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use std::fmt;
 
-use crate::game::consts::TITLE_HEADER;
+use crate::util::clear;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum PauseMenuSelection {
@@ -20,13 +20,13 @@ impl fmt::Display for PauseMenuSelection {
 }
 
 impl PauseMenuSelection {
-    fn print(&self, y: i32, selection: &PauseMenuSelection, draw_batch: &mut DrawBatch) {
+    fn print(&self, screen: &mut [u8], y: i32, selection: &PauseMenuSelection) {
         let fg = if selection == self {
             RGB::named(WHITE)
         } else {
             RGB::named(GRAY)
         };
-        draw_batch.print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
+        // print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
     }
 
     pub fn entries(&self) -> Vec<PauseMenuSelection> {
@@ -42,13 +42,11 @@ pub enum PauseMenuResult {
     NoSelection { selected: PauseMenuSelection },
     Selected { selected: PauseMenuSelection },
 }
-pub fn draw_pause_menu(selection: &PauseMenuSelection, draw_batch: &mut DrawBatch) {
-    draw_batch.cls();
-    draw_batch.print_color_centered(11, TITLE_HEADER, ColorPair::new(WHITE, BLACK));
+pub fn draw_pause_menu(screen: &mut [u8], selection: &PauseMenuSelection) {
+    clear(screen);
+    // print_color_centered(11, TITLE_HEADER, ColorPair::new(WHITE, BLACK));
 
     for (i, entry) in selection.entries().iter().enumerate() {
-        entry.print(14 + i as i32, selection, draw_batch);
+        entry.print(screen, 14 + i as i32, selection);
     }
-
-    draw_batch.submit(0).expect("DrawBatch submit");
 }

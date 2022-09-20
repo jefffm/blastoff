@@ -37,10 +37,22 @@ pub enum PlayerAction {
     PassTurn,
 }
 
-pub fn read_game(_world: &mut World, _resources: &mut Resources, ctx: &mut BTerm) -> PlayerInput {
-    match ctx.key {
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Controls {
+    key: Option<VirtualKeyCode>,
+    control: bool,
+    alt: bool,
+    shift: bool,
+}
+
+pub fn read_game(
+    controls: Controls,
+    _world: &mut World,
+    _resources: &mut Resources,
+) -> PlayerInput {
+    match controls.key {
         None => PlayerInput::Undefined,
-        Some(key) => match (key, ctx.control, ctx.alt, ctx.shift) {
+        Some(key) => match (key, controls.control, controls.alt, controls.shift) {
             (VirtualKeyCode::Left, _, _, false) => PlayerInput::Game(PlayerAction::MoveWest),
             (VirtualKeyCode::Left, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthWest),
             (VirtualKeyCode::Right, _, _, false) => PlayerInput::Game(PlayerAction::MoveEast),
@@ -70,11 +82,12 @@ pub fn read_game(_world: &mut World, _resources: &mut Resources, ctx: &mut BTerm
     }
 }
 
-pub fn read_mainmenu(selection: MainMenuSelection, ctx: &BTerm) -> RunState {
+// TODO: return PlayerInput instead of RunState
+pub fn read_mainmenu(controls: Controls, selection: MainMenuSelection) -> RunState {
     let can_continue = false; // TODO: implement save/continue
     let entries = selection.entries(can_continue);
 
-    let result = match ctx.key {
+    let result = match controls.key {
         None => MainMenuResult::NoSelection {
             selected: selection,
         },
@@ -121,10 +134,11 @@ pub fn read_mainmenu(selection: MainMenuSelection, ctx: &BTerm) -> RunState {
     }
 }
 
-pub fn read_pausemenu(selection: PauseMenuSelection, ctx: &BTerm) -> RunState {
+// TODO: return Input instead of RunState
+pub fn read_pausemenu(controls: Controls, selection: PauseMenuSelection) -> RunState {
     let entries = selection.entries();
 
-    let result = match ctx.key {
+    let result = match controls.key {
         None => PauseMenuResult::NoSelection {
             selected: selection,
         },
@@ -167,9 +181,10 @@ pub fn read_pausemenu(selection: PauseMenuSelection, ctx: &BTerm) -> RunState {
     }
 }
 
-pub fn read_gameover(selection: GameOverSelection, ctx: &BTerm) -> RunState {
+// TODO: return Input instead of RunState
+pub fn read_gameover(controls: Controls, selection: GameOverSelection) -> RunState {
     let entries = selection.entries();
-    let result = match ctx.key {
+    let result = match controls.key {
         None => GameOverResult::NoSelection {
             selected: selection,
         },
