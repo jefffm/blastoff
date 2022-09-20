@@ -199,8 +199,7 @@ mod tests {
         let screen = ScreenRect::new(ScreenPoint::new(0, 0), ScreenSize::new(8, 8));
 
         // coordinates mapped 1:1, but 8x8 pixels == 1x1 screen tiles
-        let p2s = PixelToScreen::from_points(pixel.origin, screen.origin).then_scale(8, 8);
-        let s2p = p2s.inverse().unwrap();
+        let s2p = ScreenToPixel::from_points(screen.origin, pixel.origin).then_scale(8, 8);
 
         assert_eq!(
             s2p.transform_point(ScreenPoint::new(1, 0)),
