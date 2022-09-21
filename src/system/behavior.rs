@@ -2,7 +2,7 @@ use hecs::{Entity, World};
 
 use crate::{
     component::{
-        Actor, Behavior, BehaviorKind, DerivedBehavior, InitialBehavior, Position, Viewshed,
+        Actor, Behavior, BehaviorKind, DerivedBehavior, InitialBehavior, Player, Position, Viewshed,
     },
     resource::Resources,
 };
@@ -28,7 +28,9 @@ pub fn behavior_system(world: &mut World, resources: &mut Resources) {
                             let mut query =
                                 world.query_one::<(&Position, &Actor)>(*map_entity).unwrap();
 
-                            if query.get().is_some() {
+                            let is_actor = query.get().is_some();
+
+                            if is_actor && we_want_to_follow(world, map_entity) {
                                 updates.push((
                                     entity,
                                     BehaviorKind::Derived(DerivedBehavior::FollowOrWander(
@@ -52,4 +54,12 @@ pub fn behavior_system(world: &mut World, resources: &mut Resources) {
         let behavior = world.query_one_mut::<&mut Behavior>(entity).unwrap();
         behavior.set_kind(behavior_kind);
     }
+}
+
+/// Currently, entities will only really want to follow the player
+pub fn we_want_to_follow(world: &World, entity: &Entity) -> bool {
+    let mut query = world.query_one::<&Player>(*entity).unwrap();
+    let is_player = query.get().is_some();
+
+    is_player
 }
