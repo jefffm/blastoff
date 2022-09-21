@@ -1,14 +1,14 @@
 mod geometry;
 pub use geometry::*;
 
-mod sprite_atlas;
-pub use sprite_atlas::*;
-
 mod sprite;
 pub use sprite::*;
 
 mod dither;
 pub use dither::*;
+
+mod sprite_atlas;
+pub use sprite_atlas::*;
 
 /// Clear the screen
 pub fn clear(screen: &mut [u8]) {

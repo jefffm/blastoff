@@ -1915,6 +1915,7 @@ dependencies = [
  "symmetric-shadowcasting",
  "tracing",
  "tracing-subscriber",
+ "wgpu",
  "winit",
  "winit_input_helper",
 ]

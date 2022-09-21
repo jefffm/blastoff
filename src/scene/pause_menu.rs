@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use std::fmt;
 
-use crate::util::clear;
+use crate::{resource::Resources, util::clear};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum PauseMenuSelection {
@@ -42,7 +42,11 @@ pub enum PauseMenuResult {
     NoSelection { selected: PauseMenuSelection },
     Selected { selected: PauseMenuSelection },
 }
-pub fn draw_pause_menu(screen: &mut [u8], selection: &PauseMenuSelection) {
+pub fn draw_pause_menu(
+    screen: &mut [u8],
+    selection: &PauseMenuSelection,
+    resources: &mut Resources,
+) {
     clear(screen);
     // print_color_centered(11, TITLE_HEADER, ColorPair::new(WHITE, BLACK));
 

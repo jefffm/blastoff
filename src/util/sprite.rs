@@ -3,40 +3,41 @@ use std::cmp::min;
 
 use crate::game::consts::{PIXEL_RECT, SCREEN_HEIGHT_PIXELS, SCREEN_WIDTH_PIXELS};
 
-use super::{PixelPoint, PixelSize};
+use super::{PixelPoint, PixelSize, SpriteView};
 
-#[derive(Debug)]
-pub struct Sprite {
-    size: PixelSize,
-    pixels: Vec<u8>,
-}
+// #[derive(Debug)]
+// pub struct Sprite {
+//     size: PixelSize,
+//     pixels: Vec<u8>,
+// }
 
-impl Sprite {
-    pub fn new(size: PixelSize, pixels: Vec<u8>) -> Self {
-        Self { size, pixels }
-    }
-}
+// impl Sprite {
+//     pub fn new(size: PixelSize, pixels: Vec<u8>) -> Self {
+//         Self { size, pixels }
+//     }
+// }
 
 /// Drawables can be blitted to the pixel buffer and animated.
 pub trait Drawable {
     fn width(&self) -> usize;
     fn height(&self) -> usize;
-    fn pixels(&self) -> &[u8];
+    fn pixels(&self) -> Vec<u8>;
 }
 
-impl Drawable for Sprite {
-    fn width(&self) -> usize {
-        self.size.width as usize
-    }
+// impl Drawable for Sprite {
+//     fn width(&self) -> usize {
+//         self.size.width as usize
+//     }
 
-    fn height(&self) -> usize {
-        self.size.height as usize
-    }
+//     fn height(&self) -> usize {
+//         self.size.height as usize
+//     }
 
-    fn pixels(&self) -> &[u8] {
-        &self.pixels
-    }
-}
+//     // TODO: AHHH zero copy here plz
+//     fn pixels(&self) -> Vec<u8> {
+//         &self.pixels
+//     }
+// }
 
 /// Blit a drawable to the pixel buffer.
 pub fn blit<S>(screen: &mut [u8], dest: &PixelPoint, sprite: &S)
@@ -45,7 +46,7 @@ where
 {
     assert!(PIXEL_RECT.contains(*dest));
 
-    let new_pixels = sprite.pixels();
+    let sprite_pixels = sprite.pixels();
     let width = sprite.width() * 4;
 
     let mut s = 0;
@@ -55,15 +56,18 @@ where
             + y * SCREEN_WIDTH_PIXELS as usize * 4;
 
         // Merge pixels from sprite into screen
-        let zipped = screen[i..i + width]
-            .chunks_exact_mut(4)
-            .zip(new_pixels[s..s + width].chunks_exact(4));
+        let screen_pixels = screen[i..i + width].chunks_exact_mut(4);
+        let sprite_pixels = sprite_pixels[s..s + width].chunks_exact(4);
+
         // TODO: implement dither transparency (instead of alpha blending). See https://github.com/PhalanxHead/dithering/blob/main/src/dither_tools/bayer_dithering.rs
-        for (left, right) in zipped {
-            left[0] = right[0]; // R
-            left[1] = right[1]; // G
-            left[2] = right[2]; // B
-            left[3] = right[3]; // A
+        for (screen, new_pixels) in screen_pixels.zip(sprite_pixels) {
+            if new_pixels[0] > 0 {
+                panic!("okay!");
+            }
+            screen[0] = new_pixels[0]; // R
+            screen[1] = new_pixels[1]; // G
+            screen[2] = new_pixels[2]; // B
+            screen[3] = new_pixels[3]; // A
         }
 
         s += width;

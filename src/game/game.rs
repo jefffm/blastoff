@@ -1,5 +1,5 @@
-
 use hecs::World;
+use image::DynamicImage;
 use pixels::Pixels;
 use tracing::info;
 use winit::event::Event;
@@ -20,7 +20,7 @@ use crate::scene::PauseMenuSelection;
 use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
-    TransformExt, ViewportPoint, ViewportToScreen, WorldSize,
+    blit, PixelPoint, PixelSize, TransformExt, ViewportPoint, ViewportToScreen, WorldSize,
 };
 
 use super::{process_actors, PlayGame, RunState};
@@ -34,10 +34,12 @@ pub struct Game {
     controls: Controls,
     pub input: WinitInputHelper,
     pub canvas: Pixels,
+    test_img: DynamicImage,
 }
 
 impl Game {
     pub fn new(resources: Resources, canvas: Pixels) -> Self {
+        let img = image::load_from_memory(include_bytes!("../../assets/demon.png")).unwrap();
         Self {
             state: RunState::MainMenu(MainMenuSelection::NewGame),
             scheduler: build_systems(),
@@ -50,6 +52,7 @@ impl Game {
             controls: Controls::default(),
             input: WinitInputHelper::new(),
             canvas,
+            test_img: img,
         }
     }
 
@@ -189,9 +192,11 @@ impl Game {
 
         match &self.state {
             // menus
-            RunState::MainMenu(selection) => draw_main_menu(screen, selection),
-            RunState::PauseMenu(selection) => draw_pause_menu(screen, selection),
-            RunState::GameOver(selection) => draw_game_over(screen, selection),
+            RunState::MainMenu(selection) => draw_main_menu(screen, selection, &mut self.resources),
+            RunState::PauseMenu(selection) => {
+                draw_pause_menu(screen, selection, &mut self.resources)
+            }
+            RunState::GameOver(selection) => draw_game_over(screen, selection, &mut self.resources),
 
             // game loop
             RunState::Game(_) => self
@@ -206,5 +211,11 @@ impl Game {
                 tracing::error!("No draw available for state {:?}", self.state);
             }
         };
+
+        // blit(
+        //     screen,
+        //     &PixelPoint::new(0, 0),
+        //     &Sprite::new(PixelSize::new(32, 36), self.test_img.as_bytes().to_vec()),
+        // );
     }
 }

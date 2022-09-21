@@ -1,7 +1,7 @@
 use bracket_lib::prelude::*;
 use std::fmt;
 
-use crate::util::clear;
+use crate::{resource::Resources, util::clear};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum GameOverSelection {
@@ -40,7 +40,7 @@ pub enum GameOverResult {
     Selected { selected: GameOverSelection },
 }
 
-pub fn draw_game_over(screen: &mut [u8], selection: &GameOverSelection) {
+pub fn draw_game_over(screen: &mut [u8], selection: &GameOverSelection, resources: &mut Resources) {
     clear(screen);
     // print_color_centered(
     //     11,

@@ -1,16 +1,14 @@
-use bracket_lib::random::RandomNumberGenerator;
-use game_loop::{game_loop, Time, TimeTrait as _};
+use std::io::{BufRead, Cursor};
+use std::time::Duration;
 
-use pixels::{Error, Pixels, SurfaceTexture};
+use pixels::{Error, Pixels, PixelsBuilder, SurfaceTexture};
 
-use std::io::Cursor;
-use std::{time::Duration};
 use tracing::info;
 use tracing::Level;
-use winit::{
-    dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder,
-};
+use winit::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder};
 
+use bracket_lib::random::RandomNumberGenerator;
+use game_loop::{game_loop, Time, TimeTrait as _};
 pub mod camera;
 pub mod color;
 pub mod component;
@@ -31,7 +29,7 @@ use util::{SpriteAtlas, ViewportPoint, ViewportRect, ViewportSize, WorldToViewpo
 use clap::Parser;
 use rand::RngCore;
 
-use crate::game::consts::{PIXEL_RECT, TITLE_HEADER};
+use crate::game::consts::TITLE_HEADER;
 use crate::util::SpriteSize;
 
 #[derive(Parser)]
@@ -67,14 +65,13 @@ fn main() -> Result<(), Error> {
     info!("linking resources");
 
     // Construct SpriteAtlas
-    let atlas = SpriteAtlas::from_png(
-        Cursor::new(include_bytes!(
+    let atlas = {
+        let mut cursor = Cursor::new(include_bytes!(
             "../assets/tileset/monochrome-transparent.png"
-        )),
-        SpriteSize::new(8, 8),
-    );
+        ));
+        SpriteAtlas::from_memory(cursor.fill_buf().unwrap())
+    };
 
-    info!("creating context");
     info!("creating GameState");
 
     let resources = Resources {
@@ -98,13 +95,12 @@ fn main() -> Result<(), Error> {
     let event_loop = EventLoop::new();
     let window = {
         let size = LogicalSize::new(
-            consts::SCREEN_RECT.width() as f64,
-            consts::SCREEN_RECT.height() as f64,
+            consts::SCREEN_WIDTH_PIXELS as f64,
+            consts::SCREEN_HEIGHT_PIXELS as f64,
         );
         let scaled_size = LogicalSize::new(
-            // TODO: configurable pixel scaling for window
-            consts::SCREEN_RECT.width() as f64 * 3.0,
-            consts::SCREEN_RECT.height() as f64 * 3.0,
+            consts::SCREEN_WIDTH_PIXELS * 4,
+            consts::SCREEN_HEIGHT_PIXELS * 4,
         );
         WindowBuilder::new()
             .with_title(TITLE_HEADER)
@@ -117,11 +113,14 @@ fn main() -> Result<(), Error> {
     let canvas = {
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
-        Pixels::new(
-            PIXEL_RECT.width() as u32,
-            PIXEL_RECT.height() as u32,
+        PixelsBuilder::new(
+            consts::SCREEN_WIDTH_PIXELS as u32,
+            consts::SCREEN_HEIGHT_PIXELS as u32,
             surface_texture,
-        )?
+        )
+        .enable_vsync(true)
+        .present_mode(wgpu::PresentMode::Immediate)
+        .build()?
     };
 
     let game = Game::new(resources, canvas);
