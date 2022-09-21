@@ -22,7 +22,7 @@ serde_json = "1.0"
 serde_yaml = "0.9"
 lazy_static = "1.4"
 fixedbitset = { version = "0.4", features = ["serde"] }
-euclid = { version = "0.21", features = ["serde"] }
+euclid = { version = "*", features = ["serde"] }
 clap = { version = "3.2.21", features = ["derive"] }
 game-loop = { version = "0.9", features = ["window"] }
 gilrs = "0.9"
@@ -33,3 +33,4 @@ png = "0.17"
 morton-encoding = "2.0"
 image = "0.24"
 wgpu = "0.12"
+ggez = { git = "https://github.com/ggez/ggez", tag = "0.8.0-rc0" }
