@@ -16,7 +16,7 @@ fn create_cp437_string() -> String {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct TextMap {
     pub map: HashMap<char, graphics::Rect>,
-    char_size: PixelSize,
+    sheet_size: SpriteSize,
 }
 
 impl TextMap {
@@ -67,16 +67,12 @@ impl TextMap {
         Self {
             map,
             // TODO: this is currently a float relative to 100% of the spritesheet size. it needs to be mapped back to absolute pixels
-            char_size: PixelSize::new(rect_width as i32, rect_height as i32),
+            sheet_size: SpriteSize::new(width as i32, height as i32),
         }
     }
 
-    pub fn char_width(&self) -> i32 {
-        self.char_size.width
-    }
-
-    pub fn char_height(&self) -> i32 {
-        self.char_size.height
+    pub fn sheet_size(&self) -> SpriteSize {
+        self.sheet_size
     }
 }
 
@@ -84,6 +80,7 @@ impl TextMap {
 pub struct BitmapFont {
     batch: graphics::InstanceArray,
     text_map: TextMap,
+    char_size: PixelSize,
 }
 
 impl BitmapFont {
@@ -103,7 +100,21 @@ impl BitmapFont {
     }
 
     pub fn new(batch: graphics::InstanceArray, text_map: TextMap) -> Self {
-        Self { batch, text_map }
+        let sheet_size = text_map.sheet_size();
+
+        let rect_width = 1.0 / (sheet_size.width as f32);
+        let rect_height = 1.0 / (sheet_size.height as f32);
+
+        let char_size = PixelSize::new(
+            (batch.image().width() as f32 * rect_width) as i32,
+            (batch.image().width() as f32 * rect_height) as i32,
+        );
+
+        Self {
+            batch,
+            text_map,
+            char_size,
+        }
     }
 
     /// Create and return a Drawable InstanceArray of a single string
@@ -115,10 +126,10 @@ impl BitmapFont {
             .enumerate()
             .map(|(i, rect)| {
                 let dest_rect = graphics::Rect::new_i32(
-                    point.x + (i as i32 * self.text_map.char_width()),
+                    point.x + (i as i32 * self.char_size.width),
                     point.y,
-                    self.text_map.char_width(),
-                    self.text_map.char_height(),
+                    self.char_size.width,
+                    self.char_size.height,
                 );
                 graphics::DrawParam::new()
                     .src(*rect)
