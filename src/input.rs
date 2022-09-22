@@ -1,4 +1,4 @@
-use bracket_lib::prelude::{VirtualKeyCode};
+use ggez::input::keyboard::{KeyCode, KeyInput};
 use hecs::World;
 
 use crate::{
@@ -37,43 +37,55 @@ pub enum PlayerAction {
     PassTurn,
 }
 
+// TODO: Use a HashSet to store the state for each button
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Controls {
-    key: Option<VirtualKeyCode>,
+    key: Option<KeyCode>,
     control: bool,
     alt: bool,
     shift: bool,
 }
 
+impl Controls {
+    // TODO: input handling should support multiple keys at once
+    // maybe don't reinvent the wheel, though: https://github.com/joetsoi/OpenMoonstone/blob/master/rust/src/main.rs#L85
+    pub fn key_down(&mut self, input: KeyInput) {
+        self.key = input.keycode
+    }
+    pub fn key_up(&mut self, input: KeyInput) {
+        self.key = None
+    }
+}
+
 pub fn read_game(
-    controls: Controls,
+    controls: &Controls,
     _world: &mut World,
     _resources: &mut Resources,
 ) -> PlayerInput {
     match controls.key {
         None => PlayerInput::Undefined,
         Some(key) => match (key, controls.control, controls.alt, controls.shift) {
-            (VirtualKeyCode::Left, _, _, false) => PlayerInput::Game(PlayerAction::MoveWest),
-            (VirtualKeyCode::Left, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthWest),
-            (VirtualKeyCode::Right, _, _, false) => PlayerInput::Game(PlayerAction::MoveEast),
-            (VirtualKeyCode::Right, _, _, true) => PlayerInput::Game(PlayerAction::MoveNorthEast),
-            (VirtualKeyCode::Up, _, _, false) => PlayerInput::Game(PlayerAction::MoveNorth),
-            (VirtualKeyCode::Up, _, _, true) => PlayerInput::Game(PlayerAction::MoveNorthWest),
-            (VirtualKeyCode::Down, _, _, false) => PlayerInput::Game(PlayerAction::MoveSouth),
-            (VirtualKeyCode::Down, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthEast),
-            (VirtualKeyCode::Key1, _, _, _) => todo!("label NPCs"),
-            (VirtualKeyCode::Key2, _, _, _) => todo!("label Hostiles"),
-            (VirtualKeyCode::Key3, _, _, _) => todo!("label Items"),
-            (VirtualKeyCode::Key4, _, _, _) => todo!("label something"),
-            (VirtualKeyCode::Key5, _, _, _) => todo!("label something else"),
-            (VirtualKeyCode::A, _, _, _) => todo!("skills"),
-            (VirtualKeyCode::E, _, _, _) => todo!("equipment"),
-            (VirtualKeyCode::I, _, _, _) => todo!("inventory"),
-            (VirtualKeyCode::X, _, _, _) => todo!("character"),
-            (VirtualKeyCode::L, _, _, _) => todo!("look"),
-            (VirtualKeyCode::F, _, _, _) => todo!("ranged fire mode"),
-            (VirtualKeyCode::Space, _, _, _) => PlayerInput::Game(PlayerAction::PassTurn),
-            (VirtualKeyCode::Escape, _, _, _) => PlayerInput::Ui(UiAction::PauseMenu),
+            (KeyCode::Left, _, _, false) => PlayerInput::Game(PlayerAction::MoveWest),
+            (KeyCode::Left, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthWest),
+            (KeyCode::Right, _, _, false) => PlayerInput::Game(PlayerAction::MoveEast),
+            (KeyCode::Right, _, _, true) => PlayerInput::Game(PlayerAction::MoveNorthEast),
+            (KeyCode::Up, _, _, false) => PlayerInput::Game(PlayerAction::MoveNorth),
+            (KeyCode::Up, _, _, true) => PlayerInput::Game(PlayerAction::MoveNorthWest),
+            (KeyCode::Down, _, _, false) => PlayerInput::Game(PlayerAction::MoveSouth),
+            (KeyCode::Down, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthEast),
+            (KeyCode::Key1, _, _, _) => todo!("label NPCs"),
+            (KeyCode::Key2, _, _, _) => todo!("label Hostiles"),
+            (KeyCode::Key3, _, _, _) => todo!("label Items"),
+            (KeyCode::Key4, _, _, _) => todo!("label something"),
+            (KeyCode::Key5, _, _, _) => todo!("label something else"),
+            (KeyCode::A, _, _, _) => todo!("skills"),
+            (KeyCode::E, _, _, _) => todo!("equipment"),
+            (KeyCode::I, _, _, _) => todo!("inventory"),
+            (KeyCode::X, _, _, _) => todo!("character"),
+            (KeyCode::L, _, _, _) => todo!("look"),
+            (KeyCode::F, _, _, _) => todo!("ranged fire mode"),
+            (KeyCode::Space, _, _, _) => PlayerInput::Game(PlayerAction::PassTurn),
+            (KeyCode::Escape, _, _, _) => PlayerInput::Ui(UiAction::PauseMenu),
             other => {
                 tracing::debug!("unhandled keypress: {:?}", other);
                 PlayerInput::Undefined
@@ -83,7 +95,7 @@ pub fn read_game(
 }
 
 // TODO: return PlayerInput instead of RunState
-pub fn read_mainmenu(controls: Controls, selection: MainMenuSelection) -> RunState {
+pub fn read_mainmenu(controls: &Controls, selection: MainMenuSelection) -> RunState {
     let can_continue = false; // TODO: implement save/continue
     let entries = selection.entries(can_continue);
 
@@ -92,10 +104,10 @@ pub fn read_mainmenu(controls: Controls, selection: MainMenuSelection) -> RunSta
             selected: selection,
         },
         Some(key) => match key {
-            VirtualKeyCode::Escape => MainMenuResult::NoSelection {
+            KeyCode::Escape => MainMenuResult::NoSelection {
                 selected: MainMenuSelection::Quit,
             },
-            VirtualKeyCode::Up => {
+            KeyCode::Up => {
                 let idx = entries
                     .iter()
                     .position(|&x| x == selection)
@@ -104,7 +116,7 @@ pub fn read_mainmenu(controls: Controls, selection: MainMenuSelection) -> RunSta
                     selected: entries[(idx + entries.len() - 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Down => {
+            KeyCode::Down => {
                 let idx = entries
                     .iter()
                     .position(|&x| x == selection)
@@ -113,7 +125,7 @@ pub fn read_mainmenu(controls: Controls, selection: MainMenuSelection) -> RunSta
                     selected: entries[(idx + 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Return => MainMenuResult::Selected {
+            KeyCode::Return => MainMenuResult::Selected {
                 selected: selection,
             },
             _ => MainMenuResult::NoSelection {
@@ -135,7 +147,7 @@ pub fn read_mainmenu(controls: Controls, selection: MainMenuSelection) -> RunSta
 }
 
 // TODO: return Input instead of RunState
-pub fn read_pausemenu(controls: Controls, selection: PauseMenuSelection) -> RunState {
+pub fn read_pausemenu(controls: &Controls, selection: PauseMenuSelection) -> RunState {
     let entries = selection.entries();
 
     let result = match controls.key {
@@ -143,10 +155,10 @@ pub fn read_pausemenu(controls: Controls, selection: PauseMenuSelection) -> RunS
             selected: selection,
         },
         Some(key) => match key {
-            VirtualKeyCode::Escape => PauseMenuResult::NoSelection {
+            KeyCode::Escape => PauseMenuResult::NoSelection {
                 selected: PauseMenuSelection::Continue,
             },
-            VirtualKeyCode::Up => {
+            KeyCode::Up => {
                 let idx = entries
                     .iter()
                     .position(|&x| x == selection)
@@ -155,7 +167,7 @@ pub fn read_pausemenu(controls: Controls, selection: PauseMenuSelection) -> RunS
                     selected: entries[(idx + entries.len() - 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Down => {
+            KeyCode::Down => {
                 let idx = entries
                     .iter()
                     .position(|&x| x == selection)
@@ -164,7 +176,7 @@ pub fn read_pausemenu(controls: Controls, selection: PauseMenuSelection) -> RunS
                     selected: entries[(idx + 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Return => PauseMenuResult::Selected {
+            KeyCode::Return => PauseMenuResult::Selected {
                 selected: selection,
             },
             _ => PauseMenuResult::NoSelection {
@@ -182,29 +194,29 @@ pub fn read_pausemenu(controls: Controls, selection: PauseMenuSelection) -> RunS
 }
 
 // TODO: return Input instead of RunState
-pub fn read_gameover(controls: Controls, selection: GameOverSelection) -> RunState {
+pub fn read_gameover(controls: &Controls, selection: GameOverSelection) -> RunState {
     let entries = selection.entries();
     let result = match controls.key {
         None => GameOverResult::NoSelection {
             selected: selection,
         },
         Some(key) => match key {
-            VirtualKeyCode::Escape => GameOverResult::NoSelection {
+            KeyCode::Escape => GameOverResult::NoSelection {
                 selected: GameOverSelection::Quit,
             },
-            VirtualKeyCode::Up => {
+            KeyCode::Up => {
                 let idx = entries.iter().position(|&x| x == selection).unwrap();
                 GameOverResult::NoSelection {
                     selected: entries[(idx + entries.len() - 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Down => {
+            KeyCode::Down => {
                 let idx = entries.iter().position(|&x| x == selection).unwrap();
                 GameOverResult::NoSelection {
                     selected: entries[(idx + 1) % entries.len()],
                 }
             }
-            VirtualKeyCode::Return => GameOverResult::Selected {
+            KeyCode::Return => GameOverResult::Selected {
                 selected: selection,
             },
             _ => GameOverResult::NoSelection {

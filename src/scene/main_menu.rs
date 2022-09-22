@@ -1,5 +1,6 @@
 use bracket_lib::prelude::*;
 use euclid::Point2D;
+use ggez::graphics::Canvas;
 use rgb::RGBA8;
 use std::fmt;
 
@@ -7,7 +8,7 @@ use crate::{
     game::consts::{PIXEL_RECT, SCREEN_HEIGHT_PIXELS, SCREEN_RECT, SCREEN_WIDTH_PIXELS},
     map::Tile,
     resource::Resources,
-    util::{blit, clear, PixelPoint, PixelSize},
+    util::{PixelPoint, PixelSize},
 };
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -29,7 +30,7 @@ impl fmt::Display for MainMenuSelection {
 }
 
 impl MainMenuSelection {
-    fn print(&self, _screen: &mut [u8], _y: i32, selection: &MainMenuSelection) {
+    fn print(&self, canval: &mut Canvas, _y: i32, selection: &MainMenuSelection) {
         let _fg = if selection == self {
             RGB::named(WHITE)
         } else {
@@ -52,18 +53,12 @@ pub enum MainMenuResult {
     NoSelection { selected: MainMenuSelection },
     Selected { selected: MainMenuSelection },
 }
-pub fn draw_main_menu(screen: &mut [u8], selection: &MainMenuSelection, resources: &mut Resources) {
+pub fn draw_main_menu(
+    canvas: &mut Canvas,
+    selection: &MainMenuSelection,
+    resources: &mut Resources,
+) {
     let can_continue: bool = false;
-
-    clear(screen);
-
-    let tree = resources
-        .atlas
-        .create_view(PixelPoint::new(8, 8), PixelSize::new(8, 8));
-
-    blit(screen, &PixelPoint::new(30, 30), &tree);
-
-    // TODO: load up bitmap fonts like
 
     // print_color_centered(
     //     11,
@@ -73,6 +68,6 @@ pub fn draw_main_menu(screen: &mut [u8], selection: &MainMenuSelection, resource
 
     let entries = selection.entries(can_continue);
     for (i, entry) in entries.iter().enumerate() {
-        entry.print(screen, 14 + i as i32, selection);
+        entry.print(canvas, 14 + i as i32, selection);
     }
 }

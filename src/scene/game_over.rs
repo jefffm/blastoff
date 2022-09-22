@@ -1,7 +1,8 @@
 use bracket_lib::prelude::*;
+use ggez::graphics::Canvas;
 use std::fmt;
 
-use crate::{resource::Resources, util::clear};
+use crate::resource::Resources;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum GameOverSelection {
@@ -20,7 +21,7 @@ impl fmt::Display for GameOverSelection {
 }
 
 impl GameOverSelection {
-    fn print(&self, _screen: &mut [u8], _y: i32, selection: &GameOverSelection) {
+    fn print(&self, canvas: &mut Canvas, _y: i32, selection: &GameOverSelection) {
         let _fg = if selection == self {
             RGB::named(WHITE)
         } else {
@@ -40,8 +41,11 @@ pub enum GameOverResult {
     Selected { selected: GameOverSelection },
 }
 
-pub fn draw_game_over(screen: &mut [u8], selection: &GameOverSelection, resources: &mut Resources) {
-    clear(screen);
+pub fn draw_game_over(
+    canvas: &mut Canvas,
+    selection: &GameOverSelection,
+    resources: &mut Resources,
+) {
     // print_color_centered(
     //     11,
     //     "You are Dead",
@@ -49,6 +53,6 @@ pub fn draw_game_over(screen: &mut [u8], selection: &GameOverSelection, resource
     // );
 
     for (i, entry) in selection.entries().iter().enumerate() {
-        entry.print(screen, 14 + i as i32, selection);
+        entry.print(canvas, 14 + i as i32, selection);
     }
 }

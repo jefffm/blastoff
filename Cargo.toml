@@ -5,7 +5,6 @@ authors = ["Jeff Lynn <jmlynn@protonmail.com>"]
 edition = "2021"
 
 [dependencies]
-pixels = "0.9"
 rgb = "0.8"
 symmetric-shadowcasting = "0.2"
 pathfinding = "3.0"
@@ -24,13 +23,8 @@ lazy_static = "1.4"
 fixedbitset = { version = "0.4", features = ["serde"] }
 euclid = { version = "*", features = ["serde"] }
 clap = { version = "3.2.21", features = ["derive"] }
-game-loop = { version = "0.9", features = ["window"] }
-gilrs = "0.9"
-winit = "0.26"
-winit_input_helper = "0.12"
 line_drawing = "1.0.0"
 png = "0.17"
 morton-encoding = "2.0"
 image = "0.24"
-wgpu = "0.12"
 ggez = { git = "https://github.com/ggez/ggez", tag = "0.8.0-rc0" }

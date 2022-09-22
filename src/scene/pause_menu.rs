@@ -1,7 +1,8 @@
 use bracket_lib::prelude::*;
+use ggez::graphics::Canvas;
 use std::fmt;
 
-use crate::{resource::Resources, util::clear};
+use crate::resource::Resources;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum PauseMenuSelection {
@@ -20,7 +21,7 @@ impl fmt::Display for PauseMenuSelection {
 }
 
 impl PauseMenuSelection {
-    fn print(&self, _screen: &mut [u8], _y: i32, selection: &PauseMenuSelection) {
+    fn print(&self, canvas: &mut Canvas, _y: i32, selection: &PauseMenuSelection) {
         let _fg = if selection == self {
             RGB::named(WHITE)
         } else {
@@ -43,14 +44,13 @@ pub enum PauseMenuResult {
     Selected { selected: PauseMenuSelection },
 }
 pub fn draw_pause_menu(
-    screen: &mut [u8],
+    canvas: &mut Canvas,
     selection: &PauseMenuSelection,
     resources: &mut Resources,
 ) {
-    clear(screen);
     // print_color_centered(11, TITLE_HEADER, ColorPair::new(WHITE, BLACK));
 
     for (i, entry) in selection.entries().iter().enumerate() {
-        entry.print(screen, 14 + i as i32, selection);
+        entry.print(canvas, 14 + i as i32, selection);
     }
 }

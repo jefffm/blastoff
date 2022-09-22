@@ -1,4 +1,5 @@
 mod wall;
+use ggez::graphics::Canvas;
 use rgb::RGBA8;
 pub use wall::*;
 
@@ -63,7 +64,7 @@ pub trait TileHandler {
         EMPTY
     }
 
-    fn render(&self, _screen: &mut [u8], _point: ScreenPoint, visibility_kind: VisibilityKind) {
+    fn render(&self, canvas: &mut Canvas, _point: ScreenPoint, visibility_kind: VisibilityKind) {
         // TODO: use blit for each of these
         match visibility_kind {
             VisibilityKind::Torch { brightness: _ } => {

@@ -226,7 +226,7 @@ version = "0.8.3"
 source = "git+https://github.com/patchfx/bracket-lib?branch=fix-tile-leaks-on-cls#ffbd98e395581871eedee9ecefc0e7946c7603a5"
 dependencies = [
  "serde",
- "ultraviolet 0.9.0",
+ "ultraviolet",
 ]
 
 [[package]]
@@ -306,7 +306,7 @@ dependencies = [
  "object-pool",
  "parking_lot 0.12.1",
  "rand",
- "ultraviolet 0.9.0",
+ "ultraviolet",
  "wasm-bindgen",
  "wasm-timer",
  "web-sys",
@@ -1129,17 +1129,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "game-loop"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a83659fd8f86e4bd345a63d1954010e9a3dc4f408e3b304750a8ab2774f73c02"
-dependencies = [
- "wasm-bindgen",
- "web-sys",
- "winit",
-]
-
-[[package]]
 name = "getrandom"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1163,7 +1152,7 @@ dependencies = [
  "crevice",
  "directories",
  "futures 0.3.24",
- "gilrs 0.8.2",
+ "gilrs",
  "glam",
  "glyph_brush",
  "image",
@@ -1203,22 +1192,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1550c8bdebc993576e343d600a954654708a9a1182396ee1e805d6fe60c72909"
 dependencies = [
  "fnv",
- "gilrs-core 0.3.2",
+ "gilrs-core",
  "log",
- "uuid 0.8.2",
- "vec_map",
-]
-
-[[package]]
-name = "gilrs"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d6ba7c37bf8ea7ba0c3e3795dfa1a7771b1e47c4bb417c4d27c7b338d79685f"
-dependencies = [
- "fnv",
- "gilrs-core 0.4.1",
- "log",
- "uuid 1.1.2",
+ "uuid",
  "vec_map",
 ]
 
@@ -1229,36 +1205,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84c7262ce1e88429c9b1d847820c9d2ba00adafc955218393d9c0861d5aaab88"
 dependencies = [
  "core-foundation 0.6.4",
- "io-kit-sys 0.1.0",
+ "io-kit-sys",
  "libc",
  "libudev-sys",
  "log",
  "nix 0.23.1",
  "rusty-xinput",
  "stdweb 0.4.20",
- "uuid 0.8.2",
+ "uuid",
  "vec_map",
- "winapi",
-]
-
-[[package]]
-name = "gilrs-core"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96a8d94a7fc5afd27e894e08a4cfe5a49237f85bcc7140e90721bad3399c7d02"
-dependencies = [
- "core-foundation 0.9.3",
- "io-kit-sys 0.2.0",
- "js-sys",
- "libc",
- "libudev-sys",
- "log",
- "nix 0.24.2",
- "rusty-xinput",
- "uuid 1.1.2",
- "vec_map",
- "wasm-bindgen",
- "web-sys",
  "winapi",
 ]
 
@@ -1585,16 +1540,6 @@ checksum = "f21dcc74995dd4cd090b147e79789f8d65959cbfb5f0b118002db869ea3bd0a0"
 dependencies = [
  "core-foundation-sys 0.6.2",
  "mach 0.2.3",
-]
-
-[[package]]
-name = "io-kit-sys"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7789f7f3c9686f96164f5109d69152de759e76e284f736bd57661c6df5091919"
-dependencies = [
- "core-foundation-sys 0.8.3",
- "mach 0.3.2",
 ]
 
 [[package]]
@@ -2464,20 +2409,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
-name = "pixels"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3be4951b24b374c72b0aaaeb59e51e1acb38b8e680b11f43c1d0049b8550891"
-dependencies = [
- "bytemuck",
- "pollster",
- "raw-window-handle",
- "thiserror",
- "ultraviolet 0.8.1",
- "wgpu",
-]
-
-[[package]]
 name = "pkg-config"
 version = "0.3.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2738,16 +2669,13 @@ dependencies = [
  "clap",
  "euclid",
  "fixedbitset",
- "game-loop",
  "ggez",
- "gilrs 0.9.0",
  "hecs",
  "image",
  "lazy_static",
  "line_drawing",
  "morton-encoding",
  "pathfinding",
- "pixels",
  "png",
  "rand",
  "rand_core",
@@ -2758,9 +2686,6 @@ dependencies = [
  "symmetric-shadowcasting",
  "tracing",
  "tracing-subscriber",
- "wgpu",
- "winit",
- "winit_input_helper",
 ]
 
 [[package]]
@@ -2794,15 +2719,6 @@ name = "ryu"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4501abdff3ae82a1c1b477a17252eb69cee9e66eb915c1abaa4f44d873df9f09"
-
-[[package]]
-name = "safe_arch"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1ff3d6d9696af502cc3110dacce942840fb06ff4514cad92236ecc455f2ce05"
-dependencies = [
- "bytemuck",
-]
 
 [[package]]
 name = "safe_arch"
@@ -3358,20 +3274,11 @@ checksum = "0685c84d5d54d1c26f7d3eb96cd41550adb97baed141a761cf335d3d33bcd0ae"
 
 [[package]]
 name = "ultraviolet"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16b9e3507eba17043af05c8a72fce3ec2c24b58945f45732e71dbc6646d904a7"
-dependencies = [
- "wide 0.6.5",
-]
-
-[[package]]
-name = "ultraviolet"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bf2728f3858937f50df6d92b741f53ef8fd5b5ae23b03b73fb9ac891e980df3b"
 dependencies = [
- "wide 0.7.4",
+ "wide",
 ]
 
 [[package]]
@@ -3406,12 +3313,6 @@ name = "uuid"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
-
-[[package]]
-name = "uuid"
-version = "1.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd6469f4314d5f1ffec476e05f17cc9a78bc7a27a6a857842170bdf8d6f98d2f"
 
 [[package]]
 name = "valuable"
@@ -3720,22 +3621,12 @@ dependencies = [
 
 [[package]]
 name = "wide"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46bbe7c604a27ca0b05c5503221e76da628225b568e6f1280b42dbad3b72d89b"
-dependencies = [
- "bytemuck",
- "safe_arch 0.5.2",
-]
-
-[[package]]
-name = "wide"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3aba2d1dac31ac7cae82847ac5b8be822aee8f99a4e100f279605016b185c5f"
 dependencies = [
  "bytemuck",
- "safe_arch 0.6.0",
+ "safe_arch",
 ]
 
 [[package]]
@@ -3843,15 +3734,6 @@ dependencies = [
  "web-sys",
  "winapi",
  "x11-dl",
-]
-
-[[package]]
-name = "winit_input_helper"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f114b4fe1f38c80027543eb8a0711634fb9136a5cd18e8e990122aaea21f9302"
-dependencies = [
- "winit",
 ]
 
 [[package]]

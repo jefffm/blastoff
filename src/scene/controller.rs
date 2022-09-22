@@ -1,4 +1,4 @@
-
+use ggez::graphics::Canvas;
 
 use crate::game::RunState;
 use crate::game::{self, PlayGame};
@@ -10,7 +10,7 @@ pub struct Controller {}
 impl Controller {
     pub fn map_generation(
         &self,
-        screen: &mut [u8],
+        canvas: &mut Canvas,
         state: MapGenerationState,
         history: &Vec<Map>,
     ) -> RunState {
@@ -22,7 +22,7 @@ impl Controller {
             } else {
                 // If we have more frames to render for map generation, pass the
                 // state onto the next tick.
-                state.draw(screen, history);
+                state.draw(canvas, history);
                 // TODO: fix update for mapgen debugger
                 // state.update(ctx);
                 RunState::MapGeneration(state)

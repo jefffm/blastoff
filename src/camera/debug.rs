@@ -1,3 +1,5 @@
+use ggez::graphics::Canvas;
+
 use crate::{
     game::consts::SCREEN_RECT,
     map::{Map, VisibilityKind},
@@ -8,9 +10,8 @@ use crate::{
     },
 };
 
-
 // Create default transforms and render the map as absolute coordinates
-pub fn render_debug_map(screen: &mut [u8], map: &Map, _show_boundaries: bool, _index: usize) {
+pub fn render_debug_map(canvas: &mut Canvas, map: &Map, _show_boundaries: bool, _index: usize) {
     let t1 = WorldToViewport::default();
     let t2 = ViewportToScreen::from_points(ViewportPoint::new(0, 0), ScreenPoint::new(0, 1));
     let viewport = Viewport::new(
@@ -26,7 +27,7 @@ pub fn render_debug_map(screen: &mut [u8], map: &Map, _show_boundaries: bool, _i
         if let Some(tile) = map.get(world_point) {
             let screen_point = t2.transform_point(viewport_point);
             tile.handler().render(
-                screen,
+                canvas,
                 screen_point,
                 VisibilityKind::Torch { brightness: 50 },
             );

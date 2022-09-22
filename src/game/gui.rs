@@ -1,3 +1,4 @@
+use ggez::graphics::Canvas;
 use hecs::World;
 
 use crate::{
@@ -6,7 +7,7 @@ use crate::{
 };
 
 /// UI:
-pub fn draw_ui(_screen: &mut [u8], world: &World, resources: &Resources) {
+pub fn draw_ui(canvas: &mut Canvas, world: &World, resources: &Resources) {
     let _map = resources.map.as_ref().unwrap();
     let _turn_history = &resources.turn_history;
     // print(Point::new(1, 0), format!("Level : {}", map.get_level()));

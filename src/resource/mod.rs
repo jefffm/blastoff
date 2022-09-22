@@ -7,7 +7,6 @@ use crate::{
     game::{RunState, TurnsHistory},
     map::Map,
     scene::Controller,
-    util::SpriteAtlas,
 };
 
 pub struct Resources {
@@ -20,7 +19,6 @@ pub struct Resources {
     pub viewport: Viewport,
     // TODO: use newtype here to prevent issues
     pub turn_number: u32,
-    pub atlas: SpriteAtlas,
 }
 
 impl Resources {

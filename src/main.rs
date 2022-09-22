@@ -1,14 +1,10 @@
-use std::io::{BufRead, Cursor};
-use std::time::Duration;
-
-use pixels::{Error, Pixels, PixelsBuilder, SurfaceTexture};
-
+use ggez::conf;
+use ggez::event;
+use ggez::{ContextBuilder, GameResult};
 use tracing::info;
 use tracing::Level;
-use winit::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder};
 
 use bracket_lib::random::RandomNumberGenerator;
-use game_loop::{game_loop, Time, TimeTrait as _};
 pub mod camera;
 pub mod color;
 pub mod component;
@@ -24,13 +20,12 @@ pub mod util;
 use game::{consts, Game, RunState, TurnsHistory};
 use resource::{Resources, Viewport};
 use scene::{Controller, MainMenuSelection};
-use util::{SpriteAtlas, ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
+use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 
 use clap::Parser;
 use rand::RngCore;
 
 use crate::game::consts::TITLE_HEADER;
-use crate::util::SpriteSize;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -43,7 +38,7 @@ struct Cli {
     mapgen_show: bool,
 }
 
-fn main() -> Result<(), Error> {
+fn main() -> GameResult {
     let cli = Cli::parse();
 
     let level = match cli.verbose {
@@ -63,17 +58,11 @@ fn main() -> Result<(), Error> {
     info!("using rng seed: {}", rng_seed);
 
     info!("linking resources");
-
-    // Construct SpriteAtlas
-    let atlas = {
-        let mut cursor = Cursor::new(include_bytes!(
-            "../assets/tileset/monochrome-transparent.png"
-        ));
-        SpriteAtlas::from_memory(cursor.fill_buf().unwrap())
-    };
+    // TODO: load sprite sheet like https://github.com/ggez/ggez/blob/0.8.0-rc0/examples/animation.rs#L237
 
     info!("creating GameState");
 
+    // TODO: move this into Game::new()
     let resources = Resources {
         rng: RandomNumberGenerator::seeded(rng_seed),
         controller: Controller::default(),
@@ -89,71 +78,19 @@ fn main() -> Result<(), Error> {
             ),
             WorldToViewport::default(),
         ),
-        atlas,
     };
 
-    let event_loop = EventLoop::new();
-    let window = {
-        let size = LogicalSize::new(
-            consts::SCREEN_WIDTH_PIXELS as f64,
-            consts::SCREEN_HEIGHT_PIXELS as f64,
-        );
-        let scaled_size = LogicalSize::new(
-            consts::SCREEN_WIDTH_PIXELS * 4,
-            consts::SCREEN_HEIGHT_PIXELS * 4,
-        );
-        WindowBuilder::new()
-            .with_title(TITLE_HEADER)
-            .with_inner_size(scaled_size)
-            .with_min_inner_size(size)
-            .build(&event_loop)
-            .unwrap()
-    };
+    // TODO: add resources path using cargo manifest dir https://github.com/joetsoi/OpenMoonstone/blob/master/rust/src/main.rs#L108-L113
+    let (mut ctx, event_loop) = ContextBuilder::new("roguemon", "Jeff Lynn")
+        .window_setup(conf::WindowSetup::default().title(TITLE_HEADER))
+        .window_mode(conf::WindowMode::default().dimensions(640.0, 480.0))
+        .add_resource_path(consts::RESOURCE_PATH)
+        .build()
+        .expect("aieee, could not create ggez context!");
 
-    let canvas = {
-        let window_size = window.inner_size();
-        let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
-        PixelsBuilder::new(
-            consts::SCREEN_WIDTH_PIXELS as u32,
-            consts::SCREEN_HEIGHT_PIXELS as u32,
-            surface_texture,
-        )
-        .enable_vsync(true)
-        .present_mode(wgpu::PresentMode::Immediate)
-        .build()?
-    };
-
-    let game = Game::new(resources, canvas);
+    let game = Game::new(resources);
 
     info!("starting main_loop");
 
-    game_loop(
-        event_loop,
-        window,
-        game,
-        consts::FPS as u32,
-        0.1,
-        move |g| g.game.handle_update(),
-        move |g| {
-            // Drawing
-            g.game.handle_render();
-            if let Err(e) = g.game.canvas.render() {
-                tracing::error!("pixels.render() failed: {}", e);
-                g.exit();
-            }
-
-            // Sleep the main thread to limit drawing to the fixed time step.
-            // See: https://github.com/parasyte/pixels/issues/174
-            let dt = consts::TIME_STEP.as_secs_f64() - Time::now().sub(&g.current_instant());
-            if dt > 0.0 {
-                std::thread::sleep(Duration::from_secs_f64(dt));
-            }
-        },
-        |g, event| {
-            g.game.handle_input(event);
-            if let RunState::Exiting = g.game.state() {
-                g.exit();
-            }
-        },
-    );
+    event::run(ctx, event_loop, game)
 }
