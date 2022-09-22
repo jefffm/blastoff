@@ -1,5 +1,5 @@
 use ggez::event::EventHandler;
-use ggez::graphics::Color;
+use ggez::graphics::{Color, DrawParam};
 use ggez::{graphics, timer, Context, GameError};
 use hecs::World;
 use tracing::info;
@@ -18,9 +18,11 @@ use crate::scene::MapGenerationState;
 use crate::scene::PauseMenuSelection;
 use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
 use crate::system::{build_systems, Scheduler};
-use crate::util::{TransformExt, ViewportPoint, ViewportToScreen, WorldSize};
+use crate::util::{
+    BitmapFont, PixelPoint, PixelSize, TransformExt, ViewportPoint, ViewportToScreen, WorldSize,
+};
 
-use super::consts::SCALING_FACTOR;
+use super::consts::{PIXEL_RECT, SCALING_FACTOR};
 use super::{consts, process_actors, PlayGame, RunState};
 
 pub struct Game {
@@ -31,10 +33,14 @@ pub struct Game {
     screen: Screen,
     controls: Controls,
     canvas_image: graphics::ScreenImage,
+    font: BitmapFont,
 }
 
 impl Game {
     pub fn new(resources: Resources, ctx: &mut Context) -> Self {
+        let font_image =
+            graphics::Image::from_path(ctx, "/fonts/yun_16x16.png", true).expect("load font");
+        let font = BitmapFont::from_grid(ctx, font_image, &PixelSize::new(16, 16));
         Self {
             state: RunState::MainMenu(MainMenuSelection::NewGame),
             scheduler: build_systems(),
@@ -52,6 +58,7 @@ impl Game {
                 1. / SCALING_FACTOR,
                 1,
             ),
+            font,
         }
     }
 
@@ -214,6 +221,7 @@ impl EventHandler for Game {
         // Example for how to do the rest: https://github.com/ggez/ggez/blob/0.8.0-rc0/examples/animation.rs
         let mut canvas =
             graphics::Canvas::from_screen_image(ctx, &mut self.canvas_image, Color::BLACK);
+        // let mut canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);
         canvas.set_sampler(graphics::Sampler::nearest_clamp());
 
         match &self.state {
@@ -243,12 +251,21 @@ impl EventHandler for Game {
             }
         };
 
+        canvas.draw(
+            self.font.text(
+                "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz ",
+                &PixelPoint::new(0, 50),
+            ),
+            DrawParam::default(),
+        );
+
         canvas.finish(ctx)?;
 
         let mut outer_canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);
         outer_canvas.set_sampler(graphics::Sampler::nearest_clamp());
 
         let image = self.canvas_image.image(ctx);
+
         outer_canvas.draw(
             &image,
             graphics::DrawParam::new()

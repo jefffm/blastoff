@@ -38,7 +38,9 @@ impl MainMenuSelection {
         };
         canvas.draw(
             graphics::Text::new(self.to_string()).set_scale(50.),
-            graphics::DrawParam::from([0.0_f32, y as f32]).color(fg.to_ggez_color()),
+            graphics::DrawParam::default()
+                .dest([0.0_f32, y as f32])
+                .color(fg.to_ggez_color()),
         );
     }
 
