@@ -1,5 +1,5 @@
 use ggez::event::EventHandler;
-use ggez::graphics::{Color, DrawParam};
+use ggez::graphics::{Color, DrawParam, StrokeOptions};
 use ggez::{graphics, timer, Context, GameError};
 use hecs::World;
 use tracing::info;
@@ -19,7 +19,8 @@ use crate::scene::PauseMenuSelection;
 use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
-    BitmapFont, PixelPoint, PixelSize, TransformExt, ViewportPoint, ViewportToScreen, WorldSize,
+    BitmapFont, PixelPoint, PixelSize, SpriteSize, TransformExt, ViewportPoint, ViewportToScreen,
+    WorldSize,
 };
 
 use super::consts::{PIXEL_RECT, SCALING_FACTOR};
@@ -34,13 +35,17 @@ pub struct Game {
     controls: Controls,
     canvas_image: graphics::ScreenImage,
     font: BitmapFont,
+    font2: BitmapFont,
 }
 
 impl Game {
     pub fn new(resources: Resources, ctx: &mut Context) -> Self {
         let font_image =
+            graphics::Image::from_path(ctx, "/fonts/rex_8x8.png", true).expect("load font");
+        let font = BitmapFont::from_grid(ctx, font_image, &SpriteSize::new(16, 16));
+        let font_image2 =
             graphics::Image::from_path(ctx, "/fonts/yun_16x16.png", true).expect("load font");
-        let font = BitmapFont::from_grid(ctx, font_image, &PixelSize::new(16, 16));
+        let font2 = BitmapFont::from_grid(ctx, font_image2, &SpriteSize::new(16, 16));
         Self {
             state: RunState::MainMenu(MainMenuSelection::NewGame),
             scheduler: build_systems(),
@@ -59,6 +64,7 @@ impl Game {
                 1,
             ),
             font,
+            font2,
         }
     }
 
@@ -255,6 +261,14 @@ impl EventHandler for Game {
             self.font.text(
                 "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz ",
                 &PixelPoint::new(0, 50),
+            ),
+            DrawParam::default(),
+        );
+
+        canvas.draw(
+            self.font2.text(
+                "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz ",
+                &PixelPoint::new(0, 70),
             ),
             DrawParam::default(),
         );

@@ -13,6 +13,8 @@ use bracket_lib::prelude::Point;
 use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
 use serde::{Deserialize, Serialize};
 
+/// SpriteSpace is coordinates to refer to different sprites in a spritesheet of equal tile sizes
+/// eg. 0, 0 is the top left sprite
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SpriteSpace;
 

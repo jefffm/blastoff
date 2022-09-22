@@ -5,7 +5,7 @@ use ggez::{context::Has, graphics};
 
 use crate::game::consts::SCALING_FACTOR;
 
-use super::{PixelPoint, PixelSize};
+use super::{PixelPoint, PixelSize, SpriteSize};
 
 fn create_cp437_string() -> String {
     (0..255u8).map(to_char).collect()
@@ -37,7 +37,12 @@ impl TextMap {
     fn from_grid(mapping: &str, width: usize, height: usize) -> Self {
         // Assert the given width and height can fit the listed characters.
         let num_chars = mapping.chars().count();
-        assert!(num_chars <= width * height);
+        assert!(
+            num_chars <= width * height,
+            "expected {:?} characters for this spritesheet (got {:?})",
+            width * height,
+            num_chars
+        );
         let rect_width = 1.0 / (width as f32);
         let rect_height = 1.0 / (height as f32);
         let mut map = HashMap::with_capacity(num_chars);
@@ -61,7 +66,8 @@ impl TextMap {
 
         Self {
             map,
-            char_size: PixelSize::new(width as i32, height as i32),
+            // TODO: this is currently a float relative to 100% of the spritesheet size. it needs to be mapped back to absolute pixels
+            char_size: PixelSize::new(rect_width as i32, rect_height as i32),
         }
     }
 
@@ -84,24 +90,20 @@ impl BitmapFont {
     pub fn from_grid(
         gfx: &impl Has<graphics::GraphicsContext>,
         image: graphics::Image,
-        char_size: &PixelSize,
+        sprite_sheet_size: &SpriteSize,
     ) -> Self {
         let mapping = create_cp437_string();
         let text_map = TextMap::from_grid(
             &mapping,
-            char_size.width as usize,
-            char_size.height as usize,
+            sprite_sheet_size.width as usize,
+            sprite_sheet_size.height as usize,
         );
         let batch = graphics::InstanceArray::new(gfx, image, 100, true);
         Self::new(batch, text_map)
     }
 
     pub fn new(batch: graphics::InstanceArray, text_map: TextMap) -> Self {
-        Self {
-            // bitmap,
-            batch,
-            text_map,
-        }
+        Self { batch, text_map }
     }
 
     /// Create and return a Drawable InstanceArray of a single string
