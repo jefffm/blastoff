@@ -25,6 +25,8 @@ use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 use clap::Parser;
 use rand::RngCore;
 
+use crate::game::consts::SCREEN_HEIGHT_PIXELS;
+use crate::game::consts::SCREEN_WIDTH_PIXELS;
 use crate::game::consts::TITLE_HEADER;
 
 #[derive(Parser)]
@@ -81,9 +83,12 @@ fn main() -> GameResult {
     };
 
     // TODO: add resources path using cargo manifest dir https://github.com/joetsoi/OpenMoonstone/blob/master/rust/src/main.rs#L108-L113
-    let (mut ctx, event_loop) = ContextBuilder::new("roguemon", "Jeff Lynn")
+    let (ctx, event_loop) = ContextBuilder::new("roguemon", "Jeff Lynn")
         .window_setup(conf::WindowSetup::default().title(TITLE_HEADER))
-        .window_mode(conf::WindowMode::default().dimensions(640.0, 480.0))
+        .window_mode(
+            conf::WindowMode::default()
+                .dimensions(SCREEN_WIDTH_PIXELS as f32, SCREEN_HEIGHT_PIXELS as f32),
+        )
         .add_resource_path(consts::RESOURCE_PATH)
         .build()
         .expect("aieee, could not create ggez context!");

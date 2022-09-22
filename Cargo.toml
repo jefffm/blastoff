@@ -28,3 +28,4 @@ png = "0.17"
 morton-encoding = "2.0"
 image = "0.24"
 ggez = { git = "https://github.com/ggez/ggez", tag = "0.8.0-rc0" }
+ggez-goodies = "*"

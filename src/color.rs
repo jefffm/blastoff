@@ -1,6 +1,8 @@
 use bracket_lib::terminal::RGBA as BracketRGBA;
 use rgb::RGBA8;
 
+use ggez::graphics::Color;
+
 // Each Palette uses five colors
 pub struct Palette {
     pub one: RGBA8,
@@ -177,6 +179,9 @@ pub const PLANT: Palette = Palette {
 pub trait RGBA8Ext {
     fn to_bracket_rgba(&self) -> BracketRGBA;
     fn from_bracket_rgba(rgba: BracketRGBA) -> Self;
+
+    fn to_ggez_color(&self) -> Color;
+    fn from_ggez_color(color: Color) -> Self;
 }
 
 impl RGBA8Ext for RGBA8 {
@@ -191,5 +196,14 @@ impl RGBA8Ext for RGBA8 {
             b: (rgba.b * 255.0).round() as u8,
             a: (rgba.a * 255.0).round() as u8,
         }
+    }
+
+    fn to_ggez_color(&self) -> Color {
+        Color::from_rgba(self.r, self.g, self.b, self.a)
+    }
+
+    fn from_ggez_color(color: Color) -> Self {
+        let (r, g, b, a) = color.to_rgba();
+        Self { r, g, b, a }
     }
 }

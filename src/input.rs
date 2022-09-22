@@ -40,29 +40,32 @@ pub enum PlayerAction {
 // TODO: Use a HashSet to store the state for each button
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Controls {
-    key: Option<KeyCode>,
+    _key: Option<KeyCode>,
     control: bool,
     alt: bool,
     shift: bool,
 }
 
 impl Controls {
-    // TODO: input handling should support multiple keys at once
-    // maybe don't reinvent the wheel, though: https://github.com/joetsoi/OpenMoonstone/blob/master/rust/src/main.rs#L85
+    // look into using this(?) https://github.com/ggez/ggez-goodies/blob/master/src/input.rs
     pub fn key_down(&mut self, input: KeyInput) {
-        self.key = input.keycode
+        self._key = input.keycode
     }
     pub fn key_up(&mut self, input: KeyInput) {
-        self.key = None
+        // Do nothing
+    }
+
+    pub fn read(&mut self) -> Option<KeyCode> {
+        self._key.take()
     }
 }
 
 pub fn read_game(
-    controls: &Controls,
+    controls: &mut Controls,
     _world: &mut World,
     _resources: &mut Resources,
 ) -> PlayerInput {
-    match controls.key {
+    match controls.read() {
         None => PlayerInput::Undefined,
         Some(key) => match (key, controls.control, controls.alt, controls.shift) {
             (KeyCode::Left, _, _, false) => PlayerInput::Game(PlayerAction::MoveWest),
@@ -95,11 +98,11 @@ pub fn read_game(
 }
 
 // TODO: return PlayerInput instead of RunState
-pub fn read_mainmenu(controls: &Controls, selection: MainMenuSelection) -> RunState {
+pub fn read_mainmenu(controls: &mut Controls, selection: MainMenuSelection) -> RunState {
     let can_continue = false; // TODO: implement save/continue
     let entries = selection.entries(can_continue);
 
-    let result = match controls.key {
+    let result = match controls.read() {
         None => MainMenuResult::NoSelection {
             selected: selection,
         },
@@ -147,10 +150,10 @@ pub fn read_mainmenu(controls: &Controls, selection: MainMenuSelection) -> RunSt
 }
 
 // TODO: return Input instead of RunState
-pub fn read_pausemenu(controls: &Controls, selection: PauseMenuSelection) -> RunState {
+pub fn read_pausemenu(controls: &mut Controls, selection: PauseMenuSelection) -> RunState {
     let entries = selection.entries();
 
-    let result = match controls.key {
+    let result = match controls.read() {
         None => PauseMenuResult::NoSelection {
             selected: selection,
         },
@@ -194,9 +197,9 @@ pub fn read_pausemenu(controls: &Controls, selection: PauseMenuSelection) -> Run
 }
 
 // TODO: return Input instead of RunState
-pub fn read_gameover(controls: &Controls, selection: GameOverSelection) -> RunState {
+pub fn read_gameover(controls: &mut Controls, selection: GameOverSelection) -> RunState {
     let entries = selection.entries();
-    let result = match controls.key {
+    let result = match controls.read() {
         None => GameOverResult::NoSelection {
             selected: selection,
         },

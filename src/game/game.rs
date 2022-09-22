@@ -69,14 +69,18 @@ impl Game {
     /// Handle any new keyboard events as part of the game update loop
     fn update_from_input(&mut self) {
         let next_state = match self.state {
-            RunState::MainMenu(selection) => Some(input::read_mainmenu(&self.controls, selection)),
-            RunState::PauseMenu(selection) => {
-                Some(input::read_pausemenu(&self.controls, selection))
+            RunState::MainMenu(selection) => {
+                Some(input::read_mainmenu(&mut self.controls, selection))
             }
-            RunState::GameOver(selection) => Some(input::read_gameover(&self.controls, selection)),
+            RunState::PauseMenu(selection) => {
+                Some(input::read_pausemenu(&mut self.controls, selection))
+            }
+            RunState::GameOver(selection) => {
+                Some(input::read_gameover(&mut self.controls, selection))
+            }
             RunState::Game(_) => {
                 // TODO: refactor read_game to take Input and determine what to do (rather than looking at BTerm events directly)
-                match input::read_game(&self.controls, &mut self.world, &mut self.resources) {
+                match input::read_game(&mut self.controls, &mut self.world, &mut self.resources) {
                     input::PlayerInput::Ui(action) => match action {
                         input::UiAction::MainMenu => {
                             Some(RunState::MainMenu(MainMenuSelection::NewGame))
@@ -231,15 +235,7 @@ impl EventHandler for Game {
         };
 
         canvas.finish(ctx)?;
-
-        // And yield the timeslice
-        // This tells the OS that we're done using the CPU but it should
-        // get back to this program as soon as it can.
-        // This ideally prevents the game from using 100% CPU all the time
-        // even if vsync is off.
-        // The actual behavior can be a little platform-specific.
         timer::yield_now();
-
         Ok(())
     }
 }

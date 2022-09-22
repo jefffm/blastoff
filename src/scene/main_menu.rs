@@ -1,10 +1,10 @@
-use bracket_lib::prelude::*;
 use euclid::Point2D;
-use ggez::graphics::Canvas;
+use ggez::graphics::{self, Canvas};
 use rgb::RGBA8;
 use std::fmt;
 
 use crate::{
+    color::{RGBA8Ext, COMMON},
     game::consts::{PIXEL_RECT, SCREEN_HEIGHT_PIXELS, SCREEN_RECT, SCREEN_WIDTH_PIXELS},
     map::Tile,
     resource::Resources,
@@ -30,12 +30,16 @@ impl fmt::Display for MainMenuSelection {
 }
 
 impl MainMenuSelection {
-    fn print(&self, canval: &mut Canvas, _y: i32, selection: &MainMenuSelection) {
-        let _fg = if selection == self {
-            RGB::named(WHITE)
+    fn print(&self, canvas: &mut Canvas, y: i32, selection: &MainMenuSelection) {
+        let fg = if selection == self {
+            COMMON.five
         } else {
-            RGB::named(GRAY)
+            COMMON.one
         };
+        canvas.draw(
+            graphics::Text::new(self.to_string()).set_scale(32.),
+            graphics::DrawParam::from([0.0_f32, y as f32]).color(fg.to_ggez_color()),
+        );
         // print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
     }
 
@@ -68,6 +72,6 @@ pub fn draw_main_menu(
 
     let entries = selection.entries(can_continue);
     for (i, entry) in entries.iter().enumerate() {
-        entry.print(canvas, 14 + i as i32, selection);
+        entry.print(canvas, 32 * i as i32, selection);
     }
 }
