@@ -27,5 +27,5 @@ line_drawing = "1.0.0"
 png = "0.17"
 morton-encoding = "2.0"
 image = "0.24"
-ggez = { git = "https://github.com/ggez/ggez", tag = "0.8.0-rc0" }
+ggez = { git = "https://github.com/ggez/ggez", hash = "e0dda6eb66d9e17ed7bb21e62ab6e6ddda5dffc9" }
 ggez-goodies = "*"

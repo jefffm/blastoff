@@ -34,13 +34,12 @@ impl MainMenuSelection {
         let fg = if selection == self {
             COMMON.five
         } else {
-            COMMON.one
+            COMMON.three
         };
         canvas.draw(
-            graphics::Text::new(self.to_string()).set_scale(32.),
+            graphics::Text::new(self.to_string()).set_scale(50.),
             graphics::DrawParam::from([0.0_f32, y as f32]).color(fg.to_ggez_color()),
         );
-        // print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
     }
 
     pub fn entries(&self, can_continue: bool) -> Vec<Self> {
@@ -72,6 +71,6 @@ pub fn draw_main_menu(
 
     let entries = selection.entries(can_continue);
     for (i, entry) in entries.iter().enumerate() {
-        entry.print(canvas, 32 * i as i32, selection);
+        entry.print(canvas, 50 * i as i32, selection);
     }
 }

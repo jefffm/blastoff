@@ -1,6 +1,6 @@
 use ggez::event::EventHandler;
 use ggez::graphics::Color;
-use ggez::{graphics, timer, GameError};
+use ggez::{graphics, timer, Context, GameError};
 use hecs::World;
 use tracing::info;
 
@@ -20,6 +20,7 @@ use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSele
 use crate::system::{build_systems, Scheduler};
 use crate::util::{TransformExt, ViewportPoint, ViewportToScreen, WorldSize};
 
+use super::consts::{SCREEN_HEIGHT_PIXELS, SCREEN_WIDTH_PIXELS};
 use super::{consts, process_actors, PlayGame, RunState};
 
 pub struct Game {
@@ -29,10 +30,14 @@ pub struct Game {
     resources: Resources,
     screen: Screen,
     controls: Controls,
+    canvas_image: graphics::ScreenImage,
+    image: graphics::Image,
 }
 
 impl Game {
-    pub fn new(resources: Resources) -> Self {
+    pub fn new(resources: Resources, ctx: &mut Context) -> Self {
+        let image = graphics::Image::from_path(ctx, "/demon.png", true).unwrap();
+
         Self {
             state: RunState::MainMenu(MainMenuSelection::NewGame),
             scheduler: build_systems(),
@@ -43,6 +48,8 @@ impl Game {
                 VIEWPORT_SCREEN_POINT,
             )),
             controls: Controls::default(),
+            image,
+            canvas_image: graphics::ScreenImage::new(ctx, None, 1. / 3.0, 1. / 3.0, 1),
         }
     }
 
@@ -203,8 +210,8 @@ impl EventHandler for Game {
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> Result<(), GameError> {
         // Example for how to do the rest: https://github.com/ggez/ggez/blob/0.8.0-rc0/examples/animation.rs
-        let mut canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);
-
+        let mut canvas =
+            graphics::Canvas::from_screen_image(ctx, &mut self.canvas_image, Color::BLACK);
         canvas.set_sampler(graphics::Sampler::nearest_clamp()); // because pixel art
 
         match &self.state {
@@ -234,7 +241,30 @@ impl EventHandler for Game {
             }
         };
 
+        // from https://github.com/parasyte/pixels/blob/main/src/renderers.rs#L226
+        // #[rustfmt::skip]
+        // canvas.set_projection([
+        //     3.0, 0.0, 0.0, 0.0,
+        //     0.0, 3.0, 0.0, 0.0,
+        //     0.0, 0.0, 1.0, 0.0,
+        //     0.0, 0.0, 0.0, 1.0,
+        // ]);
+
+        canvas.draw(&self.image, graphics::DrawParam::new().dest([50., 50.]));
+
         canvas.finish(ctx)?;
+
+        let mut outer_canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);
+        outer_canvas.set_sampler(graphics::Sampler::nearest_clamp()); // because pixel art
+
+        let image = self.canvas_image.image(ctx);
+        outer_canvas.draw(
+            &image,
+            graphics::DrawParam::new().dest([0., 0.]).scale([3., 3.]),
+        );
+
+        outer_canvas.finish(ctx)?;
+
         timer::yield_now();
         Ok(())
     }

@@ -1,6 +1,8 @@
 use ggez::conf;
 use ggez::event;
+use ggez::graphics;
 use ggez::{ContextBuilder, GameResult};
+use std::{env, path};
 use tracing::info;
 use tracing::Level;
 
@@ -83,17 +85,26 @@ fn main() -> GameResult {
     };
 
     // TODO: add resources path using cargo manifest dir https://github.com/joetsoi/OpenMoonstone/blob/master/rust/src/main.rs#L108-L113
-    let (ctx, event_loop) = ContextBuilder::new("roguemon", "Jeff Lynn")
-        .window_setup(conf::WindowSetup::default().title(TITLE_HEADER))
+    let mut builder = ContextBuilder::new("roguemon", "Jeff Lynn");
+    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
+        let path = path::PathBuf::from(manifest_dir).join(consts::RESOURCE_PATH);
+        tracing::info!("Adding 'resources' path {:?}", path);
+        builder = builder.add_resource_path(path);
+    }
+    let (mut ctx, event_loop) = builder
+        .window_setup(conf::WindowSetup::default().title(TITLE_HEADER).vsync(true))
         .window_mode(
             conf::WindowMode::default()
-                .dimensions(SCREEN_WIDTH_PIXELS as f32, SCREEN_HEIGHT_PIXELS as f32),
+                .dimensions(
+                    SCREEN_WIDTH_PIXELS as f32 * 3.0,
+                    SCREEN_HEIGHT_PIXELS as f32 * 3.0,
+                )
+                .fullscreen_type(conf::FullscreenType::Windowed),
         )
-        .add_resource_path(consts::RESOURCE_PATH)
         .build()
         .expect("aieee, could not create ggez context!");
 
-    let game = Game::new(resources);
+    let game = Game::new(resources, &mut ctx);
 
     info!("starting main_loop");
 
