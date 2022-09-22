@@ -27,6 +27,7 @@ use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 use clap::Parser;
 use rand::RngCore;
 
+use crate::game::consts::SCALING_FACTOR;
 use crate::game::consts::SCREEN_HEIGHT_PIXELS;
 use crate::game::consts::SCREEN_WIDTH_PIXELS;
 use crate::game::consts::TITLE_HEADER;
@@ -96,8 +97,8 @@ fn main() -> GameResult {
         .window_mode(
             conf::WindowMode::default()
                 .dimensions(
-                    SCREEN_WIDTH_PIXELS as f32 * 3.0,
-                    SCREEN_HEIGHT_PIXELS as f32 * 3.0,
+                    SCREEN_WIDTH_PIXELS as f32 * SCALING_FACTOR,
+                    SCREEN_HEIGHT_PIXELS as f32 * SCALING_FACTOR,
                 )
                 .fullscreen_type(conf::FullscreenType::Windowed),
         )

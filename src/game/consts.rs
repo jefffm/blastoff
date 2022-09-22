@@ -34,3 +34,5 @@ pub const TOP_BOX_HEIGHT: i32 = SCREEN_HEIGHT - VIEWPORT_HEIGHT;
 pub const SIDE_BOX_WIDTH: i32 = SCREEN_WIDTH - VIEWPORT_WIDTH;
 
 pub const RESOURCE_PATH: &str = "assets";
+
+pub const SCALING_FACTOR: f32 = 3.;
