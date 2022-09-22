@@ -19,8 +19,8 @@ use crate::scene::PauseMenuSelection;
 use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
 use crate::system::{build_systems, Scheduler};
 use crate::util::{
-    BitmapFont, PixelPoint, PixelSize, SpriteSize, TransformExt, ViewportPoint, ViewportToScreen,
-    WorldSize,
+    BitmapFont, PixelPoint, PixelSize, SpritePoint, SpriteSheet, SpriteSize, TransformExt,
+    ViewportPoint, ViewportToScreen, WorldSize,
 };
 
 use super::consts::{PIXEL_RECT, SCALING_FACTOR};
@@ -35,7 +35,7 @@ pub struct Game {
     controls: Controls,
     canvas_image: graphics::ScreenImage,
     font: BitmapFont,
-    font2: BitmapFont,
+    spritesheet: SpriteSheet,
 }
 
 impl Game {
@@ -43,9 +43,12 @@ impl Game {
         let font_image =
             graphics::Image::from_path(ctx, "/fonts/rex_8x8.png", true).expect("load font");
         let font = BitmapFont::from_grid(ctx, font_image, &SpriteSize::new(16, 16));
-        let font_image2 =
-            graphics::Image::from_path(ctx, "/fonts/yun_16x16.png", true).expect("load font");
-        let font2 = BitmapFont::from_grid(ctx, font_image2, &SpriteSize::new(16, 16));
+
+        let spritesheet_image =
+            graphics::Image::from_path(ctx, "/tileset/monochrome-transparent.png", true)
+                .expect("load spritesheet");
+        let spritesheet = SpriteSheet::from_grid(ctx, spritesheet_image, SpriteSize::new(49, 22));
+
         Self {
             state: RunState::MainMenu(MainMenuSelection::NewGame),
             scheduler: build_systems(),
@@ -64,7 +67,7 @@ impl Game {
                 1,
             ),
             font,
-            font2,
+            spritesheet,
         }
     }
 
@@ -266,10 +269,8 @@ impl EventHandler for Game {
         );
 
         canvas.draw(
-            self.font2.text(
-                "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz ",
-                &PixelPoint::new(0, 70),
-            ),
+            self.spritesheet
+                .push_sprite(SpritePoint::new(0, 1), PixelPoint::new(100, 100)),
             DrawParam::default(),
         );
 
