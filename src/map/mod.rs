@@ -343,4 +343,132 @@ mod tests {
 
         assert_eq!(path.len(), 7);
     }
+
+    #[test]
+    fn test_wall_bitset() {
+        let w = Tile::Wall(WallKind::default());
+        let f = Tile::Floor(FloorKind::default());
+
+        #[allow(clippy::redundant_clone)]
+        #[rustfmt::skip]
+        let tiles: Vec<Tile> = vec![
+            w.clone(), w.clone(), w.clone(), w.clone(), w.clone(),
+            w.clone(), f.clone(), f.clone(), f.clone(), w.clone(),
+            w.clone(), f.clone(), w.clone(), f.clone(), w.clone(),
+            w.clone(), f.clone(), f.clone(), f.clone(), w.clone(),
+            w.clone(), w.clone(), w.clone(), w.clone(), w.clone(),
+        ];
+
+        let mut map = Map::new(String::from("test"), 5, 5, tiles, 1);
+
+        let points: Vec<_> = map.iter_points().collect();
+        for point in points {
+            if let Some(Tile::Wall(_)) = map.get(point) {
+                map[&point] = Tile::Wall(WallKind::from_map_position(&map, point));
+            }
+        }
+
+        assert_eq!(
+            map[&WorldPoint::new(0, 0)],
+            Tile::Wall(WallKind::WallSE),
+            "0, 0"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(1, 0)],
+            Tile::Wall(WallKind::WallEW),
+            "1, 0"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(2, 0)],
+            Tile::Wall(WallKind::WallEW),
+            "2, 0"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(3, 0)],
+            Tile::Wall(WallKind::WallEW),
+            "3, 0"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(4, 0)],
+            Tile::Wall(WallKind::WallSW),
+            "4, 0"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(0, 1)],
+            Tile::Wall(WallKind::WallNS),
+            "0, 1"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(4, 1)],
+            Tile::Wall(WallKind::WallNS),
+            "4, 1"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(0, 2)],
+            Tile::Wall(WallKind::WallNS),
+            "0, 2"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(2, 2)],
+            Tile::Wall(WallKind::WallPillar),
+            "2, 2"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(4, 2)],
+            Tile::Wall(WallKind::WallNS),
+            "4, 2"
+        );
+    }
+
+    #[test]
+    fn test_wall_bitset_all_sides() {
+        let w = Tile::Wall(WallKind::default());
+
+        #[allow(clippy::redundant_clone)]
+        #[rustfmt::skip]
+        let tiles: Vec<Tile> = vec![
+            w.clone(), w.clone(), w.clone(),
+            w.clone(), w.clone(), w.clone(),
+            w.clone(), w.clone(), w.clone(),
+        ];
+
+        let mut map = Map::new(String::from("test"), 3, 3, tiles, 1);
+
+        let points: Vec<_> = map.iter_points().collect();
+        for point in points {
+            if let Some(Tile::Wall(_)) = map.get(point) {
+                map[&point] = Tile::Wall(WallKind::from_map_position(&map, point));
+            }
+        }
+
+        assert_eq!(
+            map[&WorldPoint::new(0, 0)],
+            Tile::Wall(WallKind::WallSE),
+            "0, 0"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(1, 0)],
+            Tile::Wall(WallKind::WallEW),
+            "1, 0"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(2, 0)],
+            Tile::Wall(WallKind::WallEW),
+            "2, 0"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(0, 1)],
+            Tile::Wall(WallKind::WallSE),
+            "0, 1"
+        );
+        assert_eq!(
+            map[&WorldPoint::new(1, 1)],
+            Tile::Wall(WallKind::WallAllSides)
+        );
+        assert_eq!(map[&WorldPoint::new(2, 1)], Tile::Wall(WallKind::WallEW));
+        assert_eq!(
+            map[&WorldPoint::new(2, 2)],
+            Tile::Wall(WallKind::WallPillar)
+        );
+    }
 }

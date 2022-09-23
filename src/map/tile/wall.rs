@@ -43,7 +43,7 @@ impl WallKind {
             12 => Self::WallEW,       // Wall to the east and west
             13 => Self::WallEWS,      // Wall to the east, west, and south
             14 => Self::WallEWN,      // Wall to the east, west, and north
-            15 => Self::WallAllSides, // ╬ Wall on all sides
+            15 => Self::WallAllSides, // Wall on all sides
             _ => Self::WallDefault,   // We missed one?
         }
     }
@@ -55,16 +55,16 @@ impl WallKind {
 
         let mut mask: u8 = 0;
 
-        if let Some(Tile::Wall(_)) = map.get(point - *Cardinal::S.to_vector()) {
+        if let Some(Tile::Wall(_)) = map.get(point + *Cardinal::N.to_vector()) {
             mask += 1;
         }
-        if let Some(Tile::Wall(_)) = map.get(point - *Cardinal::N.to_vector()) {
+        if let Some(Tile::Wall(_)) = map.get(point + *Cardinal::S.to_vector()) {
             mask += 2;
         }
-        if let Some(Tile::Wall(_)) = map.get(point - *Cardinal::W.to_vector()) {
+        if let Some(Tile::Wall(_)) = map.get(point + *Cardinal::W.to_vector()) {
             mask += 4;
         }
-        if let Some(Tile::Wall(_)) = map.get(point - *Cardinal::E.to_vector()) {
+        if let Some(Tile::Wall(_)) = map.get(point + *Cardinal::E.to_vector()) {
             mask += 8;
         }
 
@@ -83,8 +83,8 @@ impl WallKind {
             Self::WallSE => '╔',
             Self::WallNSE => '╠',
             Self::WallEW => '═',
-            Self::WallEWS => '╩',
             Self::WallEWN => '╦',
+            Self::WallEWS => '╩',
             Self::WallAllSides => '╬',
             Self::WallDefault => '#',
         }
