@@ -1,8 +1,10 @@
-use ggez::graphics::Canvas;
+use ggez::graphics::{Canvas, DrawParam};
 use hecs::World;
 
 use crate::camera::Glyph;
+use crate::color::RGBA8Ext;
 use crate::component::{Position, Renderable};
+use crate::game::consts::get_screen_to_pixel_transform;
 use crate::game::draw_ui;
 use crate::map::VisibilityKind;
 use crate::resource::Resources;
@@ -18,12 +20,15 @@ impl Screen {
         Self { transform }
     }
 
-    fn draw(&self, canvas: &mut Canvas, _glyph: &Glyph, _point: &ScreenPoint) {
-        // draw_batch.set(
-        //     Point::new(point.x, point.y),
-        //     ColorPair::new(glyph.fg, glyph.bg),
-        //     glyph.glyph,
-        // );
+    fn draw(&self, canvas: &mut Canvas, resources: &Resources, glyph: &Glyph, point: ScreenPoint) {
+        let pixel_point = get_screen_to_pixel_transform().transform_point(point);
+
+        resources.font.draw_char(
+            canvas,
+            glyph.glyph,
+            &pixel_point,
+            Some(DrawParam::new().color(glyph.fg.to_ggez_color())),
+        );
     }
 
     pub fn to_screen_point(&self, point: ViewportPoint) -> ScreenPoint {
@@ -41,12 +46,13 @@ impl Screen {
             // before trying to make an index for it
             if map.contains(world_point) {
                 if map.is_visible(&world_point) {
+                    // TODO DELETEME TESTING
                     if let Some(tile) = map.get(world_point) {
                         let screen_point = self.to_screen_point(viewport_point);
                         let vis = VisibilityKind::Torch {
                             brightness: resources.rng.roll_dice(1, 40) as u32,
                         };
-                        tile.handler().render(canvas, &resources, screen_point, vis);
+                        tile.handler().render(canvas, resources, screen_point, vis);
                     }
 
                     let mut data = map
@@ -67,7 +73,7 @@ impl Screen {
                     for (pos, render) in data.iter() {
                         let viewport_point = viewport.to_viewport_point(pos.p);
                         let screen_point = self.to_screen_point(viewport_point);
-                        self.draw(canvas, &render.glyph, &screen_point);
+                        self.draw(canvas, resources, &render.glyph, screen_point);
                     }
                 } else if map.is_revealed(&world_point) {
                     if let Some(tile) = map.get(world_point) {

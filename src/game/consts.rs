@@ -27,7 +27,8 @@ pub fn get_screen_to_pixel_transform() -> ScreenToPixel {
         .then_scale(TILE_SIZE.width, TILE_SIZE.height)
 }
 
-pub const VIEWPORT_WIDTH: i32 = 90;
+// TODO: derive the viewport height instead
+pub const VIEWPORT_WIDTH: i32 = 50;
 pub const VIEWPORT_HEIGHT: i32 = 50;
 
 // Where on the screen is the viewport's origin?
@@ -47,3 +48,15 @@ pub const SIDE_BOX_WIDTH: i32 = SCREEN_WIDTH - VIEWPORT_WIDTH;
 pub const RESOURCE_PATH: &str = "assets";
 
 pub const SCALING_FACTOR: f32 = 2.;
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+    #[test]
+    fn geometry() {
+        let screen_point = SCREEN_RECT.center();
+        let pixel_point = get_screen_to_pixel_transform().transform_point(screen_point);
+
+        assert_eq!(pixel_point, PixelPoint::new(480, 256));
+    }
+}

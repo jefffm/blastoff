@@ -5,7 +5,7 @@ authors = ["Jeff Lynn <jmlynn@protonmail.com>"]
 edition = "2021"
 
 [dependencies]
-rgb = "0.8"
+rgb = { version = "0.8", features = ["serde"] }
 symmetric-shadowcasting = "0.2"
 pathfinding = "3.0"
 bracket-lib = { git = "https://github.com/patchfx/bracket-lib", branch = "fix-tile-leaks-on-cls", features = [

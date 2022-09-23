@@ -214,14 +214,7 @@ impl Spawner for Bsp {
         // Add the player
         world.spawn((
             Position::new(center),
-            Renderable::new(
-                Glyph::new(
-                    to_cp437('@'),
-                    COMMON.four.to_bracket_rgba(),
-                    Palette::empty().to_bracket_rgba(),
-                ),
-                5,
-            ),
+            Renderable::new(Glyph::new('@', COMMON.four, Palette::empty()), 5),
             viewshed,
             Player {},
             Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),
@@ -242,14 +235,7 @@ impl Spawner for Bsp {
                         monster_viewshed.set_dirty();
                         world.spawn((
                             Position::new(self.rooms[room_idx].center()),
-                            Renderable::new(
-                                Glyph::new(
-                                    to_cp437('$'),
-                                    FIRE.four.to_bracket_rgba(),
-                                    Palette::empty().to_bracket_rgba(),
-                                ),
-                                2,
-                            ),
+                            Renderable::new(Glyph::new('$', FIRE.four, Palette::empty()), 2),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
                             Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
@@ -267,14 +253,7 @@ impl Spawner for Bsp {
                                 // Add a (????) every once in a while for fireworld
                                 world.spawn((
                                     Position::new(point),
-                                    Renderable::new(
-                                        Glyph::new(
-                                            to_cp437('^'),
-                                            FIRE.four.to_bracket_rgba(),
-                                            COMMON.two.to_bracket_rgba(),
-                                        ),
-                                        1,
-                                    ),
+                                    Renderable::new(Glyph::new('^', FIRE.four, COMMON.two), 1),
                                 ));
                             }
                         }
@@ -285,14 +264,7 @@ impl Spawner for Bsp {
                         monster_viewshed.set_dirty();
                         world.spawn((
                             Position::new(self.rooms[room_idx].center()),
-                            Renderable::new(
-                                Glyph::new(
-                                    to_cp437('&'),
-                                    WATER.four.to_bracket_rgba(),
-                                    Palette::empty().to_bracket_rgba(),
-                                ),
-                                2,
-                            ),
+                            Renderable::new(Glyph::new('&', WATER.four, Palette::empty()), 2),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
                             Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
@@ -310,14 +282,7 @@ impl Spawner for Bsp {
                                 // Add a puddle every once in a while for water
                                 world.spawn((
                                     Position::new(point),
-                                    Renderable::new(
-                                        Glyph::new(
-                                            to_cp437('~'),
-                                            WATER.one.to_bracket_rgba(),
-                                            WATER.two.to_bracket_rgba(),
-                                        ),
-                                        1,
-                                    ),
+                                    Renderable::new(Glyph::new('~', WATER.one, WATER.two), 1),
                                 ));
                             }
                         }
@@ -328,14 +293,7 @@ impl Spawner for Bsp {
                         monster_viewshed.set_dirty();
                         world.spawn((
                             Position::new(self.rooms[room_idx].center()),
-                            Renderable::new(
-                                Glyph::new(
-                                    to_cp437('%'),
-                                    PLANT.four.to_bracket_rgba(),
-                                    Palette::empty().to_bracket_rgba(),
-                                ),
-                                2,
-                            ),
+                            Renderable::new(Glyph::new('%', PLANT.four, Palette::empty()), 2),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
                             Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
@@ -353,14 +311,7 @@ impl Spawner for Bsp {
                                 // Add a puddle every once in a while for water
                                 world.spawn((
                                     Position::new(point),
-                                    Renderable::new(
-                                        Glyph::new(
-                                            to_cp437('{'),
-                                            PLANT.three.to_bracket_rgba(),
-                                            PLANT.one.to_bracket_rgba(),
-                                        ),
-                                        1,
-                                    ),
+                                    Renderable::new(Glyph::new('{', PLANT.three, PLANT.one), 1),
                                 ));
                             }
                         }

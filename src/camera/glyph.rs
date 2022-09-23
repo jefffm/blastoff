@@ -1,21 +1,15 @@
-use bracket_lib::prelude::BTerm;
-use bracket_lib::prelude::RGBA;
+use rgb::RGBA8;
 use serde::{Deserialize, Serialize};
-
-use crate::util::ScreenPoint;
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq, Clone, Copy)]
 pub struct Glyph {
-    pub glyph: u16,
-    pub fg: RGBA,
-    pub bg: RGBA,
+    pub glyph: char,
+    pub fg: RGBA8,
+    pub bg: RGBA8,
 }
 
 impl Glyph {
-    pub fn new(glyph: u16, fg: RGBA, bg: RGBA) -> Self {
+    pub fn new(glyph: char, fg: RGBA8, bg: RGBA8) -> Self {
         Self { glyph, fg, bg }
-    }
-    pub fn render(&self, ctx: &mut BTerm, point: &ScreenPoint) {
-        ctx.set(point.x, point.y, self.fg, self.bg, self.glyph)
     }
 }

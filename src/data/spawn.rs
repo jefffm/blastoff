@@ -1,6 +1,5 @@
-use bracket_lib::prelude::to_cp437;
-use bracket_lib::terminal::RGBA;
 use hecs::{Entity, World};
+use rgb::RGBA8;
 use serde::Deserialize;
 
 use crate::{
@@ -15,8 +14,8 @@ use crate::{
 pub struct Actor {
     name: String,
     glyph: char,
-    fg: RGBA,
-    bg: RGBA,
+    fg: RGBA8,
+    bg: RGBA8,
     #[serde(default)]
     zorder: u32,
     view_range: i32,
@@ -41,7 +40,7 @@ impl Spawnable for Actor {
     fn into_spawn(self, point: WorldPoint, world: &mut World) -> Entity {
         let position = Position::new(point);
         let renderable = Renderable {
-            glyph: Glyph::new(to_cp437(self.glyph), self.fg, self.bg),
+            glyph: Glyph::new(self.glyph, self.fg, self.bg),
             render_order: self.zorder,
         };
         let viewshed = Viewshed::default().with_range(self.view_range).with_init();
