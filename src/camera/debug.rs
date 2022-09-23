@@ -2,7 +2,7 @@ use ggez::graphics::Canvas;
 
 use crate::{
     game::consts::SCREEN_RECT,
-    map::{Map, VisibilityKind},
+    map::VisibilityKind,
     resource::{Resources, Viewport},
     util::{
         ScreenPoint, TransformExt, ViewportPoint, ViewportRect, ViewportSize, ViewportToScreen,
@@ -32,7 +32,7 @@ pub fn render_debug_map(
         let world_point = viewport.to_world_point(viewport_point);
         if let Some(tile) = map.get(world_point) {
             let screen_point = t2.transform_point(viewport_point);
-            tile.handler().render(
+            tile.render(
                 canvas,
                 resources,
                 screen_point,

@@ -13,7 +13,7 @@ use crate::{
     color::{RGBA8Ext, COMMON, EMPTY},
     game::consts::get_screen_to_pixel_transform,
     resource::Resources,
-    util::{BitmapFont, ScreenPoint, SpritePoint},
+    util::ScreenPoint,
 };
 pub enum VisibilityKind {
     Torch { brightness: u32 },
@@ -25,48 +25,54 @@ pub enum VisibilityKind {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Tile {
-    Floor,
-    Wall,
+    Floor(FloorKind),
+    Wall(WallKind),
 }
 
 impl Default for Tile {
     fn default() -> Self {
-        Self::Floor
+        Self::Floor(FloorKind::default())
     }
 }
 
 impl Tile {
-    pub fn handler(&self) -> Box<dyn TileHandler> {
+    pub fn glyph(&self) -> char {
         match self {
-            Self::Floor => Box::new(Floor {}),
-            Self::Wall => Box::new(Wall {}),
+            Self::Floor(floor) => floor.glyph(),
+            Self::Wall(wall) => wall.glyph(),
         }
     }
 
-    pub fn value(&self) -> SpritePoint {
-        match self {
-            Self::Floor => SpritePoint::new(7, 0),
-            Self::Wall => SpritePoint::new(5, 1),
-        }
-    }
-}
-
-/// TileHandler
-pub trait TileHandler {
-    fn glyph(&self) -> char;
     fn color_pair(&self) -> ColorPair {
-        // Default implementation
         ColorPair::new(self.fg().to_bracket_rgba(), self.bg().to_bracket_rgba())
     }
 
-    fn is_passable(&self) -> bool;
-    fn is_opaque(&self) -> bool;
-    fn fg(&self) -> RGBA8;
-    fn bg(&self) -> RGBA8 {
+    pub fn is_passable(&self) -> bool {
+        match self {
+            Self::Floor(floor) => floor.is_passable(),
+            Self::Wall(wall) => wall.is_passable(),
+        }
+    }
+
+    pub fn is_opaque(&self) -> bool {
+        match self {
+            Self::Floor(floor) => floor.is_opaque(),
+            Self::Wall(wall) => wall.is_opaque(),
+        }
+    }
+
+    pub fn fg(&self) -> RGBA8 {
+        match self {
+            Self::Floor(floor) => floor.fg(),
+            Self::Wall(wall) => wall.fg(),
+        }
+    }
+
+    pub fn bg(&self) -> RGBA8 {
         EMPTY
     }
 
-    fn render(
+    pub fn render(
         &self,
         canvas: &mut Canvas,
         resources: &Resources,
@@ -74,7 +80,6 @@ pub trait TileHandler {
         visibility_kind: VisibilityKind,
     ) {
         let pixel_point = get_screen_to_pixel_transform().transform_point(point);
-        // TODO: use blit for each of these
         match visibility_kind {
             VisibilityKind::Torch { brightness: _ } => {
                 // TODO: use torch brightness to modify rendering brightness
@@ -109,43 +114,3 @@ pub trait TileHandler {
         }
     }
 }
-
-// fn wall_glyph(map: &Map, x: i32, y: i32) -> FontCharType {
-//     if x < 1 || x > map.width - 2 || y < 1 || y > map.height - 2 as i32 {
-//         return 35;
-//     }
-//     let mut mask: u8 = 0;
-
-//     if is_revealed_and_wall(map, x, y - 1) {
-//         mask += 1;
-//     }
-//     if is_revealed_and_wall(map, x, y + 1) {
-//         mask += 2;
-//     }
-//     if is_revealed_and_wall(map, x - 1, y) {
-//         mask += 4;
-//     }
-//     if is_revealed_and_wall(map, x + 1, y) {
-//         mask += 8;
-//     }
-
-//     match mask {
-//         0 => 9,    // Pillar because we can't see neighbors
-//         1 => 186,  // Wall only to the north
-//         2 => 186,  // Wall only to the south
-//         3 => 186,  // Wall to the north and south
-//         4 => 205,  // Wall only to the west
-//         5 => 188,  // Wall to the north and west
-//         6 => 187,  // Wall to the south and west
-//         7 => 185,  // Wall to the north, south and west
-//         8 => 205,  // Wall only to the east
-//         9 => 200,  // Wall to the north and east
-//         10 => 201, // Wall to the south and east
-//         11 => 204, // Wall to the north, south and east
-//         12 => 205, // Wall to the east and west
-//         13 => 202, // Wall to the east, west, and south
-//         14 => 203, // Wall to the east, west, and north
-//         15 => 206, // ╬ Wall on all sides
-//         _ => 35,   // We missed one?
-//     }
-// }

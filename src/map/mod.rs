@@ -40,7 +40,7 @@ pub struct Map {
 impl Map {
     /// Create a map with a given size filled in with Wall tiles
     pub fn init(name: String, size: WorldSize, level: u32) -> Self {
-        let tiles = vec![Tile::Wall; (size.height * size.width) as usize];
+        let tiles = vec![Tile::Wall(WallKind::default()); (size.height * size.width) as usize];
         Self::new(name, size.width, size.height, tiles, level)
     }
 
@@ -146,7 +146,7 @@ impl Map {
             }
 
             // If it's blocked via the tile, it's blocked
-            let tile = self.tiles[idx].handler();
+            let tile = &self.tiles[idx];
             if !tile.is_passable() {
                 return true;
             }
@@ -209,16 +209,16 @@ impl Map {
         self.level
     }
 
-    pub fn iter_tiles(&self) -> impl Iterator<Item = (WorldPoint, &Tile)> {
+    pub fn iter_points(&self) -> impl Iterator<Item = WorldPoint> {
         let xrange = self.rect.x_range();
         let yrange = self.rect.y_range();
 
-        xrange.flat_map(move |x| {
-            yrange.clone().map(move |y| {
-                let point = WorldPoint::new(x, y);
-                (point, &self.tiles[point.to_index(self.get_width())])
-            })
-        })
+        xrange.flat_map(move |x| yrange.clone().map(move |y| WorldPoint::new(x, y)))
+    }
+
+    pub fn iter_tiles(&self) -> impl Iterator<Item = (WorldPoint, &Tile)> {
+        self.iter_points()
+            .map(|point| (point, &self.tiles[point.to_index(self.get_width())]))
     }
 
     pub fn get(&self, point: WorldPoint) -> Option<&Tile> {
@@ -245,7 +245,7 @@ impl Map {
         let idx = point.to_index(self.get_width());
         self.assert_idx_for_point(idx, point);
 
-        self.tiles[idx].handler().is_opaque()
+        self.tiles[idx].is_opaque()
     }
 }
 
@@ -281,7 +281,7 @@ mod tests {
         for x in map.rect.x_range() {
             for y in map.rect.y_range() {
                 let point = &WorldPoint::new(x, y);
-                map[point] = Tile::Floor;
+                map[point] = Tile::Floor(FloorKind::default());
                 map.set_blocked(point);
             }
         }
@@ -300,7 +300,13 @@ mod tests {
 
     #[test]
     fn path_open() {
-        let map = Map::new(String::from("test"), 5, 5, vec![Tile::Floor; 25], 1);
+        let map = Map::new(
+            String::from("test"),
+            5,
+            5,
+            vec![Tile::Floor(FloorKind::default()); 25],
+            1,
+        );
 
         let start = WorldPoint::new(0, 0);
         let end = WorldPoint::new(4, 0);
@@ -314,12 +320,12 @@ mod tests {
 
     #[test]
     fn path_closed() {
-        let mut tiles = vec![Tile::Floor; 25];
+        let mut tiles = vec![Tile::Floor(FloorKind::default()); 25];
 
         // Create a wall dividing the square down the middle
         for y in 0..3 {
             let point = WorldPoint::new(2, y);
-            tiles[point.to_index(5)] = Tile::Wall;
+            tiles[point.to_index(5)] = Tile::Wall(WallKind::default());
         }
 
         let map = Map::new(String::from("test"), 5, 5, tiles, 1);
@@ -327,8 +333,8 @@ mod tests {
         let start = WorldPoint::new(0, 0);
         let end = WorldPoint::new(4, 0);
 
-        assert_eq!(map[&WorldPoint::new(2, 0)], Tile::Wall);
-        assert!(!map[&WorldPoint::new(2, 0)].handler().is_passable());
+        assert_eq!(map[&WorldPoint::new(2, 0)], Tile::Wall(WallKind::default()));
+        assert!(!map[&WorldPoint::new(2, 0)].is_passable());
         assert!(map.is_blocked(&WorldPoint::new(2, 0)));
         assert!(map.is_blocked(&WorldPoint::new(2, 1)));
         assert!(map.is_blocked(&WorldPoint::new(2, 2)));
