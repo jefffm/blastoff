@@ -203,9 +203,22 @@ impl MapGenerator for Bsp {
         }
 
         let points: Vec<_> = map.iter_points().collect();
-        for point in points {
-            if let Some(Tile::Wall(_)) = map.get(point) {
-                map[&point] = Tile::Wall(WallKind::from_map_position(&map, point));
+
+        // first pass to find all the "all sides" walls and replace them with floor
+        for point in &points {
+            if let Some(Tile::Wall(_)) = map.get(*point) {
+                if let Tile::Wall(WallKind::WallAllSides) =
+                    Tile::Wall(WallKind::from_map_position(&map, *point))
+                {
+                    map[point] = Tile::Floor(FloorKind::default());
+                }
+            }
+        }
+
+        // second pass to flip all the walls
+        for point in &points {
+            if let Some(Tile::Wall(_)) = map.get(*point) {
+                map[point] = Tile::Wall(WallKind::from_map_position(&map, *point));
             }
         }
 
