@@ -41,8 +41,8 @@ impl WallKind {
             10 => Self::WallSE,       // Wall to the south and east
             11 => Self::WallNSE,      // Wall to the north, south and east
             12 => Self::WallEW,       // Wall to the east and west
-            13 => Self::WallEWS,      // Wall to the east, west, and south
-            14 => Self::WallEWN,      // Wall to the east, west, and north
+            13 => Self::WallEWN,      // Wall to the east, west, and north
+            14 => Self::WallEWS,      // Wall to the east, west, and south
             15 => Self::WallAllSides, // Wall on all sides
             _ => Self::WallDefault,   // We missed one?
         }
@@ -83,8 +83,8 @@ impl WallKind {
             Self::WallSE => '╔',
             Self::WallNSE => '╠',
             Self::WallEW => '═',
-            Self::WallEWN => '╦',
-            Self::WallEWS => '╩',
+            Self::WallEWS => '╦',
+            Self::WallEWN => '╩',
             Self::WallAllSides => '╬',
             Self::WallDefault => '#',
         }

@@ -448,27 +448,23 @@ mod tests {
         );
         assert_eq!(
             map[&WorldPoint::new(1, 0)],
-            Tile::Wall(WallKind::WallEW),
+            Tile::Wall(WallKind::WallEWS),
             "1, 0"
         );
         assert_eq!(
             map[&WorldPoint::new(2, 0)],
-            Tile::Wall(WallKind::WallEW),
+            Tile::Wall(WallKind::WallSW),
             "2, 0"
         );
         assert_eq!(
             map[&WorldPoint::new(0, 1)],
-            Tile::Wall(WallKind::WallSE),
+            Tile::Wall(WallKind::WallNSE),
             "0, 1"
         );
         assert_eq!(
             map[&WorldPoint::new(1, 1)],
             Tile::Wall(WallKind::WallAllSides)
         );
-        assert_eq!(map[&WorldPoint::new(2, 1)], Tile::Wall(WallKind::WallEW));
-        assert_eq!(
-            map[&WorldPoint::new(2, 2)],
-            Tile::Wall(WallKind::WallPillar)
-        );
+        assert_eq!(map[&WorldPoint::new(2, 1)], Tile::Wall(WallKind::WallNSW));
     }
 }
