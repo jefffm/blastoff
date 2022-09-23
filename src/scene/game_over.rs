@@ -1,8 +1,12 @@
-use bracket_lib::prelude::*;
-use ggez::graphics::Canvas;
+use ggez::graphics::{Canvas, DrawParam};
 use std::fmt;
 
-use crate::resource::Resources;
+use crate::{
+    color::{RGBA8Ext, COMMON},
+    game::consts::{PIXEL_RECT, SCREEN_RECT},
+    resource::Resources,
+    util::PixelPoint,
+};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum GameOverSelection {
@@ -21,13 +25,24 @@ impl fmt::Display for GameOverSelection {
 }
 
 impl GameOverSelection {
-    fn print(&self, canvas: &mut Canvas, _y: i32, selection: &GameOverSelection) {
-        let _fg = if selection == self {
-            RGB::named(WHITE)
+    fn print(
+        &self,
+        canvas: &mut Canvas,
+        resources: &Resources,
+        y: i32,
+        selection: &GameOverSelection,
+    ) {
+        let fg = if selection == self {
+            COMMON.five
         } else {
-            RGB::named(GRAY)
+            COMMON.three
         };
-        // print_color_centered(y, self.to_string(), ColorPair::new(fg, BLACK));
+        resources.font.draw_each_char(
+            canvas,
+            &self.to_string(),
+            &PixelPoint::new(SCREEN_RECT.center().x, y),
+            Some(DrawParam::default().color(fg.to_ggez_color())),
+        );
     }
 
     pub fn entries(&self) -> Vec<GameOverSelection> {
@@ -46,13 +61,19 @@ pub fn draw_game_over(
     selection: &GameOverSelection,
     resources: &mut Resources,
 ) {
-    // print_color_centered(
-    //     11,
-    //     "You are Dead",
-    //     ColorPair::new(RGB::named(DARK_RED), RGB::named(BLACK)),
-    // );
+    resources.font.draw_each_char(
+        canvas,
+        "You are Dead",
+        &PixelPoint::new(PIXEL_RECT.center().x, 0),
+        None,
+    );
 
     for (i, entry) in selection.entries().iter().enumerate() {
-        entry.print(canvas, 14 + i as i32, selection);
+        entry.print(
+            canvas,
+            resources,
+            resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
+            selection,
+        );
     }
 }

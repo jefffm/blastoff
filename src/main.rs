@@ -31,6 +31,9 @@ use crate::game::consts::SCALING_FACTOR;
 use crate::game::consts::SCREEN_HEIGHT_PIXELS;
 use crate::game::consts::SCREEN_WIDTH_PIXELS;
 use crate::game::consts::TITLE_HEADER;
+use crate::util::BitmapFont;
+use crate::util::SpriteSheet;
+use crate::util::SpriteSize;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -55,36 +58,6 @@ fn main() -> GameResult {
 
     // TODO: remove game::env mutability
     game::env().show_map_generation = cli.mapgen_show;
-    // TODO: add seed parameter to CLI
-    let rng_seed = game::env()
-        .seed
-        .unwrap_or_else(|| rand::thread_rng().next_u64());
-
-    info!("using rng seed: {}", rng_seed);
-
-    info!("linking resources");
-    // TODO: load sprite sheet like https://github.com/ggez/ggez/blob/0.8.0-rc0/examples/animation.rs#L237
-
-    info!("creating GameState");
-
-    // TODO: move this into Game::new()
-    let resources = Resources {
-        rng: RandomNumberGenerator::seeded(rng_seed),
-        controller: Controller::default(),
-        map: None,
-        mapgen_history: Vec::default(),
-        run_state: Some(RunState::MainMenu(MainMenuSelection::NewGame)),
-        turn_number: 0,
-        turn_history: TurnsHistory::default(),
-        viewport: Viewport::new(
-            ViewportRect::new(
-                ViewportPoint::new(0, 0),
-                ViewportSize::new(consts::VIEWPORT_WIDTH, consts::VIEWPORT_HEIGHT),
-            ),
-            WorldToViewport::default(),
-        ),
-    };
-
     // TODO: add resources path using cargo manifest dir https://github.com/joetsoi/OpenMoonstone/blob/master/rust/src/main.rs#L108-L113
     let mut builder = ContextBuilder::new("roguemon", "Jeff Lynn");
     if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
@@ -104,6 +77,45 @@ fn main() -> GameResult {
         )
         .build()
         .expect("aieee, could not create ggez context!");
+
+    // TODO: add seed parameter to CLI
+    let rng_seed = game::env()
+        .seed
+        .unwrap_or_else(|| rand::thread_rng().next_u64());
+
+    info!("using rng seed: {}", rng_seed);
+
+    info!("linking resources");
+    // TODO: load sprite sheet like https://github.com/ggez/ggez/blob/0.8.0-rc0/examples/animation.rs#L237
+
+    info!("creating GameState");
+    let font_image =
+        graphics::Image::from_path(&ctx, "/fonts/rex_16x16.png", true).expect("load font");
+    let font = BitmapFont::from_grid(&ctx, font_image, &SpriteSize::new(16, 16));
+
+    let spritesheet_image =
+        graphics::Image::from_path(&ctx, "/tileset/monochrome-transparent.png", true)
+            .expect("load spritesheet");
+    let spritesheet = SpriteSheet::from_grid(&ctx, spritesheet_image, SpriteSize::new(49, 22));
+
+    let resources = Resources {
+        rng: RandomNumberGenerator::seeded(rng_seed),
+        controller: Controller::default(),
+        map: None,
+        mapgen_history: Vec::default(),
+        run_state: Some(RunState::MainMenu(MainMenuSelection::NewGame)),
+        turn_number: 0,
+        turn_history: TurnsHistory::default(),
+        viewport: Viewport::new(
+            ViewportRect::new(
+                ViewportPoint::new(0, 0),
+                ViewportSize::new(consts::VIEWPORT_WIDTH, consts::VIEWPORT_HEIGHT),
+            ),
+            WorldToViewport::default(),
+        ),
+        font,
+        spritesheet,
+    };
 
     let game = Game::new(resources, &mut ctx);
 

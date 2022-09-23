@@ -1,15 +1,8 @@
-use std::{collections::HashMap, ops::Index};
+use std::ops::Index;
 
-use bracket_lib::terminal::to_char;
 use ggez::{context::Has, graphics};
 
-use crate::game::consts::SCALING_FACTOR;
-
 use super::{PixelPoint, PixelSize, PointExt, SpritePoint, SpriteRect, SpriteSize};
-
-fn create_cp437_string() -> String {
-    (0..255u8).map(to_char).collect()
-}
 
 /// Describes the layout of characters in your
 /// bitmap font.

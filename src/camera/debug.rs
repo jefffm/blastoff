@@ -3,7 +3,7 @@ use ggez::graphics::Canvas;
 use crate::{
     game::consts::SCREEN_RECT,
     map::{Map, VisibilityKind},
-    resource::Viewport,
+    resource::{Resources, Viewport},
     util::{
         ScreenPoint, TransformExt, ViewportPoint, ViewportRect, ViewportSize, ViewportToScreen,
         WorldToViewport,
@@ -11,7 +11,13 @@ use crate::{
 };
 
 // Create default transforms and render the map as absolute coordinates
-pub fn render_debug_map(canvas: &mut Canvas, map: &Map, _show_boundaries: bool, _index: usize) {
+pub fn render_debug_map(
+    canvas: &mut Canvas,
+    resources: &mut Resources,
+    _show_boundaries: bool,
+    index: usize,
+) {
+    let map = &resources.mapgen_history[index];
     let t1 = WorldToViewport::default();
     let t2 = ViewportToScreen::from_points(ViewportPoint::new(0, 0), ScreenPoint::new(0, 1));
     let viewport = Viewport::new(
@@ -28,6 +34,7 @@ pub fn render_debug_map(canvas: &mut Canvas, map: &Map, _show_boundaries: bool, 
             let screen_point = t2.transform_point(viewport_point);
             tile.handler().render(
                 canvas,
+                resources,
                 screen_point,
                 VisibilityKind::Torch { brightness: 50 },
             );

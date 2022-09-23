@@ -34,21 +34,10 @@ pub struct Game {
     screen: Screen,
     controls: Controls,
     canvas_image: graphics::ScreenImage,
-    font: BitmapFont,
-    spritesheet: SpriteSheet,
 }
 
 impl Game {
     pub fn new(resources: Resources, ctx: &mut Context) -> Self {
-        let font_image =
-            graphics::Image::from_path(ctx, "/fonts/rex_8x8.png", true).expect("load font");
-        let font = BitmapFont::from_grid(ctx, font_image, &SpriteSize::new(16, 16));
-
-        let spritesheet_image =
-            graphics::Image::from_path(ctx, "/tileset/monochrome-transparent.png", true)
-                .expect("load spritesheet");
-        let spritesheet = SpriteSheet::from_grid(ctx, spritesheet_image, SpriteSize::new(49, 22));
-
         Self {
             state: RunState::MainMenu(MainMenuSelection::NewGame),
             scheduler: build_systems(),
@@ -66,8 +55,6 @@ impl Game {
                 1. / SCALING_FACTOR,
                 1,
             ),
-            font,
-            spritesheet,
         }
     }
 
@@ -233,6 +220,9 @@ impl EventHandler for Game {
         // let mut canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);
         canvas.set_sampler(graphics::Sampler::nearest_clamp());
 
+        self.resources.font.clear();
+        // self.resources.spritesheet.clear();
+
         match &self.state {
             // menus
             RunState::MainMenu(selection) => {
@@ -252,7 +242,7 @@ impl EventHandler for Game {
             }
 
             RunState::MapGeneration(map_state) => {
-                map_state.draw(&mut canvas, &self.resources.mapgen_history);
+                map_state.draw(&mut canvas, &mut self.resources);
             }
 
             _ => {
@@ -260,19 +250,18 @@ impl EventHandler for Game {
             }
         };
 
-        canvas.draw(
-            self.font.text(
-                "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz ",
-                &PixelPoint::new(0, 50),
-            ),
-            DrawParam::default(),
-        );
+        // canvas.draw(
+        //     self.resources
+        //         .spritesheet
+        //         .push_sprite(SpritePoint::new(0, 1), PixelPoint::new(100, 100)),
+        //     DrawParam::default(),
+        // );
 
         canvas.draw(
-            self.spritesheet
-                .push_sprite(SpritePoint::new(0, 1), PixelPoint::new(100, 100)),
-            DrawParam::default(),
+            &self.resources.font,
+            graphics::DrawParam::new().dest([0., 0.]),
         );
+        // self.resources.spritesheet;
 
         canvas.finish(ctx)?;
 

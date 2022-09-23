@@ -1,5 +1,6 @@
 use crate::camera;
 use crate::map::Map;
+use crate::resource::Resources;
 use bracket_lib::prelude::*;
 use ggez::graphics::Canvas;
 
@@ -23,7 +24,7 @@ impl MapGenerationState {
         self.index >= history.len()
     }
 
-    pub fn draw(&self, canvas: &mut Canvas, history: &[Map]) {
-        camera::render_debug_map(canvas, &history[self.index], true, self.index);
+    pub fn draw(&self, canvas: &mut Canvas, resources: &mut Resources) {
+        camera::render_debug_map(canvas, resources, true, self.index);
     }
 }

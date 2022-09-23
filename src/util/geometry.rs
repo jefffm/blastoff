@@ -24,6 +24,7 @@ pub type SpriteRect = Rect<i32, SpriteSpace>;
 
 pub type SpriteToPixel = Transform2D<i32, SpriteSpace, PixelSpace>;
 
+/// Pixel space is a subdivision of screen space
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PixelSpace;
 
@@ -34,6 +35,7 @@ pub type PixelRect = Rect<i32, PixelSpace>;
 pub type PixelToScreen = Transform2D<i32, PixelSpace, ScreenSpace>;
 pub type ScreenToPixel = Transform2D<i32, ScreenSpace, PixelSpace>;
 
+/// Screen space translates Viewport space into the right position for the GUI
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ScreenSpace;
 
@@ -43,6 +45,7 @@ pub type ScreenRect = Rect<i32, ScreenSpace>;
 
 pub type ViewportToScreen = Transform2D<i32, ViewportSpace, ScreenSpace>;
 
+/// Viewport space translates the current visible chunk of map for rendering
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ViewportSpace;
 
@@ -50,6 +53,8 @@ pub type ViewportPoint = Point2D<i32, ViewportSpace>;
 pub type ViewportSize = Size2D<i32, ViewportSpace>;
 pub type ViewportRect = Rect<i32, ViewportSpace>;
 
+/// World space is relative to game world map coordinates
+/// Our world is integer-based because we have a map tile system
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WorldSpace;
 

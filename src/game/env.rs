@@ -13,7 +13,6 @@ pub fn env<'a>() -> MutexGuard<'a, GameEnv> {
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct GameEnv {
-    pub tile_size: i32,
     pub is_debug_mode: bool,
     pub seed: Option<u64>,
     pub show_map_generation: bool,
@@ -28,7 +27,6 @@ impl GameEnv {
 impl Default for GameEnv {
     fn default() -> Self {
         Self {
-            tile_size: consts::TILE_SIZE,
             is_debug_mode: false,
             seed: None,
             show_map_generation: false,

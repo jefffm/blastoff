@@ -43,13 +43,10 @@ impl Screen {
                 if map.is_visible(&world_point) {
                     if let Some(tile) = map.get(world_point) {
                         let screen_point = self.to_screen_point(viewport_point);
-                        tile.handler().render(
-                            canvas,
-                            screen_point,
-                            VisibilityKind::Torch {
-                                brightness: resources.rng.roll_dice(1, 40) as u32,
-                            },
-                        );
+                        let vis = VisibilityKind::Torch {
+                            brightness: resources.rng.roll_dice(1, 40) as u32,
+                        };
+                        tile.handler().render(canvas, &resources, screen_point, vis);
                     }
 
                     let mut data = map
@@ -75,8 +72,12 @@ impl Screen {
                 } else if map.is_revealed(&world_point) {
                     if let Some(tile) = map.get(world_point) {
                         let screen_point = self.to_screen_point(viewport_point);
-                        tile.handler()
-                            .render(canvas, screen_point, VisibilityKind::Remembered);
+                        tile.handler().render(
+                            canvas,
+                            resources,
+                            screen_point,
+                            VisibilityKind::Remembered,
+                        );
                     }
                 }
             }

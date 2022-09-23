@@ -1,14 +1,11 @@
-use euclid::Point2D;
-use ggez::graphics::{self, Canvas};
-use rgb::RGBA8;
+use ggez::graphics::{Canvas, DrawParam};
 use std::fmt;
 
 use crate::{
     color::{RGBA8Ext, COMMON},
-    game::consts::{PIXEL_RECT, SCREEN_HEIGHT_PIXELS, SCREEN_RECT, SCREEN_WIDTH_PIXELS},
-    map::Tile,
+    game::consts::{PIXEL_RECT, SCREEN_RECT, TITLE_HEADER},
     resource::Resources,
-    util::{PixelPoint, PixelSize},
+    util::PixelPoint,
 };
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -30,17 +27,23 @@ impl fmt::Display for MainMenuSelection {
 }
 
 impl MainMenuSelection {
-    fn print(&self, canvas: &mut Canvas, y: i32, selection: &MainMenuSelection) {
+    fn print(
+        &self,
+        canvas: &mut Canvas,
+        resources: &mut Resources,
+        y: i32,
+        selection: &MainMenuSelection,
+    ) {
         let fg = if selection == self {
             COMMON.five
         } else {
             COMMON.three
         };
-        canvas.draw(
-            graphics::Text::new(self.to_string()).set_scale(50.),
-            graphics::DrawParam::default()
-                .dest([0.0_f32, y as f32])
-                .color(fg.to_ggez_color()),
+        resources.font.draw_each_char(
+            canvas,
+            &self.to_string(),
+            &PixelPoint::new(SCREEN_RECT.center().x, y),
+            Some(DrawParam::default().color(fg.to_ggez_color())),
         );
     }
 
@@ -64,15 +67,20 @@ pub fn draw_main_menu(
     resources: &mut Resources,
 ) {
     let can_continue: bool = false;
-
-    // print_color_centered(
-    //     11,
-    //     TITLE_HEADER,
-    //     ColorPair::new(RGB::named(WHITE), RGB::named(BLACK)),
-    // );
+    resources.font.draw_each_char(
+        canvas,
+        TITLE_HEADER,
+        &PixelPoint::new(PIXEL_RECT.center().x, 0),
+        None,
+    );
 
     let entries = selection.entries(can_continue);
     for (i, entry) in entries.iter().enumerate() {
-        entry.print(canvas, 50 * i as i32, selection);
+        entry.print(
+            canvas,
+            resources,
+            resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
+            selection,
+        );
     }
 }

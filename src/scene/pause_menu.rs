@@ -1,8 +1,12 @@
-use bracket_lib::prelude::*;
-use ggez::graphics::Canvas;
+use ggez::graphics::{Canvas, DrawParam};
 use std::fmt;
 
-use crate::resource::Resources;
+use crate::{
+    color::{RGBA8Ext, COMMON},
+    game::consts::{PIXEL_RECT, SCREEN_RECT, TITLE_HEADER},
+    resource::Resources,
+    util::PixelPoint,
+};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum PauseMenuSelection {
@@ -21,13 +25,24 @@ impl fmt::Display for PauseMenuSelection {
 }
 
 impl PauseMenuSelection {
-    fn print(&self, canvas: &mut Canvas, _y: i32, selection: &PauseMenuSelection) {
-        let _fg = if selection == self {
-            RGB::named(WHITE)
+    fn print(
+        &self,
+        canvas: &mut Canvas,
+        resources: &Resources,
+        y: i32,
+        selection: &PauseMenuSelection,
+    ) {
+        let fg = if selection == self {
+            COMMON.five
         } else {
-            RGB::named(GRAY)
+            COMMON.three
         };
-        // print_color_centered(y, self.to_string(), ColorPair::new(fg, RGB::named(BLACK)));
+        resources.font.draw_each_char(
+            canvas,
+            &self.to_string(),
+            &PixelPoint::new(SCREEN_RECT.center().x, y),
+            Some(DrawParam::default().color(fg.to_ggez_color())),
+        );
     }
 
     pub fn entries(&self) -> Vec<PauseMenuSelection> {
@@ -48,9 +63,19 @@ pub fn draw_pause_menu(
     selection: &PauseMenuSelection,
     resources: &mut Resources,
 ) {
-    // print_color_centered(11, TITLE_HEADER, ColorPair::new(WHITE, BLACK));
+    resources.font.draw_each_char(
+        canvas,
+        TITLE_HEADER,
+        &PixelPoint::new(PIXEL_RECT.center().x, 0),
+        None,
+    );
 
     for (i, entry) in selection.entries().iter().enumerate() {
-        entry.print(canvas, 14 + i as i32, selection);
+        entry.print(
+            canvas,
+            resources,
+            resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
+            selection,
+        );
     }
 }

@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
 use bracket_lib::terminal::to_char;
-use ggez::{context::Has, graphics};
+use ggez::{
+    context::Has,
+    graphics::{self, Canvas, DrawParam, Drawable},
+};
 
 use crate::game::consts::SCALING_FACTOR;
 
@@ -80,7 +83,7 @@ impl TextMap {
 pub struct BitmapFont {
     batch: graphics::InstanceArray,
     text_map: TextMap,
-    char_size: PixelSize,
+    pub char_size: PixelSize,
 }
 
 impl BitmapFont {
@@ -116,11 +119,60 @@ impl BitmapFont {
             char_size,
         }
     }
+    pub fn draw_char(
+        &self,
+        canvas: &mut Canvas,
+        c: char,
+        point: &PixelPoint,
+        draw_param: Option<DrawParam>,
+    ) {
+        let base_param = draw_param.unwrap_or_else(DrawParam::new);
+        let rect = self.get_for_char(c);
+        let dest_rect = graphics::Rect::new_i32(
+            point.x,
+            point.y,
+            self.char_size.width,
+            self.char_size.height,
+        );
+        let draw_param = base_param
+            .src(*rect)
+            .dest_rect(dest_rect)
+            .image_scale(false);
 
-    /// Create and return a Drawable InstanceArray of a single string
-    pub fn text(&mut self, text: &str, point: &PixelPoint) -> &impl graphics::Drawable {
-        let draw_params: Vec<_> = text
-            .chars()
+        canvas.draw(&self.batch.image(), draw_param);
+    }
+
+    pub fn draw_each_char(
+        &self,
+        canvas: &mut Canvas,
+        text: &str,
+        point: &PixelPoint,
+        draw_param: Option<DrawParam>,
+    ) {
+        let draw_params = self.string_to_draw_params(text, point, draw_param);
+        for draw_param in draw_params {
+            canvas.draw(&self.batch.image(), draw_param);
+        }
+    }
+
+    pub fn push_text(&mut self, text: &str, point: &PixelPoint, draw_param: Option<DrawParam>) {
+        let draw_params = self.string_to_draw_params(text, point, draw_param);
+        assert!(self.batch.capacity() > draw_params.len());
+        assert!(text.len() == draw_params.len());
+
+        for draw_param in draw_params {
+            self.batch.push(draw_param);
+        }
+    }
+
+    fn string_to_draw_params(
+        &self,
+        text: &str,
+        point: &PixelPoint,
+        draw_param: Option<DrawParam>,
+    ) -> Vec<DrawParam> {
+        let base_param = draw_param.unwrap_or_else(DrawParam::new);
+        text.chars()
             // TODO: how to handle whitespace??
             .map(|c| self.get_for_char(c))
             .enumerate()
@@ -131,22 +183,32 @@ impl BitmapFont {
                     self.char_size.width,
                     self.char_size.height,
                 );
-                graphics::DrawParam::new()
+                base_param
                     .src(*rect)
                     .dest_rect(dest_rect)
                     .image_scale(false)
             })
-            .collect();
+            .collect()
+    }
 
-        assert!(self.batch.capacity() > draw_params.len());
-        assert!(text.len() == draw_params.len());
-
-        self.batch.set(draw_params);
-
-        &self.batch
+    pub fn clear(&mut self) {
+        self.batch.clear()
     }
 
     fn get_for_char(&self, c: char) -> &graphics::Rect {
         self.text_map.map.get(&c).unwrap()
+    }
+}
+
+impl Drawable for BitmapFont {
+    fn draw(&self, canvas: &mut Canvas, param: DrawParam) {
+        canvas.draw(&self.batch, param)
+    }
+
+    fn dimensions(
+        &self,
+        gfx: &mut impl ggez::context::HasMut<graphics::GraphicsContext>,
+    ) -> Option<graphics::Rect> {
+        self.batch.dimensions(gfx)
     }
 }

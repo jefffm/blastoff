@@ -1,5 +1,5 @@
 mod wall;
-use ggez::graphics::Canvas;
+use ggez::graphics::{Canvas, DrawParam};
 use rgb::RGBA8;
 pub use wall::*;
 
@@ -10,8 +10,10 @@ use bracket_lib::prelude::ColorPair;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    color::{RGBA8Ext, EMPTY},
-    util::{ScreenPoint, SpritePoint},
+    color::{RGBA8Ext, COMMON, EMPTY},
+    game::consts::get_screen_to_pixel_transform,
+    resource::Resources,
+    util::{BitmapFont, ScreenPoint, SpritePoint},
 };
 pub enum VisibilityKind {
     Torch { brightness: u32 },
@@ -64,23 +66,29 @@ pub trait TileHandler {
         EMPTY
     }
 
-    fn render(&self, canvas: &mut Canvas, _point: ScreenPoint, visibility_kind: VisibilityKind) {
+    fn render(
+        &self,
+        canvas: &mut Canvas,
+        resources: &Resources,
+        point: ScreenPoint,
+        visibility_kind: VisibilityKind,
+    ) {
+        let pixel_point = get_screen_to_pixel_transform().transform_point(point);
         // TODO: use blit for each of these
         match visibility_kind {
             VisibilityKind::Torch { brightness: _ } => {
                 // TODO: use torch brightness to modify rendering brightness
-                // draw_batch.set(
-                //     Point::new(point.x, point.y),
-                //     self.color_pair(),
-                //     to_cp437(self.glyph()),
-                // );
+                resources
+                    .font
+                    .draw_char(canvas, self.glyph(), &pixel_point, None);
             }
             VisibilityKind::Remembered => {
-                // draw_batch.set(
-                //     Point::new(point.x, point.y),
-                //     ColorPair::new(COMMON.two.to_bracket_rgba(), self.bg().to_bracket_rgba()),
-                //     to_cp437(self.glyph()),
-                // );
+                resources.font.draw_char(
+                    canvas,
+                    self.glyph(),
+                    &pixel_point,
+                    Some(DrawParam::new().color(COMMON.two.to_ggez_color())),
+                );
             }
             VisibilityKind::DiscoBall { value: _ } => {
                 // draw_batch.set(
