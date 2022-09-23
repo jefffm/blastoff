@@ -1,9 +1,10 @@
 use ggez::event::EventHandler;
-use ggez::graphics::{Color, DrawParam, StrokeOptions};
+use ggez::graphics::{BlendMode, Color};
 use ggez::{graphics, timer, Context, GameError};
 use hecs::World;
 use tracing::info;
 
+use crate::color::{RGBA8Ext, EMPTY};
 use crate::component::{Actor, ActorKind, Player};
 use crate::game::consts::VIEWPORT_SCREEN_POINT;
 use crate::input::Controls;
@@ -18,10 +19,7 @@ use crate::scene::MapGenerationState;
 use crate::scene::PauseMenuSelection;
 use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
 use crate::system::{build_systems, Scheduler};
-use crate::util::{
-    BitmapFont, PixelPoint, PixelSize, SpritePoint, SpriteSheet, SpriteSize, TransformExt,
-    ViewportPoint, ViewportToScreen, WorldSize,
-};
+use crate::util::{TransformExt, ViewportPoint, ViewportToScreen, WorldSize};
 
 use super::consts::{PIXEL_RECT, SCALING_FACTOR};
 use super::{consts, process_actors, PlayGame, RunState};
@@ -214,14 +212,10 @@ impl EventHandler for Game {
     }
 
     fn draw(&mut self, ctx: &mut ggez::Context) -> Result<(), GameError> {
-        // Example for how to do the rest: https://github.com/ggez/ggez/blob/0.8.0-rc0/examples/animation.rs
         let mut canvas =
-            graphics::Canvas::from_screen_image(ctx, &mut self.canvas_image, Color::BLACK);
-        // let mut canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);
+            graphics::Canvas::from_screen_image(ctx, &mut self.canvas_image, EMPTY.to_ggez_color());
         canvas.set_sampler(graphics::Sampler::nearest_clamp());
-
-        self.resources.font.clear();
-        // self.resources.spritesheet.clear();
+        canvas.set_blend_mode(BlendMode::REPLACE);
 
         match &self.state {
             // menus
@@ -235,7 +229,6 @@ impl EventHandler for Game {
                 draw_game_over(&mut canvas, selection, &mut self.resources)
             }
 
-            // game loop
             RunState::Game(_) => {
                 self.screen
                     .draw_game(&mut canvas, &self.world, &mut self.resources)
@@ -250,18 +243,10 @@ impl EventHandler for Game {
             }
         };
 
-        // canvas.draw(
-        //     self.resources
-        //         .spritesheet
-        //         .push_sprite(SpritePoint::new(0, 1), PixelPoint::new(100, 100)),
-        //     DrawParam::default(),
-        // );
-
         canvas.draw(
             &self.resources.font,
             graphics::DrawParam::new().dest([0., 0.]),
         );
-        // self.resources.spritesheet;
 
         canvas.finish(ctx)?;
 

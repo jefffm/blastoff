@@ -6,7 +6,10 @@ use ggez::{
     graphics::{self, Canvas, DrawParam, Drawable},
 };
 
-use crate::game::consts::SCALING_FACTOR;
+use crate::{
+    color::{RGBA8Ext, EMPTY, FIRE},
+    game::consts::SCALING_FACTOR,
+};
 
 use super::{PixelPoint, PixelSize, SpriteSize};
 
@@ -84,6 +87,8 @@ pub struct BitmapFont {
     batch: graphics::InstanceArray,
     text_map: TextMap,
     pub char_size: PixelSize,
+    // Rect mesh used to clear backgrounds when needed
+    clear_rect: graphics::Mesh,
 }
 
 impl BitmapFont {
@@ -99,10 +104,7 @@ impl BitmapFont {
             sprite_sheet_size.height as usize,
         );
         let batch = graphics::InstanceArray::new(gfx, image, 100, true);
-        Self::new(batch, text_map)
-    }
 
-    pub fn new(batch: graphics::InstanceArray, text_map: TextMap) -> Self {
         let sheet_size = text_map.sheet_size();
 
         let rect_width = 1.0 / (sheet_size.width as f32);
@@ -113,10 +115,27 @@ impl BitmapFont {
             (batch.image().width() as f32 * rect_height) as i32,
         );
 
+        let clear_rect = graphics::Mesh::new_rectangle(
+            gfx,
+            graphics::DrawMode::fill(),
+            graphics::Rect::new_i32(0, 0, char_size.width, char_size.height),
+            EMPTY.to_ggez_color(),
+        )
+        .expect("clear rect");
+        Self::new(batch, text_map, char_size, clear_rect)
+    }
+
+    pub fn new(
+        batch: graphics::InstanceArray,
+        text_map: TextMap,
+        char_size: PixelSize,
+        clear_rect: graphics::Mesh,
+    ) -> Self {
         Self {
             batch,
             text_map,
             char_size,
+            clear_rect,
         }
     }
     pub fn draw_char(
@@ -139,7 +158,18 @@ impl BitmapFont {
             .dest_rect(dest_rect)
             .image_scale(false);
 
+        canvas.draw(&self.clear_rect, draw_param);
         canvas.draw(&self.batch.image(), draw_param);
+    }
+
+    pub fn draw_char_overwrite(
+        &self,
+        canvas: &mut Canvas,
+        c: char,
+        point: &PixelPoint,
+        draw_param: Option<DrawParam>,
+    ) {
+        self.draw_char(canvas, c, point, draw_param);
     }
 
     pub fn draw_each_char(

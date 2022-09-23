@@ -80,10 +80,10 @@ pub trait TileHandler {
                 // TODO: use torch brightness to modify rendering brightness
                 resources
                     .font
-                    .draw_char(canvas, self.glyph(), &pixel_point, None);
+                    .draw_char_overwrite(canvas, self.glyph(), &pixel_point, None);
             }
             VisibilityKind::Remembered => {
-                resources.font.draw_char(
+                resources.font.draw_char_overwrite(
                     canvas,
                     self.glyph(),
                     &pixel_point,

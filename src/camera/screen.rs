@@ -23,7 +23,7 @@ impl Screen {
     fn draw(&self, canvas: &mut Canvas, resources: &Resources, glyph: &Glyph, point: ScreenPoint) {
         let pixel_point = get_screen_to_pixel_transform().transform_point(point);
 
-        resources.font.draw_char(
+        resources.font.draw_char_overwrite(
             canvas,
             glyph.glyph,
             &pixel_point,
