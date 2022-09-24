@@ -32,8 +32,12 @@ pub fn visibility_system(world: &mut World, resources: &mut Resources) {
             // TODO: add something to PointExt to convert into this isize tuple
             let mut is_blocking = |(x, y)| {
                 let point = WorldPoint::new(x as i32, y as i32);
+                if !map.contains(point) {
+                    return true;
+                }
                 map.is_opaque_point(&point)
             };
+
             let mut mark_visible = |(x, y)| {
                 let point = WorldPoint::new(x as i32, y as i32);
                 if in_range(&point) && map.contains(point) {

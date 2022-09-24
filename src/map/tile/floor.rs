@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::color::COMMON;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum FloorKind {
     FloorDefault,
 }

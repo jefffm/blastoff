@@ -104,8 +104,9 @@ impl Map {
     }
 
     pub fn reset_content(&mut self) {
-        self.content =
-            vec![Vec::<Entity>::new(); (self.get_height() * self.get_width()).try_into().unwrap()];
+        for vec in self.content.iter_mut() {
+            vec.clear();
+        }
     }
 
     pub fn add_content(&mut self, point: &WorldPoint, entity: &Entity) {

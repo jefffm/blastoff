@@ -46,7 +46,6 @@ impl Screen {
             // before trying to make an index for it
             if map.contains(world_point) {
                 if map.is_visible(&world_point) {
-                    // TODO DELETEME TESTING
                     if let Some(tile) = map.get(world_point) {
                         let screen_point = self.to_screen_point(viewport_point);
                         let vis = VisibilityKind::Torch {

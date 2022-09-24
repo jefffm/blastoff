@@ -11,16 +11,18 @@ pub struct MapGenerationState {
 }
 
 impl MapGenerationState {
-    pub fn update(&mut self, ctx: &BTerm) {
-        self.timer += ctx.frame_time_ms;
+    pub fn update(&mut self, seconds: f32) {
+        tracing::warn!("timer: {:?}", self.timer);
+        self.timer += seconds;
 
-        if self.timer > 50.0 {
+        if self.timer > 3.0 {
             self.index += 1;
             self.timer = 0.0;
         }
     }
 
     pub fn is_complete(&self, history: &Vec<Map>) -> bool {
+        tracing::warn!("history: {:?} and index: {:?}", history.len(), self.index);
         self.index >= history.len()
     }
 

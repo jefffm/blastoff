@@ -1,4 +1,5 @@
 mod wall;
+use euclid::num::Floor;
 use ggez::graphics::{Canvas, DrawParam};
 use rgb::RGBA8;
 pub use wall::*;
@@ -23,7 +24,7 @@ pub enum VisibilityKind {
     Remembered,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum Tile {
     Floor(FloorKind),
     Wall(WallKind),
@@ -35,7 +36,30 @@ impl Default for Tile {
     }
 }
 
+impl From<FloorKind> for Tile {
+    fn from(fk: FloorKind) -> Self {
+        Self::Floor(fk)
+    }
+}
+
+impl From<WallKind> for Tile {
+    fn from(wk: WallKind) -> Self {
+        Self::Wall(wk)
+    }
+}
+
 impl Tile {
+    /// This is a really primitive way to map from char to tile
+    /// In the future, we'll need to use more clever metadata in one of the yaml
+    /// files to define tiles.
+    pub fn from_char(c: char) -> Option<Self> {
+        match c {
+            '\\' | '\n' => None,
+            '.' => Some(Self::Floor(FloorKind::FloorDefault)),
+            c => Some(Self::Wall(WallKind::from(c))),
+        }
+    }
+
     pub fn glyph(&self) -> char {
         match self {
             Self::Floor(floor) => floor.glyph(),

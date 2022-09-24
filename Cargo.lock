@@ -721,6 +721,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "coord_2d"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f5d80027c28c83cf5631e8a9c42f2d8b8fcbda6cb8eb420c89a7bf812ec3ad2"
+
+[[package]]
 name = "copyless"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1087,6 +1093,15 @@ checksum = "707b6a7b384888a70c8d2e8650b3e60170dfc6a67bb4aa67b6dfca57af4bedb4"
 dependencies = [
  "adler32",
  "byteorder",
+]
+
+[[package]]
+name = "direction"
+version = "0.18.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c56672976b806b6fe8e41998c6d0503cd02479c6059c47451ce8addc7871271"
+dependencies = [
+ "coord_2d",
 ]
 
 [[package]]
@@ -1937,6 +1952,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "363e3677e55ad168fef68cf9de3a4a310b53124c5e784c53a1d70e92d23f2126"
 dependencies = [
  "bitflags 1.3.2",
+]
+
+[[package]]
+name = "grid_2d"
+version = "0.15.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10ea69b4e8dfc8ae7b0f0d1fa510109113f3ae3fc265ba05c49e14cb3f249db4"
+dependencies = [
+ "coord_2d",
 ]
 
 [[package]]
@@ -3710,12 +3734,15 @@ dependencies = [
 name = "roguemon"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bracket-lib",
  "clap",
+ "coord_2d",
  "euclid 0.22.7",
  "fixedbitset",
  "ggez 0.8.0-rc0",
  "ggez-goodies",
+ "grid_2d",
  "hecs",
  "image 0.24.3",
  "lazy_static",
@@ -3732,6 +3759,7 @@ dependencies = [
  "symmetric-shadowcasting",
  "tracing",
  "tracing-subscriber",
+ "wfc",
 ]
 
 [[package]]
@@ -4776,6 +4804,20 @@ name = "weezl"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9193164d4de03a926d909d3bc7c30543cecb35400c02114792c2cae20d5e2dbb"
+
+[[package]]
+name = "wfc"
+version = "0.10.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a03c52cd9835af3baec1cf3eda275807717cf377476d707c298d82072183e858"
+dependencies = [
+ "coord_2d",
+ "direction",
+ "getrandom",
+ "grid_2d",
+ "hashbrown",
+ "rand 0.8.5",
+]
 
 [[package]]
 name = "wgpu"

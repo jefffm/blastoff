@@ -4,7 +4,7 @@ use crate::{color::COMMON, component::Cardinal, map::Map, util::WorldPoint};
 
 use super::Tile;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum WallKind {
     WallPillar,   // Pillar because we can't see neighbors
     WallN,        // Wall only to the north
@@ -23,6 +23,27 @@ pub enum WallKind {
     WallEWN,      // Wall to the east, west, and north
     WallAllSides, // ╬ Wall on all sides
     WallDefault,  // We missed one?
+}
+
+impl From<char> for WallKind {
+    fn from(c: char) -> Self {
+        match c {
+            '○' => Self::WallPillar,
+            '║' => Self::WallNS,
+            '╝' => Self::WallNW,
+            '╗' => Self::WallSW,
+            '╣' => Self::WallNSW,
+            '╚' => Self::WallNE,
+            '╔' => Self::WallSE,
+            '╠' => Self::WallNSE,
+            '═' => Self::WallEW,
+            '╦' => Self::WallEWS,
+            '╩' => Self::WallEWN,
+            '╬' => Self::WallAllSides,
+            '#' => Self::WallDefault,
+            _ => panic!("Unhandled char for WallKind: {:?}", c),
+        }
+    }
 }
 
 impl WallKind {

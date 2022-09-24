@@ -8,20 +8,19 @@ use crate::color::{RGBA8Ext, EMPTY};
 use crate::component::{Actor, ActorKind, Player};
 use crate::game::consts::VIEWPORT_SCREEN_POINT;
 use crate::input::Controls;
-use crate::map::Loader;
+use crate::map::{Loader, WfcGen};
 use crate::{game, input};
 
 use crate::camera::Screen;
-use crate::map::Bsp;
 use crate::resource::Resources;
 use crate::scene::GameOverSelection;
 use crate::scene::MapGenerationState;
 use crate::scene::PauseMenuSelection;
 use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSelection};
 use crate::system::{build_systems, Scheduler};
-use crate::util::{TransformExt, ViewportPoint, ViewportToScreen, WorldSize};
+use crate::util::{TransformExt, ViewportPoint, ViewportToScreen};
 
-use super::consts::{PIXEL_RECT, SCALING_FACTOR};
+use super::consts::SCALING_FACTOR;
 use super::{consts, process_actors, PlayGame, RunState};
 
 pub struct Game {
@@ -168,7 +167,8 @@ impl EventHandler for Game {
 
                     // Create the loader
                     let mut loader = Loader::new(
-                        Bsp::new(WorldSize::new(50, 50)),
+                        WfcGen {},
+                        // Bsp::new(WorldSize::new(50, 50)),
                         &mut self.resources.rng,
                         &mut self.resources.mapgen_history,
                     );
@@ -181,7 +181,7 @@ impl EventHandler for Game {
                     Some(RunState::MapGeneration(MapGenerationState::default()))
                 }
                 RunState::MapGeneration(m) => {
-                    let map_state = m.clone();
+                    let mut map_state = m.clone();
                     if game::env().show_map_generation {
                         if map_state.is_complete(&self.resources.mapgen_history) {
                             // TODO: make it so that arrow keys pan around and enter allows us to continue
@@ -191,7 +191,7 @@ impl EventHandler for Game {
                             // If we have more frames to render for map generation, pass the
                             // state onto the next tick.
                             // TODO: mapgen is borked
-                            // map_state.update(ctx);
+                            map_state.update(seconds);
                             Some(RunState::MapGeneration(map_state))
                         }
                     } else {
