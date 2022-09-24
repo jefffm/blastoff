@@ -3,6 +3,7 @@
 use std::num::NonZeroU32;
 use std::option;
 
+use bracket_random::prelude::RandomNumberGenerator;
 use grid_2d::Grid;
 use rand::Rng;
 use wfc::orientation::Orientation;
@@ -86,7 +87,7 @@ pub struct WfcGen {}
 impl MapGenerator for WfcGen {
     fn generate(
         &mut self,
-        rng: &mut bracket_lib::random::RandomNumberGenerator,
+        rng: &mut RandomNumberGenerator,
         mapgen_history: &mut Vec<Map>,
         level: u32,
     ) -> Map {
@@ -128,12 +129,7 @@ impl MapGenerator for WfcGen {
 }
 
 impl Spawner for WfcGen {
-    fn spawn(
-        &self,
-        map: &Map,
-        world: &mut hecs::World,
-        rng: &mut bracket_lib::random::RandomNumberGenerator,
-    ) {
+    fn spawn(&self, map: &Map, world: &mut hecs::World, rng: &mut RandomNumberGenerator) {
         for point in map.iter_points() {
             if let Tile::Floor(_) = map[&point] {
                 // Add the player

@@ -1,4 +1,4 @@
-use bracket_lib::random::RandomNumberGenerator;
+use bracket_random::prelude::RandomNumberGenerator;
 use hecs::World;
 
 use super::Map;

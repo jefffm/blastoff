@@ -6,7 +6,8 @@ use std::{env, path};
 use tracing::info;
 use tracing::Level;
 
-use bracket_lib::random::RandomNumberGenerator;
+use bracket_random::prelude::RandomNumberGenerator;
+
 pub mod camera;
 pub mod color;
 pub mod component;

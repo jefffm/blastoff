@@ -7,7 +7,6 @@ pub use wall::*;
 mod floor;
 pub use floor::*;
 
-use bracket_lib::prelude::ColorPair;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -65,10 +64,6 @@ impl Tile {
             Self::Floor(floor) => floor.glyph(),
             Self::Wall(wall) => wall.glyph(),
         }
-    }
-
-    fn color_pair(&self) -> ColorPair {
-        ColorPair::new(self.fg().to_bracket_rgba(), self.bg().to_bracket_rgba())
     }
 
     pub fn is_passable(&self) -> bool {

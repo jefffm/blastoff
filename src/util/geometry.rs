@@ -9,7 +9,6 @@
 
 use std::{convert::TryInto, fmt::Debug};
 
-use bracket_lib::prelude::Point;
 use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
 use serde::{Deserialize, Serialize};
 
@@ -117,20 +116,6 @@ impl<U> PointExt<i32, U> for Point2D<i32, U> {
 
     fn get_vector(self, other: Self) -> Vector2D<i32, U> {
         other - self
-    }
-}
-
-pub trait WorldPointExt {
-    fn to_bracket_point(&self) -> Point;
-    fn from_bracket_point(point: Point) -> Self;
-}
-impl WorldPointExt for WorldPoint {
-    fn to_bracket_point(&self) -> Point {
-        Point::new(self.x, self.y)
-    }
-
-    fn from_bracket_point(point: Point) -> Self {
-        Self::new(point.x, point.y)
     }
 }
 

@@ -1,5 +1,5 @@
 // TODO: deprecate use of bracket rng
-use bracket_lib::prelude::RandomNumberGenerator;
+use bracket_random::prelude::RandomNumberGenerator;
 
 mod viewport;
 pub use viewport::*;

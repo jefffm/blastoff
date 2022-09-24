@@ -4,8 +4,9 @@ pub use bsp::*;
 mod wfcgen;
 pub use wfcgen::*;
 
+use bracket_random::prelude::RandomNumberGenerator;
+
 use crate::map::Map;
-use bracket_lib::prelude::RandomNumberGenerator;
 
 pub trait MapGenerator {
     fn generate(

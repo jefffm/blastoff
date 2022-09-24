@@ -1,4 +1,4 @@
-use bracket_lib::prelude::*;
+use bracket_random::prelude::RandomNumberGenerator;
 
 use crate::camera::Glyph;
 use crate::color::{Palette, COMMON, FIRE, PLANT, WATER};

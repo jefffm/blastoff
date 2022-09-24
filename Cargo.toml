@@ -8,9 +8,7 @@ edition = "2021"
 rgb = { version = "0.8", features = ["serde"] }
 symmetric-shadowcasting = "0.2"
 pathfinding = "3.0"
-bracket-lib = { git = "https://github.com/patchfx/bracket-lib", branch = "fix-tile-leaks-on-cls", features = [
-    "serde",
-] }
+bracket-random = "0.8"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 hecs = { version = "0.9", features = ["serde"] }
@@ -27,7 +25,7 @@ line_drawing = "1.0.0"
 png = "0.17"
 morton-encoding = "2.0"
 image = "0.24"
-ggez = { git = "https://github.com/ggez/ggez", hash = "e0dda6eb66d9e17ed7bb21e62ab6e6ddda5dffc9" }
+ggez = { git = "https://github.com/ggez/ggez", rev = "558d2c48860abfa1b0e88c5e277eb6055e6e50d7" }
 wfc = "0.10"
 grid_2d = "0.15"
 coord_2d = "0.3"
