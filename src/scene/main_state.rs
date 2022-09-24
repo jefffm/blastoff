@@ -59,6 +59,7 @@ impl EventHandler for MainState {
         input: ggez::input::keyboard::KeyInput,
     ) -> Result<(), GameError> {
         self.controls.key_up(input);
+        self.scene_stack.input(&mut self.controls, true);
 
         Ok(())
     }
