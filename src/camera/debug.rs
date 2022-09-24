@@ -16,7 +16,7 @@ pub fn render_debug_map(
     resources: &mut Resources,
     map: &Map,
     _show_boundaries: bool,
-    index: usize,
+    _index: usize,
 ) {
     let t1 = WorldToViewport::default();
     let t2 = ViewportToScreen::from_points(ViewportPoint::new(0, 0), ScreenPoint::new(0, 1));

@@ -6,8 +6,7 @@ use ggez::{
 };
 
 use crate::{
-    color::{RGBA8Ext, EMPTY, FIRE},
-    game::consts::SCALING_FACTOR,
+    color::{RGBA8Ext, EMPTY},
 };
 
 use super::{PixelPoint, PixelSize, SpriteSize};

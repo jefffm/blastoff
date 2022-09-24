@@ -4,7 +4,7 @@ use crate::component::{BlocksTile, Door, Position};
 use crate::map::Map;
 use crate::resource::Resources;
 
-pub fn map_indexing_system(world: &mut World, resources: &mut Resources, map: &mut Map) {
+pub fn map_indexing_system(world: &mut World, _resources: &mut Resources, map: &mut Map) {
     map.reset_blocked();
     map.reset_content();
 

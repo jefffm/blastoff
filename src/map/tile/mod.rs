@@ -1,5 +1,5 @@
 mod wall;
-use euclid::num::Floor;
+
 use ggez::graphics::{Canvas, DrawParam};
 use rgb::RGBA8;
 pub use wall::*;

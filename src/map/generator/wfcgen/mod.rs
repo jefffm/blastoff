@@ -1,7 +1,7 @@
 //! For more info: https://www.gridbugs.org/wave-function-collapse/
 //!
 use std::num::NonZeroU32;
-use std::option;
+
 
 use bracket_random::prelude::RandomNumberGenerator;
 use grid_2d::Grid;
@@ -89,7 +89,7 @@ impl MapGenerator for WfcGen {
         &mut self,
         rng: &mut RandomNumberGenerator,
         mapgen_history: &mut Vec<Map>,
-        level: u32,
+        _level: u32,
     ) -> Map {
         let output_size = Size::new(50, 50);
         let tiles = TEST_HOUSE.chars().filter_map(Tile::from_char).collect();
@@ -129,7 +129,7 @@ impl MapGenerator for WfcGen {
 }
 
 impl Spawner for WfcGen {
-    fn spawn(&self, map: &Map, world: &mut hecs::World, rng: &mut RandomNumberGenerator) {
+    fn spawn(&self, map: &Map, world: &mut hecs::World, _rng: &mut RandomNumberGenerator) {
         for point in map.iter_points() {
             if let Tile::Floor(_) = map[&point] {
                 // Add the player

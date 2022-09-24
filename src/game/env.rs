@@ -10,7 +10,7 @@ pub fn env<'a>() -> MutexGuard<'a, GameEnv> {
     GAME_ENV.lock().unwrap()
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, Default)]
 pub struct GameEnv {
     pub is_debug_mode: bool,
     pub seed: Option<u64>,
@@ -20,15 +20,5 @@ pub struct GameEnv {
 impl GameEnv {
     pub fn new() -> Self {
         Self::default()
-    }
-}
-
-impl Default for GameEnv {
-    fn default() -> Self {
-        Self {
-            is_debug_mode: false,
-            seed: None,
-            show_map_generation: false,
-        }
     }
 }

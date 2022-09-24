@@ -137,7 +137,7 @@ impl<C, Ev> SceneStack<C, Ev> {
         world: &mut C,
         canvas: &mut graphics::Canvas,
     ) {
-        assert!(scenes.len() > 0);
+        assert!(!scenes.is_empty());
         if let Some((current, rest)) = scenes.split_last_mut() {
             if current.draw_previous() {
                 SceneStack::draw_scenes(rest, world, canvas);
@@ -173,6 +173,6 @@ mod tests {
 
     #[test]
     fn test1() {
-        let x = Thing { scenes: vec![] };
+        let _x = Thing { scenes: vec![] };
     }
 }

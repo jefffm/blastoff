@@ -1,24 +1,20 @@
-use ggez::event::EventHandler;
-use ggez::graphics::{BlendMode, Canvas, Color};
+use ggez::graphics::Canvas;
 use ggez::input::keyboard::KeyCode;
-use ggez::{graphics, timer, Context, GameError};
+
 use hecs::World;
-use tracing::info;
 
 use crate::camera::Screen;
-use crate::color::{RGBA8Ext, EMPTY};
+
 use crate::component::{Actor, ActorKind, Player};
 use crate::game::consts::VIEWPORT_SCREEN_POINT;
-use crate::game::{consts, process_actors, PlayGame, RunState, TurnsHistory};
+use crate::game::{process_actors, TurnsHistory};
 use crate::input::{Controls, PlayerAction, PlayerInput, UiAction};
-use crate::map::{Loader, Map, WfcGen};
+use crate::map::Map;
 use crate::resource::Resources;
-use crate::scene::GameOverSelection;
-use crate::scene::MapGenerationState;
-use crate::scene::PauseMenuSelection;
+
+use crate::input;
 use crate::system::{build_systems, Scheduler};
-use crate::util::{Scene, SceneStack, SceneSwitch, TransformExt, ViewportPoint, ViewportToScreen};
-use crate::{game, input};
+use crate::util::{Scene, SceneSwitch, TransformExt, ViewportPoint, ViewportToScreen};
 
 use super::{GameOver, MainMenu, PauseMenu};
 
@@ -36,7 +32,6 @@ pub struct Game {
     state: GameState,
     screen: Screen,
     scheduler: Scheduler,
-    turn_number: u32,
     turn_history: TurnsHistory,
 }
 
@@ -52,7 +47,6 @@ impl Game {
                 VIEWPORT_SCREEN_POINT,
             )),
             scheduler: build_systems(),
-            turn_number: 0,
             turn_history: TurnsHistory::default(),
         }
     }
@@ -69,7 +63,7 @@ impl Game {
 }
 
 impl Scene<Resources, Controls> for Game {
-    fn input(&mut self, resources: &mut Resources, mut controls: Controls, started: bool) {
+    fn input(&mut self, _resources: &mut Resources, mut controls: Controls, _started: bool) {
         self.input = match controls.read() {
             None => PlayerInput::Undefined,
             Some(key) => match (key, controls.control, controls.alt, controls.shift) {

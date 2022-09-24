@@ -17,7 +17,7 @@ impl Scene<Resources, Controls> for Initialization {
     fn update(
         &mut self,
         resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         // If we're in debug mode, show the debug menu
         // Otherwise, start the game (intro scene?)
@@ -62,5 +62,5 @@ impl Scene<Resources, Controls> for Initialization {
         Ok(())
     }
 
-    fn input(&mut self, resources: &mut Resources, event: Controls, started: bool) {}
+    fn input(&mut self, _resources: &mut Resources, _event: Controls, _started: bool) {}
 }

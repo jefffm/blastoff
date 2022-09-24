@@ -41,7 +41,7 @@ impl Controls {
     pub fn key_down(&mut self, input: KeyInput) {
         self._key = input.keycode
     }
-    pub fn key_up(&mut self, input: KeyInput) {
+    pub fn key_up(&mut self, _input: KeyInput) {
         // Do nothing
     }
 

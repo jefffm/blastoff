@@ -52,15 +52,15 @@ impl MapGeneration {
 }
 
 impl Scene<Resources, Controls> for MapGeneration {
-    fn input(&mut self, resources: &mut Resources, event: Controls, started: bool) {
+    fn input(&mut self, _resources: &mut Resources, _event: Controls, _started: bool) {
         // TODO: make it so that arrow keys pan around and enter allows us to continue
         todo!()
     }
 
     fn update(
         &mut self,
-        resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _resources: &mut Resources,
+        _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         if self.state.is_complete(&self.history) {
             // If we're done, return to the debug menu

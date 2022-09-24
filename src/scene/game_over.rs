@@ -6,7 +6,6 @@ use crate::{
     color::{RGBA8Ext, COMMON},
     game::{
         consts::{PIXEL_RECT, SCREEN_RECT},
-        RunState,
     },
     input::Controls,
     resource::Resources,
@@ -68,7 +67,7 @@ impl Default for GameOver {
     }
 }
 impl Scene<Resources, Controls> for GameOver {
-    fn input(&mut self, resources: &mut Resources, mut controls: Controls, started: bool) {
+    fn input(&mut self, _resources: &mut Resources, mut controls: Controls, _started: bool) {
         let selection = self.state.selection();
         let entries = selection.entries();
         self.state = match controls.read() {
@@ -103,11 +102,11 @@ impl Scene<Resources, Controls> for GameOver {
 
     fn update(
         &mut self,
-        resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _resources: &mut Resources,
+        _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
-            MenuResult::NoSelection { selected } => SceneSwitch::None,
+            MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
             MenuResult::Selected { selected } => match selected {
                 GameOverSelection::MainMenu => SceneSwitch::Reinit(Box::new(MainMenu::default())),
                 GameOverSelection::Quit => {
@@ -131,7 +130,7 @@ impl Scene<Resources, Controls> for GameOver {
                 canvas,
                 resources,
                 resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
-                &selection,
+                selection,
             );
         }
 

@@ -3,21 +3,19 @@ use ggez::graphics::{BlendMode, Color};
 use ggez::{graphics, timer, Context, GameError};
 
 use crate::color::{RGBA8Ext, EMPTY};
-use crate::game::consts::VIEWPORT_SCREEN_POINT;
+
 use crate::input::Controls;
 
-use crate::camera::Screen;
+
 use crate::resource::Resources;
-use crate::system::{build_systems, Scheduler};
-use crate::util::{SceneStack, TransformExt, ViewportPoint, ViewportToScreen};
+
+use crate::util::{SceneStack};
 
 use crate::game::consts;
 
 use super::MainMenu;
 
 pub struct MainState {
-    scheduler: Scheduler,
-    screen: Screen,
     controls: Controls,
     canvas_image: graphics::ScreenImage,
     scene_stack: SceneStack<Resources, Controls>,
@@ -26,11 +24,6 @@ pub struct MainState {
 impl MainState {
     pub fn new(resources: Resources, ctx: &mut Context) -> Self {
         Self {
-            scheduler: build_systems(),
-            screen: Screen::new(ViewportToScreen::from_points(
-                ViewportPoint::new(0, 0),
-                VIEWPORT_SCREEN_POINT,
-            )),
             controls: Controls::default(),
             canvas_image: graphics::ScreenImage::new(
                 ctx,
@@ -56,6 +49,7 @@ impl EventHandler for MainState {
         _repeated: bool,
     ) -> Result<(), GameError> {
         self.controls.key_down(input);
+        self.scene_stack.input(self.controls, true);
 
         Ok(())
     }

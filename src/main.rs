@@ -20,9 +20,9 @@ pub mod scene;
 pub mod system;
 pub mod util;
 
-use game::{consts, RunState, TurnsHistory};
+use game::{consts};
 use resource::{Resources, Viewport};
-use scene::{MainMenuSelection, MainState};
+use scene::{MainState};
 use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 
 use clap::Parser;

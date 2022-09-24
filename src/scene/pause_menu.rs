@@ -63,9 +63,9 @@ pub enum PauseMenuResult {
     Selected { selected: PauseMenuSelection },
 }
 pub fn draw_pause_menu(
-    canvas: &mut Canvas,
-    selection: &PauseMenuSelection,
-    resources: &mut Resources,
+    _canvas: &mut Canvas,
+    _selection: &PauseMenuSelection,
+    _resources: &mut Resources,
 ) {
 }
 
@@ -81,11 +81,11 @@ impl Default for PauseMenu {
     }
 }
 impl Scene<Resources, Controls> for PauseMenu {
-    fn input(&mut self, resources: &mut Resources, mut controls: Controls, started: bool) {
+    fn input(&mut self, _resources: &mut Resources, mut controls: Controls, _started: bool) {
         let selection = self.state.selection();
         let entries = selection.entries();
 
-        let result = match controls.read() {
+        let _result = match controls.read() {
             None => PauseMenuResult::NoSelection {
                 selected: *selection,
             },
@@ -123,11 +123,11 @@ impl Scene<Resources, Controls> for PauseMenu {
 
     fn update(
         &mut self,
-        resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _resources: &mut Resources,
+        _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
-            MenuResult::NoSelection { selected } => SceneSwitch::None,
+            MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
             MenuResult::Selected { selected } => match selected {
                 PauseMenuSelection::Continue => SceneSwitch::Pop,
                 PauseMenuSelection::ExitToMainMenu => {

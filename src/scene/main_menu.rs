@@ -72,7 +72,7 @@ impl Default for MainMenu {
     }
 }
 impl Scene<Resources, Controls> for MainMenu {
-    fn input(&mut self, resources: &mut Resources, mut controls: Controls, started: bool) {
+    fn input(&mut self, _resources: &mut Resources, mut controls: Controls, _started: bool) {
         let selection = self.state.selection();
 
         let can_continue = false; // TODO: implement save/continue
@@ -120,7 +120,7 @@ impl Scene<Resources, Controls> for MainMenu {
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
-            MenuResult::NoSelection { selected } => SceneSwitch::None,
+            MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
             MenuResult::Selected { selected } => match selected {
                 MainMenuSelection::NewGame => {
                     SceneSwitch::Push(Box::new(Initialization::default()))

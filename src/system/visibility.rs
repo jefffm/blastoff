@@ -10,7 +10,7 @@ use crate::{
 };
 
 // Update the viewport to be centered on the Camera position
-pub fn visibility_system(world: &mut World, resources: &mut Resources, map: &mut Map) {
+pub fn visibility_system(world: &mut World, _resources: &mut Resources, map: &mut Map) {
     let mut updated_ents = HashSet::<Entity>::new();
 
     for (entity, (pos, viewshed)) in world.query_mut::<(&Position, &mut Viewshed)>() {

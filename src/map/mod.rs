@@ -353,11 +353,11 @@ mod tests {
         #[allow(clippy::redundant_clone)]
         #[rustfmt::skip]
         let tiles: Vec<Tile> = vec![
-            w.clone(), w.clone(), w.clone(), w.clone(), w.clone(),
-            w.clone(), f.clone(), f.clone(), f.clone(), w.clone(),
-            w.clone(), f.clone(), w.clone(), f.clone(), w.clone(),
-            w.clone(), f.clone(), f.clone(), f.clone(), w.clone(),
-            w.clone(), w.clone(), w.clone(), w.clone(), w.clone(),
+            w, w, w, w, w,
+            w, f, f, f, w,
+            w, f, w, f, w,
+            w, f, f, f, w,
+            w, w, w, w, w,
         ];
 
         let mut map = Map::new(String::from("test"), 5, 5, tiles, 1);
@@ -428,9 +428,9 @@ mod tests {
         #[allow(clippy::redundant_clone)]
         #[rustfmt::skip]
         let tiles: Vec<Tile> = vec![
-            w.clone(), w.clone(), w.clone(),
-            w.clone(), w.clone(), w.clone(),
-            w.clone(), w.clone(), w.clone(),
+            w, w, w,
+            w, w, w,
+            w, w, w,
         ];
 
         let mut map = Map::new(String::from("test"), 3, 3, tiles, 1);
