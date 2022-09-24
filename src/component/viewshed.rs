@@ -9,7 +9,7 @@ pub struct Viewshed {
 
 impl Viewshed {
     pub fn init(&mut self) {
-        self.dirty = false;
+        self.set_dirty();
         self.visible_tiles.clear();
     }
 
