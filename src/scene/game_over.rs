@@ -4,9 +4,7 @@ use std::fmt;
 
 use crate::{
     color::{RGBA8Ext, COMMON},
-    game::{
-        consts::{PIXEL_RECT, SCREEN_RECT},
-    },
+    game::consts::{PIXEL_RECT, SCREEN_RECT},
     input::Controls,
     resource::Resources,
     util::{PixelPoint, Scene, SceneSwitch},
@@ -67,7 +65,7 @@ impl Default for GameOver {
     }
 }
 impl Scene<Resources, Controls> for GameOver {
-    fn input(&mut self, _resources: &mut Resources, mut controls: Controls, _started: bool) {
+    fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         let selection = self.state.selection();
         let entries = selection.entries();
         self.state = match controls.read() {

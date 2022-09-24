@@ -81,7 +81,7 @@ impl Default for PauseMenu {
     }
 }
 impl Scene<Resources, Controls> for PauseMenu {
-    fn input(&mut self, _resources: &mut Resources, mut controls: Controls, _started: bool) {
+    fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         let selection = self.state.selection();
         let entries = selection.entries();
 

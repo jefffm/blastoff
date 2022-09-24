@@ -6,10 +6,9 @@ use crate::color::{RGBA8Ext, EMPTY};
 
 use crate::input::Controls;
 
-
 use crate::resource::Resources;
 
-use crate::util::{SceneStack};
+use crate::util::SceneStack;
 
 use crate::game::consts;
 
@@ -49,7 +48,7 @@ impl EventHandler for MainState {
         _repeated: bool,
     ) -> Result<(), GameError> {
         self.controls.key_down(input);
-        self.scene_stack.input(self.controls, true);
+        self.scene_stack.input(&mut self.controls, true);
 
         Ok(())
     }

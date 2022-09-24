@@ -63,7 +63,7 @@ impl Game {
 }
 
 impl Scene<Resources, Controls> for Game {
-    fn input(&mut self, _resources: &mut Resources, mut controls: Controls, _started: bool) {
+    fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         self.input = match controls.read() {
             None => PlayerInput::Undefined,
             Some(key) => match (key, controls.control, controls.alt, controls.shift) {

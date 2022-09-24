@@ -62,5 +62,5 @@ impl Scene<Resources, Controls> for Initialization {
         Ok(())
     }
 
-    fn input(&mut self, _resources: &mut Resources, _event: Controls, _started: bool) {}
+    fn input(&mut self, _resources: &mut Resources, _event: &mut Controls, _started: bool) {}
 }

@@ -16,7 +16,7 @@ pub enum SceneSwitch<C, Ev> {
 /// Defines the callbacks the scene uses:
 /// a common context type `C`, and an input event type `Ev`.
 pub trait Scene<C, Ev> {
-    fn input(&mut self, resources: &mut C, event: Ev, started: bool);
+    fn input(&mut self, resources: &mut C, controls: &mut Ev, started: bool);
     fn update(&mut self, resources: &mut C, ctx: &mut ggez::Context) -> SceneSwitch<C, Ev>;
     fn draw(&mut self, resources: &mut C, canvas: &mut graphics::Canvas) -> ggez::GameResult<()>;
     /// This returns whether or not to draw the next scene down on the
@@ -154,12 +154,12 @@ impl<C, Ev> SceneStack<C, Ev> {
     }
 
     /// Feeds the given input event to the current scene.
-    pub fn input(&mut self, event: Ev, started: bool) {
+    pub fn input(&mut self, controls: &mut Ev, started: bool) {
         let current_scene = &mut **self
             .scenes
             .last_mut()
             .expect("Tried to do input for empty scene stack");
-        current_scene.input(&mut self.world, event, started);
+        current_scene.input(&mut self.world, controls, started);
     }
 }
 

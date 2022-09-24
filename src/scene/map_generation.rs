@@ -52,9 +52,8 @@ impl MapGeneration {
 }
 
 impl Scene<Resources, Controls> for MapGeneration {
-    fn input(&mut self, _resources: &mut Resources, _event: Controls, _started: bool) {
+    fn input(&mut self, _resources: &mut Resources, _event: &mut Controls, _started: bool) {
         // TODO: make it so that arrow keys pan around and enter allows us to continue
-        todo!()
     }
 
     fn update(
