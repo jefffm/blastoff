@@ -1,4 +1,3 @@
-use super::consts;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::sync::{Mutex, MutexGuard};

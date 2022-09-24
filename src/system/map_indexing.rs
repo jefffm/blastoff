@@ -1,10 +1,10 @@
 use hecs::World;
 
 use crate::component::{BlocksTile, Door, Position};
+use crate::map::Map;
 use crate::resource::Resources;
 
-pub fn map_indexing_system(world: &mut World, resources: &mut Resources) {
-    let map = resources.map.as_mut().expect("map");
+pub fn map_indexing_system(world: &mut World, resources: &mut Resources, map: &mut Map) {
     map.reset_blocked();
     map.reset_content();
 

@@ -1,12 +1,19 @@
 use ggez::graphics::{Canvas, DrawParam};
+use ggez::input::keyboard::KeyCode;
 use std::fmt;
 
 use crate::{
     color::{RGBA8Ext, COMMON},
-    game::consts::{PIXEL_RECT, SCREEN_RECT},
+    game::{
+        consts::{PIXEL_RECT, SCREEN_RECT},
+        RunState,
+    },
+    input::Controls,
     resource::Resources,
-    util::PixelPoint,
+    util::{PixelPoint, Scene, SceneSwitch},
 };
+
+use super::{MainMenu, MenuResult};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum GameOverSelection {
@@ -50,30 +57,84 @@ impl GameOverSelection {
     }
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
-pub enum GameOverResult {
-    NoSelection { selected: GameOverSelection },
-    Selected { selected: GameOverSelection },
+pub struct GameOver {
+    state: MenuResult<GameOverSelection>,
 }
+impl Default for GameOver {
+    fn default() -> Self {
+        Self {
+            state: MenuResult::new(GameOverSelection::MainMenu),
+        }
+    }
+}
+impl Scene<Resources, Controls> for GameOver {
+    fn input(&mut self, resources: &mut Resources, mut controls: Controls, started: bool) {
+        let selection = self.state.selection();
+        let entries = selection.entries();
+        self.state = match controls.read() {
+            None => MenuResult::NoSelection {
+                selected: *selection,
+            },
+            Some(key) => match key {
+                KeyCode::Escape => MenuResult::NoSelection {
+                    selected: GameOverSelection::Quit,
+                },
+                KeyCode::Up => {
+                    let idx = entries.iter().position(|&x| x == *selection).unwrap();
+                    MenuResult::NoSelection {
+                        selected: entries[(idx + entries.len() - 1) % entries.len()],
+                    }
+                }
+                KeyCode::Down => {
+                    let idx = entries.iter().position(|&x| x == *selection).unwrap();
+                    MenuResult::NoSelection {
+                        selected: entries[(idx + 1) % entries.len()],
+                    }
+                }
+                KeyCode::Return => MenuResult::Selected {
+                    selected: *selection,
+                },
+                _ => MenuResult::NoSelection {
+                    selected: *selection,
+                },
+            },
+        }
+    }
 
-pub fn draw_game_over(
-    canvas: &mut Canvas,
-    selection: &GameOverSelection,
-    resources: &mut Resources,
-) {
-    resources.font.draw_each_char(
-        canvas,
-        "You are Dead",
-        &PixelPoint::new(PIXEL_RECT.center().x, 0),
-        None,
-    );
+    fn update(
+        &mut self,
+        resources: &mut Resources,
+        ctx: &mut ggez::Context,
+    ) -> SceneSwitch<Resources, Controls> {
+        match self.state {
+            MenuResult::NoSelection { selected } => SceneSwitch::None,
+            MenuResult::Selected { selected } => match selected {
+                GameOverSelection::MainMenu => SceneSwitch::Reinit(Box::new(MainMenu::default())),
+                GameOverSelection::Quit => {
+                    ::std::process::exit(0);
+                }
+            },
+        }
+    }
 
-    for (i, entry) in selection.entries().iter().enumerate() {
-        entry.print(
+    fn draw(&mut self, resources: &mut Resources, canvas: &mut Canvas) -> ggez::GameResult<()> {
+        let selection = self.state.selection();
+        resources.font.draw_each_char(
             canvas,
-            resources,
-            resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
-            selection,
+            "You are Dead",
+            &PixelPoint::new(PIXEL_RECT.center().x, 0),
+            None,
         );
+
+        for (i, entry) in selection.entries().iter().enumerate() {
+            entry.print(
+                canvas,
+                resources,
+                resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
+                &selection,
+            );
+        }
+
+        Ok(())
     }
 }

@@ -2,16 +2,23 @@ use hecs::{Entity, World};
 
 use crate::{
     component::{Actor, ActorKind, Cardinal, Player, Position, Viewshed},
-    game::{Action, RunState},
+    game::Action,
     input,
+    map::Map,
     resource::Resources,
+    scene::GameState,
     util::{WorldPoint, WorldVector},
 };
 
-use super::PlayGame;
+use super::TurnsHistory;
 
 /// The Actor System implements energy-based turn actions using Actor components
-pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState {
+pub fn process_actors(
+    world: &mut World,
+    resources: &mut Resources,
+    map: &Map,
+    turn_history: &mut TurnsHistory,
+) -> GameState {
     let mut actions: Vec<Action> = vec![];
 
     // Collect mut references to all the actors
@@ -29,7 +36,7 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
 
     // Iterate over actors in priority-descending order
     'outer: for (entity, actor) in actors {
-        tracing::trace!("Processing actor for turn {:?}", resources.turn_number);
+        tracing::trace!("Processing actor for turn {:?}", turn_history.steps);
 
         // Filter to only actors in the current turn
         // Increment the actor's turn counter (even if no action is taken/possible)
@@ -66,7 +73,7 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
                     // If the player-controlled Actor does not have an action,
                     // skip over this entity without incrementing its turn counter
                     None => {
-                        tracing::trace!("Need player input for turn {:?}", resources.turn_number);
+                        tracing::trace!("Need player input for turn {:?}", turn_history.steps);
                         needs_player_input = true;
                         actor.increase_priority();
                         break 'outer;
@@ -81,7 +88,7 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
                         Some(next_action)
                     }
                     None => {
-                        tracing::trace!("Need AI input for turn {:?}", resources.turn_number);
+                        tracing::trace!("Need AI input for turn {:?}", turn_history.steps);
                         // Wait for the AI system to set something for this entity
                         actor.increase_priority();
                         break 'outer;
@@ -103,24 +110,29 @@ pub fn process_actors(world: &mut World, resources: &mut Resources) -> RunState 
         actor.recover_energy();
     }
 
-    ActionProcessor::new(world, resources).process_actions(&actions);
-    resources.turn_history.add_turn(actions);
+    ActionProcessor::new(world, resources, map).process_actions(&actions);
+    turn_history.add_turn(actions);
 
     if needs_player_input {
-        RunState::Game(PlayGame::NeedPlayerInput)
+        GameState::NeedPlayerInput
     } else {
-        RunState::Game(PlayGame::Ticking)
+        GameState::Ticking
     }
 }
 
 struct ActionProcessor<'a> {
     world: &'a mut World,
     resources: &'a mut Resources,
+    map: &'a Map,
 }
 
 impl<'a> ActionProcessor<'a> {
-    fn new(world: &'a mut World, resources: &'a mut Resources) -> Self {
-        Self { world, resources }
+    fn new(world: &'a mut World, resources: &'a mut Resources, map: &'a Map) -> Self {
+        Self {
+            world,
+            resources,
+            map,
+        }
     }
 
     fn process_actions(&mut self, actions: &[Action]) {
@@ -149,8 +161,7 @@ impl<'a> ActionProcessor<'a> {
         };
 
         // TODO: clean up "off by one" point clamping for player movement
-        let map = self.resources.map.as_ref().expect("map");
-        let map_rect = map.get_rect();
+        let map_rect = self.map.get_rect();
         let dest_point =
             (source_point + *vector).clamp(map_rect.min(), map_rect.max() - WorldVector::new(1, 1));
 
@@ -176,7 +187,7 @@ impl<'a> ActionProcessor<'a> {
             }
         }
 
-        if position_swap || !map.is_blocked(&dest_point) {
+        if position_swap || !self.map.is_blocked(&dest_point) {
             // No entities in the way. Anything else?
             let (position, viewshed) = self
                 .world
@@ -193,8 +204,7 @@ impl<'a> ActionProcessor<'a> {
             .query_one_mut::<(&mut Position, &mut Viewshed)>(*entity)
             .expect("move entity exists");
 
-        let map = self.resources.map.as_ref().expect("map");
-        if &position.point() != point && !map.is_blocked(point) {
+        if &position.point() != point && !self.map.is_blocked(point) {
             viewshed.set_dirty();
             position.set_point(*point)
         }

@@ -6,7 +6,7 @@ use crate::color::RGBA8Ext;
 use crate::component::{Position, Renderable};
 use crate::game::consts::get_screen_to_pixel_transform;
 use crate::game::draw_ui;
-use crate::map::VisibilityKind;
+use crate::map::{Map, VisibilityKind};
 use crate::resource::Resources;
 use crate::util::{ScreenPoint, ViewportPoint, ViewportToScreen};
 
@@ -35,9 +35,14 @@ impl Screen {
         self.transform.transform_point(point)
     }
 
-    pub fn draw_game(&self, canvas: &mut Canvas, world: &World, resources: &mut Resources) {
+    pub fn draw_game(
+        &self,
+        canvas: &mut Canvas,
+        world: &World,
+        resources: &mut Resources,
+        map: &Map,
+    ) {
         let viewport = &resources.viewport;
-        let map = resources.map.as_ref().unwrap();
 
         // Use the viewport to find and render all visible Map tiles
         for viewport_point in viewport.points() {
@@ -84,6 +89,6 @@ impl Screen {
         }
 
         // Draw the UI overlay last
-        draw_ui(canvas, world, resources);
+        draw_ui(canvas, world, resources, map);
     }
 }

@@ -6,6 +6,7 @@ use crate::{
         Position, Viewshed,
     },
     game::Action,
+    map::Map,
     resource::Resources,
     util::{PointExt, WorldPoint},
 };
@@ -20,6 +21,7 @@ impl Intention {
         self,
         world: &World,
         resources: &mut Resources,
+        map: &Map,
         point: &WorldPoint,
         viewshed: &Viewshed,
     ) -> (BehaviorKind, Action) {
@@ -39,7 +41,7 @@ impl Intention {
                 DerivedBehavior::FollowOrWander(target) => {
                     let target_point = target_point(world, target);
                     if viewshed.contains(&target_point) {
-                        if let Some(path_next) = path_next(resources, point, &target_point) {
+                        if let Some(path_next) = path_next(map, point, &target_point) {
                             return (
                                 BehaviorKind::Derived(DerivedBehavior::FollowOrWander(target)),
                                 Action::MovesBy(self.entity, point.get_vector(path_next)),
@@ -76,12 +78,7 @@ pub fn wander(entity: Entity, resources: &mut Resources) -> Action {
     possible_actions[idx as usize]
 }
 
-pub fn path_next(
-    resources: &mut Resources,
-    start: &WorldPoint,
-    end: &WorldPoint,
-) -> Option<WorldPoint> {
-    let map = resources.map.as_mut().unwrap();
+pub fn path_next(map: &Map, start: &WorldPoint, end: &WorldPoint) -> Option<WorldPoint> {
     let result = map.astar_path(start, end);
     if let Some(path) = result {
         if path.len() > 1 {
@@ -105,7 +102,7 @@ pub fn target_point(world: &World, target: Entity) -> WorldPoint {
 ///
 /// Process each intention, resolving each entity's target and deciding
 /// on a next action and behavior for next turn.
-pub fn action_decider_system(world: &mut World, resources: &mut Resources) {
+pub fn action_decider_system(world: &mut World, resources: &mut Resources, map: &mut Map) {
     let mut intentions: Vec<Intention> = vec![];
 
     // Find all entities without an action set
@@ -129,7 +126,7 @@ pub fn action_decider_system(world: &mut World, resources: &mut Resources) {
                 .unwrap();
             let (position, viewshed) = q1.get().unwrap();
             let point = position.point();
-            intention.into_next(world, resources, &point, viewshed)
+            intention.into_next(world, resources, map, &point, viewshed)
         };
 
         let (behavior, actor) = world

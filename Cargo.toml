@@ -28,7 +28,6 @@ png = "0.17"
 morton-encoding = "2.0"
 image = "0.24"
 ggez = { git = "https://github.com/ggez/ggez", hash = "e0dda6eb66d9e17ed7bb21e62ab6e6ddda5dffc9" }
-ggez-goodies = "*"
 wfc = "0.10"
 grid_2d = "0.15"
 coord_2d = "0.3"

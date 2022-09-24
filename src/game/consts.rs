@@ -35,6 +35,8 @@ pub const VIEWPORT_HEIGHT: i32 = 50;
 pub const VIEWPORT_SCREEN_POINT: ScreenPoint = ScreenPoint::new(0, SCREEN_HEIGHT - VIEWPORT_HEIGHT);
 pub const TITLE_HEADER: &str = "Roguemon";
 pub const UPDATE_FPS: u32 = 60;
+pub const UPDATE_INTERVAL_SECS: f32 = 1.0 / (UPDATE_FPS as f32);
+
 pub const TIME_STEP: Duration = Duration::from_nanos(1_000_000_000 / UPDATE_FPS as u64);
 pub const ONE_FRAME: Duration = Duration::from_nanos(1_000_000_000 / 60);
 

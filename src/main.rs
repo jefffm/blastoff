@@ -21,7 +21,7 @@ pub mod util;
 
 use game::{consts, RunState, TurnsHistory};
 use resource::{Resources, Viewport};
-use scene::{Game, MainMenuSelection};
+use scene::{MainMenuSelection, MainState};
 use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 
 use clap::Parser;
@@ -100,11 +100,6 @@ fn main() -> GameResult {
 
     let resources = Resources {
         rng: RandomNumberGenerator::seeded(rng_seed),
-        map: None,
-        mapgen_history: Vec::default(),
-        run_state: Some(RunState::MainMenu(MainMenuSelection::NewGame)),
-        turn_number: 0,
-        turn_history: TurnsHistory::default(),
         viewport: Viewport::new(
             ViewportRect::new(
                 ViewportPoint::new(0, 0),
@@ -116,7 +111,10 @@ fn main() -> GameResult {
         spritesheet,
     };
 
-    let game = Game::new(resources, &mut ctx);
+    let mut game = MainState::new(resources, &mut ctx);
+
+    // Push an initial scene to the SceneStack and prepare it for playing
+    game.init();
 
     info!("starting main_loop");
 

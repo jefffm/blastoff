@@ -1,12 +1,16 @@
 use ggez::graphics::{Canvas, DrawParam};
+use ggez::input::keyboard::KeyCode;
 use std::fmt;
 
 use crate::{
     color::{RGBA8Ext, COMMON},
     game::consts::{PIXEL_RECT, SCREEN_RECT, TITLE_HEADER},
+    input::Controls,
     resource::Resources,
-    util::PixelPoint,
+    util::{PixelPoint, Scene, SceneSwitch},
 };
+
+use super::{MainMenu, MenuResult};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum PauseMenuSelection {
@@ -63,19 +67,94 @@ pub fn draw_pause_menu(
     selection: &PauseMenuSelection,
     resources: &mut Resources,
 ) {
-    resources.font.draw_each_char(
-        canvas,
-        TITLE_HEADER,
-        &PixelPoint::new(PIXEL_RECT.center().x, 0),
-        None,
-    );
+}
 
-    for (i, entry) in selection.entries().iter().enumerate() {
-        entry.print(
+pub struct PauseMenu {
+    state: MenuResult<PauseMenuSelection>,
+}
+
+impl Default for PauseMenu {
+    fn default() -> Self {
+        Self {
+            state: MenuResult::new(PauseMenuSelection::Continue),
+        }
+    }
+}
+impl Scene<Resources, Controls> for PauseMenu {
+    fn input(&mut self, resources: &mut Resources, mut controls: Controls, started: bool) {
+        let selection = self.state.selection();
+        let entries = selection.entries();
+
+        let result = match controls.read() {
+            None => PauseMenuResult::NoSelection {
+                selected: *selection,
+            },
+            Some(key) => match key {
+                KeyCode::Escape => PauseMenuResult::NoSelection {
+                    selected: PauseMenuSelection::Continue,
+                },
+                KeyCode::Up => {
+                    let idx = entries
+                        .iter()
+                        .position(|&x| x == *selection)
+                        .expect("MainMenuSelection");
+                    PauseMenuResult::NoSelection {
+                        selected: entries[(idx + entries.len() - 1) % entries.len()],
+                    }
+                }
+                KeyCode::Down => {
+                    let idx = entries
+                        .iter()
+                        .position(|&x| x == *selection)
+                        .expect("MainMenuSelection");
+                    PauseMenuResult::NoSelection {
+                        selected: entries[(idx + 1) % entries.len()],
+                    }
+                }
+                KeyCode::Return => PauseMenuResult::Selected {
+                    selected: *selection,
+                },
+                _ => PauseMenuResult::NoSelection {
+                    selected: *selection,
+                },
+            },
+        };
+    }
+
+    fn update(
+        &mut self,
+        resources: &mut Resources,
+        ctx: &mut ggez::Context,
+    ) -> SceneSwitch<Resources, Controls> {
+        match self.state {
+            MenuResult::NoSelection { selected } => SceneSwitch::None,
+            MenuResult::Selected { selected } => match selected {
+                PauseMenuSelection::Continue => SceneSwitch::Pop,
+                PauseMenuSelection::ExitToMainMenu => {
+                    SceneSwitch::Reinit(Box::new(MainMenu::default()))
+                }
+            },
+        }
+    }
+
+    fn draw(&mut self, resources: &mut Resources, canvas: &mut Canvas) -> ggez::GameResult<()> {
+        let selection = self.state.selection();
+        resources.font.draw_each_char(
             canvas,
-            resources,
-            resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
-            selection,
+            TITLE_HEADER,
+            &PixelPoint::new(PIXEL_RECT.center().x, 0),
+            None,
         );
+
+        for (i, entry) in selection.entries().iter().enumerate() {
+            entry.print(
+                canvas,
+                resources,
+                resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
+                selection,
+            );
+        }
+
+        Ok(())
     }
 }

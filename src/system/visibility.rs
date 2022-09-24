@@ -4,14 +4,13 @@ use symmetric_shadowcasting::compute_fov;
 
 use crate::{
     component::{Player, Position, Viewshed},
+    map::Map,
     resource::Resources,
     util::{WorldFloatPoint, WorldPoint},
 };
 
 // Update the viewport to be centered on the Camera position
-pub fn visibility_system(world: &mut World, resources: &mut Resources) {
-    let map = resources.map.as_mut().unwrap();
-
+pub fn visibility_system(world: &mut World, resources: &mut Resources, map: &mut Map) {
     let mut updated_ents = HashSet::<Entity>::new();
 
     for (entity, (pos, viewshed)) in world.query_mut::<(&Position, &mut Viewshed)>() {

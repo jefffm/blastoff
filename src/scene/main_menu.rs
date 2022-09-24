@@ -1,12 +1,16 @@
 use ggez::graphics::{Canvas, DrawParam};
+use ggez::input::keyboard::KeyCode;
 use std::fmt;
 
 use crate::{
     color::{RGBA8Ext, COMMON},
     game::consts::{PIXEL_RECT, SCREEN_RECT, TITLE_HEADER},
+    input::Controls,
     resource::Resources,
-    util::PixelPoint,
+    util::{PixelPoint, Scene, SceneSwitch},
 };
+
+use super::{Initialization, MenuResult};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MainMenuSelection {
@@ -56,31 +60,99 @@ impl MainMenuSelection {
     }
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
-pub enum MainMenuResult {
-    NoSelection { selected: MainMenuSelection },
-    Selected { selected: MainMenuSelection },
+pub struct MainMenu {
+    state: MenuResult<MainMenuSelection>,
 }
-pub fn draw_main_menu(
-    canvas: &mut Canvas,
-    selection: &MainMenuSelection,
-    resources: &mut Resources,
-) {
-    let can_continue: bool = false;
-    resources.font.draw_each_char(
-        canvas,
-        TITLE_HEADER,
-        &PixelPoint::new(PIXEL_RECT.center().x, 0),
-        None,
-    );
 
-    let entries = selection.entries(can_continue);
-    for (i, entry) in entries.iter().enumerate() {
-        entry.print(
+impl Default for MainMenu {
+    fn default() -> Self {
+        Self {
+            state: MenuResult::new(MainMenuSelection::NewGame),
+        }
+    }
+}
+impl Scene<Resources, Controls> for MainMenu {
+    fn input(&mut self, resources: &mut Resources, mut controls: Controls, started: bool) {
+        let selection = self.state.selection();
+
+        let can_continue = false; // TODO: implement save/continue
+        let entries = selection.entries(can_continue);
+
+        self.state = match controls.read() {
+            None => MenuResult::NoSelection {
+                selected: *selection,
+            },
+            Some(key) => match key {
+                KeyCode::Escape => MenuResult::NoSelection {
+                    selected: MainMenuSelection::Quit,
+                },
+                KeyCode::Up => {
+                    let idx = entries
+                        .iter()
+                        .position(|&x| x == *selection)
+                        .expect("MainMenuSelection");
+                    MenuResult::NoSelection {
+                        selected: entries[(idx + entries.len() - 1) % entries.len()],
+                    }
+                }
+                KeyCode::Down => {
+                    let idx = entries
+                        .iter()
+                        .position(|&x| x == *selection)
+                        .expect("MainMenuSelection");
+                    MenuResult::NoSelection {
+                        selected: entries[(idx + 1) % entries.len()],
+                    }
+                }
+                KeyCode::Return => MenuResult::Selected {
+                    selected: *selection,
+                },
+                _ => MenuResult::NoSelection {
+                    selected: *selection,
+                },
+            },
+        };
+    }
+
+    fn update(
+        &mut self,
+        _resources: &mut Resources,
+        _ctx: &mut ggez::Context,
+    ) -> SceneSwitch<Resources, Controls> {
+        match self.state {
+            MenuResult::NoSelection { selected } => SceneSwitch::None,
+            MenuResult::Selected { selected } => match selected {
+                MainMenuSelection::NewGame => {
+                    SceneSwitch::Push(Box::new(Initialization::default()))
+                }
+                MainMenuSelection::Continue => SceneSwitch::None, // TODO: implement save/load/continue
+                MainMenuSelection::Quit => {
+                    ::std::process::exit(0);
+                }
+            },
+        }
+    }
+
+    fn draw(&mut self, resources: &mut Resources, canvas: &mut Canvas) -> ggez::GameResult<()> {
+        let selection = self.state.selection();
+        let can_continue: bool = false;
+        resources.font.draw_each_char(
             canvas,
-            resources,
-            resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
-            selection,
+            TITLE_HEADER,
+            &PixelPoint::new(PIXEL_RECT.center().x, 0),
+            None,
         );
+
+        let entries = selection.entries(can_continue);
+        for (i, entry) in entries.iter().enumerate() {
+            entry.print(
+                canvas,
+                resources,
+                resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
+                selection,
+            );
+        }
+
+        Ok(())
     }
 }

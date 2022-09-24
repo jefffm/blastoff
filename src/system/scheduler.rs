@@ -1,8 +1,8 @@
 use hecs::{Entity, World};
 
-use crate::resource::Resources;
+use crate::{map::Map, resource::Resources};
 
-pub type SystemFn = fn(&mut World, &mut Resources);
+pub type SystemFn = fn(&mut World, &mut Resources, &mut Map);
 
 /// This is used as a component to signify ownership
 pub struct Owner(pub Entity);
@@ -55,9 +55,9 @@ impl Scheduler {
         SchedulerBuilder::default()
     }
 
-    pub fn execute(&mut self, world: &mut World, resources: &mut Resources) {
+    pub fn execute(&mut self, world: &mut World, resources: &mut Resources, map: &mut Map) {
         for f in &mut self.steps {
-            f(world, resources);
+            f(world, resources, map);
         }
     }
 }

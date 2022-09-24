@@ -4,12 +4,12 @@ use crate::{
     component::{
         Actor, Behavior, BehaviorKind, DerivedBehavior, InitialBehavior, Player, Position, Viewshed,
     },
+    map::Map,
     resource::Resources,
 };
 
 /// Check Behavior for all entities and resolve any behaviors that can change
-pub fn behavior_system(world: &mut World, resources: &mut Resources) {
-    let map = resources.map.as_ref().unwrap();
+pub fn behavior_system(world: &mut World, resources: &mut Resources, map: &mut Map) {
     let mut updates: Vec<(Entity, BehaviorKind)> = vec![];
     for (entity, (_actor, behavior, viewshed)) in
         world.query::<(&Actor, &Behavior, &Viewshed)>().iter()
