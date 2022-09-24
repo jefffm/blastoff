@@ -21,7 +21,7 @@ pub mod util;
 
 use game::{consts, Game, RunState, TurnsHistory};
 use resource::{Resources, Viewport};
-use scene::{Controller, MainMenuSelection};
+use scene::MainMenuSelection;
 use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 
 use clap::Parser;
@@ -100,7 +100,6 @@ fn main() -> GameResult {
 
     let resources = Resources {
         rng: RandomNumberGenerator::seeded(rng_seed),
-        controller: Controller::default(),
         map: None,
         mapgen_history: Vec::default(),
         run_state: Some(RunState::MainMenu(MainMenuSelection::NewGame)),

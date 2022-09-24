@@ -1,6 +1,3 @@
-mod controller;
-pub use controller::*;
-
 mod main_menu;
 pub use main_menu::*;
 

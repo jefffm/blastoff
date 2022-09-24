@@ -6,13 +6,11 @@ pub use viewport::*;
 use crate::{
     game::{RunState, TurnsHistory},
     map::Map,
-    scene::Controller,
     util::{BitmapFont, SpriteSheet},
 };
 
 pub struct Resources {
     pub rng: RandomNumberGenerator,
-    pub controller: Controller,
     pub map: Option<Map>,
     pub mapgen_history: Vec<Map>,
     pub run_state: Option<RunState>,
