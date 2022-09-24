@@ -5,9 +5,7 @@ use ggez::{
     graphics::{self, Canvas, DrawParam, Drawable},
 };
 
-use crate::{
-    color::{RGBA8Ext, EMPTY},
-};
+use crate::color::{RGBA8Ext, EMPTY};
 
 use super::{PixelPoint, PixelSize, SpriteSize};
 
@@ -428,10 +426,7 @@ impl BitmapFont {
             self.char_size.width,
             self.char_size.height,
         );
-        let draw_param = base_param
-            .src(*rect)
-            .dest_rect(dest_rect)
-            .image_scale(false);
+        let draw_param = base_param.src(*rect).dest_rect(dest_rect);
 
         canvas.draw(&self.clear_rect, draw_param);
         canvas.draw(&self.batch.image(), draw_param);
@@ -488,10 +483,7 @@ impl BitmapFont {
                     self.char_size.width,
                     self.char_size.height,
                 );
-                base_param
-                    .src(*rect)
-                    .dest_rect(dest_rect)
-                    .image_scale(false)
+                base_param.src(*rect).dest_rect(dest_rect)
             })
             .collect()
     }

@@ -20,9 +20,9 @@ pub mod scene;
 pub mod system;
 pub mod util;
 
-use game::{consts};
+use game::consts;
 use resource::{Resources, Viewport};
-use scene::{MainState};
+use scene::MainState;
 use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 
 use clap::Parser;
@@ -90,13 +90,11 @@ fn main() -> GameResult {
     // TODO: load sprite sheet like https://github.com/ggez/ggez/blob/0.8.0-rc0/examples/animation.rs#L237
 
     info!("creating GameState");
-    let font_image =
-        graphics::Image::from_path(&ctx, "/fonts/rex_16x16.png", true).expect("load font");
+    let font_image = graphics::Image::from_path(&ctx, "/fonts/rex_16x16.png").expect("load font");
     let font = BitmapFont::from_grid(&ctx, font_image, &SpriteSize::new(16, 16));
 
-    let spritesheet_image =
-        graphics::Image::from_path(&ctx, "/tileset/monochrome-transparent.png", true)
-            .expect("load spritesheet");
+    let spritesheet_image = graphics::Image::from_path(&ctx, "/tileset/monochrome-transparent.png")
+        .expect("load spritesheet");
     let spritesheet = SpriteSheet::from_grid(&ctx, spritesheet_image, SpriteSize::new(49, 22));
 
     let resources = Resources {

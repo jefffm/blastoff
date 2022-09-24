@@ -119,7 +119,6 @@ impl SpriteSheet {
         graphics::DrawParam::new()
             .src(sprite_rect)
             .dest_rect(dest_rect)
-            .image_scale(false)
     }
 
     pub fn push_sprite(
