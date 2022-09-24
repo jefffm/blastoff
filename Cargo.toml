@@ -25,7 +25,7 @@ line_drawing = "1.0.0"
 png = "0.17"
 morton-encoding = "2.0"
 image = "0.24"
-ggez = { git = "https://github.com/ggez/ggez", rev = "558d2c48860abfa1b0e88c5e277eb6055e6e50d7" }
+ggez = { git = "https://github.com/ggez/ggez", rev = "26e8f7a3486b84fec61006ca1d9956a340d12415" }
 wfc = "0.10"
 grid_2d = "0.15"
 coord_2d = "0.3"

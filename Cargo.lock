@@ -215,6 +215,20 @@ name = "bytemuck"
 version = "1.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2f5715e491b5a1598fc2bef5a606847b5dc1d48ea625bd3c02c00de8285591da"
+dependencies = [
+ "bytemuck_derive",
+]
+
+[[package]]
+name = "bytemuck_derive"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b9e1f5fa78f69496407a27ae9ed989e3c3b072310286f5ef385525e4cbc24a9"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "byteorder"
@@ -1008,7 +1022,7 @@ dependencies = [
 [[package]]
 name = "ggez"
 version = "0.8.0-rc0"
-source = "git+https://github.com/ggez/ggez?rev=558d2c48860abfa1b0e88c5e277eb6055e6e50d7#558d2c48860abfa1b0e88c5e277eb6055e6e50d7"
+source = "git+https://github.com/ggez/ggez?rev=26e8f7a3486b84fec61006ca1d9956a340d12415#26e8f7a3486b84fec61006ca1d9956a340d12415"
 dependencies = [
  "approx",
  "bitflags",

@@ -507,14 +507,11 @@ impl BitmapFont {
 }
 
 impl Drawable for BitmapFont {
-    fn draw(&self, canvas: &mut Canvas, param: DrawParam) {
+    fn draw(&self, canvas: &mut Canvas, param: impl Into<DrawParam>) {
         canvas.draw(&self.batch, param)
     }
 
-    fn dimensions(
-        &self,
-        gfx: &mut impl ggez::context::HasMut<graphics::GraphicsContext>,
-    ) -> Option<graphics::Rect> {
+    fn dimensions(&self, gfx: &impl Has<graphics::GraphicsContext>) -> Option<graphics::Rect> {
         self.batch.dimensions(gfx)
     }
 }
