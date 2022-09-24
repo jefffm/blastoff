@@ -9,3 +9,6 @@ pub use game_over::*;
 
 mod map_generation;
 pub use map_generation::*;
+
+mod game;
+pub use game::*;

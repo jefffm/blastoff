@@ -20,8 +20,7 @@ use crate::scene::{draw_game_over, draw_main_menu, draw_pause_menu, MainMenuSele
 use crate::system::{build_systems, Scheduler};
 use crate::util::{TransformExt, ViewportPoint, ViewportToScreen};
 
-use super::consts::SCALING_FACTOR;
-use super::{consts, process_actors, PlayGame, RunState};
+use crate::game::{consts, process_actors, PlayGame, RunState};
 
 pub struct Game {
     state: RunState,
@@ -48,8 +47,8 @@ impl Game {
             canvas_image: graphics::ScreenImage::new(
                 ctx,
                 None,
-                1. / SCALING_FACTOR,
-                1. / SCALING_FACTOR,
+                1. / consts::SCALING_FACTOR,
+                1. / consts::SCALING_FACTOR,
                 1,
             ),
         }
@@ -190,7 +189,6 @@ impl EventHandler for Game {
                         } else {
                             // If we have more frames to render for map generation, pass the
                             // state onto the next tick.
-                            // TODO: mapgen is borked
                             map_state.update(seconds);
                             Some(RunState::MapGeneration(map_state))
                         }
@@ -259,7 +257,7 @@ impl EventHandler for Game {
             &image,
             graphics::DrawParam::new()
                 .dest([0., 0.])
-                .scale([SCALING_FACTOR, SCALING_FACTOR]),
+                .scale([consts::SCALING_FACTOR, consts::SCALING_FACTOR]),
         );
 
         outer_canvas.finish(ctx)?;
