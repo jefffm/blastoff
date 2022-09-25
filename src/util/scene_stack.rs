@@ -18,7 +18,12 @@ pub enum SceneSwitch<C, Ev> {
 pub trait Scene<C, Ev> {
     fn input(&mut self, resources: &mut C, controls: &mut Ev, started: bool);
     fn update(&mut self, resources: &mut C, ctx: &mut ggez::Context) -> SceneSwitch<C, Ev>;
-    fn draw(&mut self, resources: &mut C, canvas: &mut graphics::Canvas) -> ggez::GameResult<()>;
+    fn draw(
+        &mut self,
+        resources: &mut C,
+        ctx: &mut ggez::Context,
+        canvas: &mut graphics::Canvas,
+    ) -> ggez::GameResult<()>;
     /// This returns whether or not to draw the next scene down on the
     /// stack as well; this is useful for layers or GUI stuff that
     /// only partially covers the screen.
@@ -135,22 +140,23 @@ impl<C, Ev> SceneStack<C, Ev> {
     fn draw_scenes(
         scenes: &mut [Box<dyn Scene<C, Ev>>],
         resources: &mut C,
+        ctx: &mut ggez::Context,
         canvas: &mut graphics::Canvas,
     ) {
         assert!(!scenes.is_empty());
         if let Some((current, rest)) = scenes.split_last_mut() {
             if current.draw_previous() {
-                SceneStack::draw_scenes(rest, resources, canvas);
+                SceneStack::draw_scenes(rest, resources, ctx, canvas);
             }
             current
-                .draw(resources, canvas)
+                .draw(resources, ctx, canvas)
                 .expect("I would hope drawing a scene never fails!");
         }
     }
 
     /// Draw the current scene.
-    pub fn draw(&mut self, canvas: &mut graphics::Canvas) {
-        SceneStack::draw_scenes(&mut self.scenes, &mut self.resources, canvas)
+    pub fn draw(&mut self, ctx: &mut ggez::Context, canvas: &mut graphics::Canvas) {
+        SceneStack::draw_scenes(&mut self.scenes, &mut self.resources, ctx, canvas)
     }
 
     /// Feeds the given input event to the current scene.

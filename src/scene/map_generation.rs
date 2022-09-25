@@ -71,7 +71,12 @@ impl Scene<Resources, Controls> for MapGeneration {
         }
     }
 
-    fn draw(&mut self, resources: &mut Resources, canvas: &mut Canvas) -> ggez::GameResult<()> {
+    fn draw(
+        &mut self,
+        resources: &mut Resources,
+        ctx: &mut ggez::Context,
+        canvas: &mut Canvas,
+    ) -> ggez::GameResult<()> {
         // TODO: implement zooming for map debug
         camera::render_debug_map(
             canvas,

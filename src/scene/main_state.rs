@@ -82,7 +82,8 @@ impl EventHandler for MainState {
         canvas.set_sampler(graphics::Sampler::nearest_clamp());
         canvas.set_blend_mode(BlendMode::REPLACE);
 
-        self.scene_stack.draw(&mut canvas);
+        // Draw the scene
+        self.scene_stack.draw(ctx, &mut canvas);
 
         // Write out the InstanceArrays for BitmapFonts and SpriteSheets
         canvas.draw(

@@ -5,15 +5,27 @@ use crate::{
     component::{Actor, Player},
     map::Map,
     resource::Resources,
+    util::PixelPoint,
 };
 
 /// UI:
-pub fn draw_ui(_canvas: &mut Canvas, world: &World, _resources: &Resources, _map: &Map) {
+pub fn draw_ui(
+    ctx: &mut ggez::Context,
+    canvas: &mut Canvas,
+    world: &World,
+    resources: &Resources,
+    _map: &Map,
+) {
     // let _turn_history = &resources.turn_history;
     // print(Point::new(1, 0), format!("Level : {}", map.get_level()));
     // ctx.print(1, 2, format!("Steps : {}", turn_history.steps));
     // ctx.print(1, 3, format!("Energy: {}", turn_history.energy_used));
-    // print(Point::new(20, 0), format!("Fps: {:.2}", ctx.fps));
+    resources.font.draw_each_char(
+        canvas,
+        &format!("Fps: {:.2}", ctx.time.fps()),
+        &PixelPoint::new(20, 0),
+        None,
+    );
 
     // Implement text printing for UI
     for (_ent, (_player, _actor)) in world.query::<(&Player, &Actor)>().iter() {

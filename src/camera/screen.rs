@@ -37,6 +37,7 @@ impl Screen {
 
     pub fn draw_game(
         &self,
+        ctx: &mut ggez::Context,
         canvas: &mut Canvas,
         world: &World,
         resources: &mut Resources,
@@ -89,6 +90,6 @@ impl Screen {
         }
 
         // Draw the UI overlay last
-        draw_ui(canvas, world, resources, map);
+        draw_ui(ctx, canvas, world, resources, map);
     }
 }

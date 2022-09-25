@@ -65,6 +65,7 @@ impl Scene<Resources, Controls> for Initialization {
     fn draw(
         &mut self,
         resources: &mut Resources,
+        ctx: &mut ggez::Context,
         canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
         resources.font.draw_each_char(

@@ -131,7 +131,12 @@ impl Scene<Resources, Controls> for PauseMenu {
         }
     }
 
-    fn draw(&mut self, resources: &mut Resources, canvas: &mut Canvas) -> ggez::GameResult<()> {
+    fn draw(
+        &mut self,
+        resources: &mut Resources,
+        ctx: &mut ggez::Context,
+        canvas: &mut Canvas,
+    ) -> ggez::GameResult<()> {
         let selection = self.state.selection();
         resources.font.draw_each_char(
             canvas,

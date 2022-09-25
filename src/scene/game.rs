@@ -133,9 +133,14 @@ impl Scene<Resources, Controls> for Game {
         SceneSwitch::None
     }
 
-    fn draw(&mut self, resources: &mut Resources, canvas: &mut Canvas) -> ggez::GameResult<()> {
+    fn draw(
+        &mut self,
+        resources: &mut Resources,
+        ctx: &mut ggez::Context,
+        canvas: &mut Canvas,
+    ) -> ggez::GameResult<()> {
         self.screen
-            .draw_game(canvas, &self.world, resources, &self.map);
+            .draw_game(ctx, canvas, &self.world, resources, &self.map);
 
         Ok(())
     }
