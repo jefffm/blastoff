@@ -8,29 +8,40 @@ use crate::{
     util::PixelPoint,
 };
 
+use super::consts::{SCREEN_WIDTH_PIXELS, TILE_SIZE};
+
 /// UI:
 pub fn draw_ui(
     ctx: &mut ggez::Context,
     canvas: &mut Canvas,
     world: &World,
     resources: &Resources,
-    _map: &Map,
+    map: &Map,
 ) {
     // let _turn_history = &resources.turn_history;
-    // print(Point::new(1, 0), format!("Level : {}", map.get_level()));
     // ctx.print(1, 2, format!("Steps : {}", turn_history.steps));
     // ctx.print(1, 3, format!("Energy: {}", turn_history.energy_used));
     resources.font.draw_each_char(
         canvas,
         &format!("Fps: {:.2}", ctx.time.fps()),
-        &PixelPoint::new(20, 0),
+        &PixelPoint::new(SCREEN_WIDTH_PIXELS - 20 * TILE_SIZE.width, 0),
         None,
     );
 
     // Implement text printing for UI
-    for (_ent, (_player, _actor)) in world.query::<(&Player, &Actor)>().iter() {
-        // print(Point::new(50, 0), format!("Energy: {:?}", actor.energy()));
-        // print(Point::new(50, 1), format!("Turns: {:?}", actor.turns()));
+    for (_ent, (_player, actor)) in world.query::<(&Player, &Actor)>().iter() {
+        resources.font.draw_each_char(
+            canvas,
+            &format!("Energy: {:?}", actor.energy()),
+            &PixelPoint::new(50, 0),
+            None,
+        );
+        resources.font.draw_each_char(
+            canvas,
+            &format!("Turns: {:?}", actor.turns()),
+            &PixelPoint::new(50, TILE_SIZE.height),
+            None,
+        );
     }
 
     // TODO: create relative coordinate systems for the two ui rects

@@ -2,7 +2,6 @@
 //!
 use std::num::NonZeroU32;
 
-
 use bracket_random::prelude::RandomNumberGenerator;
 use grid_2d::Grid;
 use rand::Rng;
@@ -136,7 +135,7 @@ impl Spawner for WfcGen {
                 world.spawn((
                     Position::new(point),
                     Renderable::new(Glyph::new('@', COMMON.four, Palette::empty()), 5),
-                    Viewshed::default().with_init().with_range(10),
+                    Viewshed::default().with_init().with_range(100),
                     Player {},
                     Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),
                 ));
