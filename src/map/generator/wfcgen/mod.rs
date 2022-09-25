@@ -1,5 +1,8 @@
 //! For more info: https://www.gridbugs.org/wave-function-collapse/
 //!
+mod forbid;
+pub use forbid::*;
+
 use std::num::NonZeroU32;
 
 use bracket_random::prelude::RandomNumberGenerator;
@@ -7,7 +10,7 @@ use grid_2d::Grid;
 use rand::Rng;
 use wfc::orientation::Orientation;
 use wfc::overlapping::OverlappingPatterns;
-use wfc::wrap::WrapXY;
+use wfc::wrap::{WrapNone, WrapXY};
 use wfc::{retry, ForbidNothing, ForbidPattern, PropagateError, RunOwn, Wrap};
 
 use coord_2d::{Coord, Size};
@@ -22,10 +25,10 @@ use super::MapGenerator;
 const TEST_HOUSE: &str = r"\
 .........
 .╔═╦═╗...
-.║○○○║...
-.║○○○║...
-.║○○○║...
-.║○○○║...
+.║___║...
+.║___║...
+.║___║...
+.║___║...
 .╚═╩═╝...
 .........
 .........
@@ -69,15 +72,28 @@ impl TilePattern {
         rng: &mut R,
     ) -> Result<Grid<Tile>, PropagateError> {
         let global_stats = self.overlapping_patterns.global_stats();
+
         let run = RunOwn::new_wrap_forbid(output_size, &global_stats, wrap, forbid, rng);
         let wave = run.collapse_retrying(retry::NumTimes(retry_times), rng)?;
         let wave_grid = wave.grid();
-        let grid = Grid::new_fn(wave_grid.size(), |coord| {
-            *self
-                .overlapping_patterns
-                .pattern_top_left_value(wave_grid.get(coord).unwrap().chosen_pattern_id().unwrap())
-        });
-        Ok(grid)
+
+        let wave_cell_iter: Option<Vec<_>> = wave_grid
+            .size()
+            .coord_iter_row_major()
+            .map(|coord| {
+                wave_grid
+                    .get(coord)
+                    .expect("wave cell")
+                    .chosen_pattern_id()
+                    .ok()
+                    .map(|pattern_id| *self.overlapping_patterns.pattern_top_left_value(pattern_id))
+            })
+            .collect();
+
+        match wave_cell_iter {
+            Some(cells) => Ok(Grid::new_iterator(wave_grid.size(), cells.into_iter())),
+            None => Err(PropagateError::Contradiction),
+        }
     }
 }
 
@@ -90,27 +106,38 @@ impl MapGenerator for WfcGen {
         mapgen_history: &mut Vec<Map>,
         _level: u32,
     ) -> Map {
+        let pattern_size = 3;
+        let input_size = Size::new(9, 9);
         let output_size = Size::new(50, 50);
         let tiles = TEST_HOUSE.chars().filter_map(Tile::from_char).collect();
 
         // Extract patterns from input
         let pattern = TilePattern::from_vec(
+            // WFC Input
             tiles,
-            Size::new(9, 9),
-            NonZeroU32::new(3).unwrap(),
-            &[Orientation::Original, Orientation::Clockwise180],
+            input_size,
+            // What size tiles to use examining the input?
+            NonZeroU32::new(pattern_size).unwrap(),
+            // Can we rotate tiles?
+            // &[Orientation::Original, Orientation::Clockwise180],
+            &[Orientation::Original],
         );
 
-        // Run Wave Function Collapse
-        let grid = pattern
-            .run_collapse(
+        let forbid = ForceBorderForbid::new(&pattern, pattern_size);
+
+        // Run Wave Function Collapse until it succeeds
+        let grid = loop {
+            tracing::info!("Running (or rerunning) wfc gen");
+            if let Ok(grid) = pattern.run_collapse(
                 output_size,
                 1000,
-                WrapXY,
-                ForbidNothing,
+                WrapNone,
+                forbid.clone(),
                 rng.get_rng(), // &mut rand::thread_rng(),
-            )
-            .expect("Error in WFC");
+            ) {
+                break grid;
+            }
+        };
 
         let tilevec: Vec<Tile> = grid.iter().map(move |tile| tile.to_owned()).collect();
 

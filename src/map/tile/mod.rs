@@ -55,6 +55,7 @@ impl Tile {
         match c {
             '\\' | '\n' => None,
             '.' => Some(Self::Floor(FloorKind::FloorDefault)),
+            '_' => Some(Self::Floor(FloorKind::FloorInterior)),
             c => Some(Self::Wall(WallKind::from(c))),
         }
     }
