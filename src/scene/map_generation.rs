@@ -19,7 +19,6 @@ pub struct MapGenerationState {
 
 impl MapGenerationState {
     pub fn update(&mut self, seconds: f32) {
-        tracing::warn!("timer: {:?}", self.timer);
         self.timer += seconds;
 
         if self.timer > 3.0 {
@@ -29,7 +28,6 @@ impl MapGenerationState {
     }
 
     pub fn is_complete(&self, history: &Vec<Map>) -> bool {
-        tracing::warn!("history: {:?} and index: {:?}", history.len(), self.index);
         self.index >= history.len()
     }
 }
@@ -61,14 +59,14 @@ impl Scene<Resources, Controls> for MapGeneration {
         _resources: &mut Resources,
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
+        self.state.update(UPDATE_INTERVAL_SECS);
+
         if self.state.is_complete(&self.history) {
             // If we're done, return to the debug menu
-            // TODO: implement debug menu instead of main menu
-            SceneSwitch::Reinit(Box::new(MainMenu::default()))
+            SceneSwitch::Pop
         } else {
             // If we have more frames to render for map generation, pass the
             // state onto the next tick.
-            self.state.update(UPDATE_INTERVAL_SECS);
             SceneSwitch::None
         }
     }

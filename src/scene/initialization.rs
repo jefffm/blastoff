@@ -3,16 +3,36 @@ use hecs::World;
 use crate::{
     game::{self, consts::PIXEL_RECT},
     input::Controls,
-    map::{Loader, WfcGen},
+    map::{Loader, Map, WfcGen},
     resource::Resources,
     scene::{Game, MapGeneration},
     util::{PixelPoint, Scene, SceneSwitch},
 };
 
+pub type CreateSceneFn = fn(World, Map, Vec<Map>) -> SceneSwitch<Resources, Controls>;
+
 // TODO: Initialization should take different parameters for different types of maps and worlds to generate
 // Game and MapGeneration/debug menu should both use SceneSwitch to pop themselves and pass new parameters to Initialization
-#[derive(Default)]
-pub struct Initialization {}
+pub struct Initialization {
+    create_scene: CreateSceneFn,
+}
+
+impl Initialization {
+    pub fn new(create_scene: CreateSceneFn) -> Self {
+        Self { create_scene }
+    }
+}
+
+impl Default for Initialization {
+    fn default() -> Self {
+        Self {
+            create_scene: |world: World, map: Map, _history: Vec<Map>| {
+                SceneSwitch::Replace(Box::new(Game::new(map, world)))
+            },
+        }
+    }
+}
+
 impl Scene<Resources, Controls> for Initialization {
     fn update(
         &mut self,
@@ -39,12 +59,7 @@ impl Scene<Resources, Controls> for Initialization {
         let mut world = World::default();
         let map = loader.load(1, &mut world);
 
-        if game::env().show_map_generation {
-            // View Map generation (if enabled)
-            SceneSwitch::Replace(Box::new(MapGeneration::new(world, mapgen_history)))
-        } else {
-            SceneSwitch::Replace(Box::new(Game::new(map, world)))
-        }
+        (self.create_scene)(world, map, mapgen_history)
     }
 
     fn draw(

@@ -44,7 +44,7 @@ struct Cli {
     verbose: u8,
 
     #[clap(short, long, action, default_value_t = false)]
-    mapgen_show: bool,
+    debug: bool,
 }
 
 fn main() -> GameResult {
@@ -57,8 +57,6 @@ fn main() -> GameResult {
     };
     tracing_subscriber::fmt().with_max_level(level).init();
 
-    // TODO: remove game::env mutability
-    game::env().show_map_generation = cli.mapgen_show;
     // TODO: add resources path using cargo manifest dir https://github.com/joetsoi/OpenMoonstone/blob/master/rust/src/main.rs#L108-L113
     let mut builder = ContextBuilder::new("roguemon", "Jeff Lynn");
     if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
@@ -113,7 +111,11 @@ fn main() -> GameResult {
     let mut game = MainState::new(resources, &mut ctx);
 
     // Push an initial scene to the SceneStack and prepare it for playing
-    game.init();
+    if cli.debug {
+        game.init_debug()
+    } else {
+        game.init();
+    }
 
     info!("starting main_loop");
 

@@ -12,7 +12,7 @@ use crate::util::SceneStack;
 
 use crate::game::consts;
 
-use super::MainMenu;
+use super::{DebugMenu, MainMenu};
 
 pub struct MainState {
     controls: Controls,
@@ -37,6 +37,10 @@ impl MainState {
 
     pub fn init(&mut self) {
         self.scene_stack.push(Box::new(MainMenu::default()))
+    }
+
+    pub fn init_debug(&mut self) {
+        self.scene_stack.push(Box::new(DebugMenu::default()))
     }
 }
 
