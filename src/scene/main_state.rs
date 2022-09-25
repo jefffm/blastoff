@@ -81,11 +81,14 @@ impl EventHandler for MainState {
         self.scene_stack.draw(&mut canvas);
 
         // Write out the InstanceArrays for BitmapFonts and SpriteSheets
-        // TODO: how can we share Resources with MainState as well as everything else?
-        // canvas.draw(
-        //     &self.resources.font,
-        //     graphics::DrawParam::new().dest([0., 0.]),
-        // );
+        canvas.draw(
+            &self.scene_stack.resources.font,
+            graphics::DrawParam::new().dest([0., 0.]),
+        );
+        canvas.draw(
+            &self.scene_stack.resources.spritesheet,
+            graphics::DrawParam::new().dest([0., 0.]),
+        );
         canvas.finish(ctx)?;
 
         let mut outer_canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);

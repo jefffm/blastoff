@@ -1,6 +1,9 @@
 use std::ops::Index;
 
-use ggez::{context::Has, graphics};
+use ggez::{
+    context::Has,
+    graphics::{self, Canvas, DrawParam, Drawable},
+};
 
 use super::{PixelPoint, PixelSize, PointExt, SpritePoint, SpriteRect, SpriteSize};
 
@@ -129,5 +132,15 @@ impl SpriteSheet {
         self.batch.set(vec![self.sprite(sprite, point)]);
 
         &self.batch
+    }
+}
+
+impl Drawable for SpriteSheet {
+    fn draw(&self, canvas: &mut Canvas, param: impl Into<DrawParam>) {
+        canvas.draw(&self.batch, param)
+    }
+
+    fn dimensions(&self, gfx: &impl Has<graphics::GraphicsContext>) -> Option<graphics::Rect> {
+        self.batch.dimensions(gfx)
     }
 }

@@ -50,14 +50,14 @@ impl<C, Ev> SceneSwitch<C, Ev> {
 
 /// A stack of `Scene`'s, together with a context object.
 pub struct SceneStack<C, Ev> {
-    pub world: C,
+    pub resources: C,
     scenes: Vec<Box<dyn Scene<C, Ev>>>,
 }
 
 impl<C, Ev> SceneStack<C, Ev> {
     pub fn new(_ctx: &mut ggez::Context, global_state: C) -> Self {
         Self {
-            world: global_state,
+            resources: global_state,
             scenes: Vec::new(),
         }
     }
@@ -123,7 +123,7 @@ impl<C, Ev> SceneStack<C, Ev> {
                 .scenes
                 .last_mut()
                 .expect("Tried to update empty scene stack");
-            current_scene.update(&mut self.world, ctx)
+            current_scene.update(&mut self.resources, ctx)
         };
         self.switch(next_scene);
     }
@@ -134,23 +134,23 @@ impl<C, Ev> SceneStack<C, Ev> {
     /// This allows for layering GUI's and such.
     fn draw_scenes(
         scenes: &mut [Box<dyn Scene<C, Ev>>],
-        world: &mut C,
+        resources: &mut C,
         canvas: &mut graphics::Canvas,
     ) {
         assert!(!scenes.is_empty());
         if let Some((current, rest)) = scenes.split_last_mut() {
             if current.draw_previous() {
-                SceneStack::draw_scenes(rest, world, canvas);
+                SceneStack::draw_scenes(rest, resources, canvas);
             }
             current
-                .draw(world, canvas)
+                .draw(resources, canvas)
                 .expect("I would hope drawing a scene never fails!");
         }
     }
 
     /// Draw the current scene.
     pub fn draw(&mut self, canvas: &mut graphics::Canvas) {
-        SceneStack::draw_scenes(&mut self.scenes, &mut self.world, canvas)
+        SceneStack::draw_scenes(&mut self.scenes, &mut self.resources, canvas)
     }
 
     /// Feeds the given input event to the current scene.
@@ -159,7 +159,7 @@ impl<C, Ev> SceneStack<C, Ev> {
             .scenes
             .last_mut()
             .expect("Tried to do input for empty scene stack");
-        current_scene.input(&mut self.world, controls, started);
+        current_scene.input(&mut self.resources, controls, started);
     }
 }
 
