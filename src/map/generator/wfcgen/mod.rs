@@ -96,10 +96,12 @@ impl MapGenerator for WfcGen {
         mapgen_history: &mut Vec<Map>,
         _level: u32,
     ) -> Map {
+        // let wfc_seed = seed::CITY;
+        let wfc_seed = seed::CAVE;
         let output_size = Size::new(50, 50);
-        let pattern = seed::CITY.tile_pattern();
 
-        let forbid = ForceBorderForbid::new(&pattern, seed::CITY.pattern_size);
+        let pattern = wfc_seed.tile_pattern();
+        // let forbid = ForceBorderForbid::new(&pattern, wfc_seed.pattern_size);
 
         // Run Wave Function Collapse until it succeeds
         let grid = loop {
@@ -108,7 +110,8 @@ impl MapGenerator for WfcGen {
                 output_size,
                 1000,
                 WrapNone,
-                forbid.clone(),
+                ForbidNothing,
+                // forbid.clone(),
                 rng.get_rng(), // &mut rand::thread_rng(),
             ) {
                 break grid;
