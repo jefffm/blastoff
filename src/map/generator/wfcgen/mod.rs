@@ -101,8 +101,7 @@ impl MapGenerator for WfcGen {
         let output_size = Size::new(50, 50);
 
         let pattern = wfc_seed.tile_pattern();
-        // let forbid = ForceBorderForbid::new(&pattern, wfc_seed.pattern_size);
-
+        let forbid = ForceBorderForbid::new(&pattern, wfc_seed.pattern_size);
         // Run Wave Function Collapse until it succeeds
         let grid = loop {
             tracing::info!("Running (or rerunning) wfc gen");

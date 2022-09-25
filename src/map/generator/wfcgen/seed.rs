@@ -8,8 +8,8 @@ use crate::map::Tile;
 use super::TilePattern;
 
 pub struct WfcSeed {
-    pattern: &'static str,
-    orientation: &'static [Orientation],
+    pub pattern: &'static str,
+    pub orientation: &'static [Orientation],
     pub pattern_size: u32,
 }
 
@@ -39,7 +39,7 @@ impl WfcSeed {
 }
 
 pub const CITY: WfcSeed = WfcSeed {
-    pattern: r"\
+    pattern: "\
 .........
 .╔═╦═╗...
 .║___║...
@@ -54,7 +54,7 @@ pub const CITY: WfcSeed = WfcSeed {
 };
 
 pub const CAVE: WfcSeed = WfcSeed {
-    pattern: r"\
+    pattern: "\
 ###############
 ##.####.####.##
 #...##...##...#
@@ -78,8 +78,7 @@ pub const CAVE: WfcSeed = WfcSeed {
 #...##...##...#
 ###.####.####.#
 ###......####.#
-###############\
-",
+###############",
     orientation: &[
         Orientation::Original,
         // Orientation::Clockwise90,
@@ -88,3 +87,14 @@ pub const CAVE: WfcSeed = WfcSeed {
     ],
     pattern_size: 3,
 };
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sizes() {
+        assert_eq!(CITY.pattern.chars().next().unwrap(), '.');
+        assert_eq!(CITY.input_size(), Size::new(9, 9));
+    }
+}
