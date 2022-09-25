@@ -21,7 +21,7 @@ impl MapGenerationState {
     pub fn update(&mut self, seconds: f32) {
         self.timer += seconds;
 
-        if self.timer > 3.0 {
+        if self.timer > 2.0 {
             self.index += 1;
             self.timer = 0.0;
         }

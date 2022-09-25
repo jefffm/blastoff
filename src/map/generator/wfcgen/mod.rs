@@ -3,6 +3,8 @@
 mod forbid;
 pub use forbid::*;
 
+mod seed;
+
 use std::num::NonZeroU32;
 
 use bracket_random::prelude::RandomNumberGenerator;
@@ -22,17 +24,6 @@ use crate::map::{Map, Spawner, Tile};
 
 use super::MapGenerator;
 
-const TEST_HOUSE: &str = r"\
-.........
-.╔═╦═╗...
-.║___║...
-.║___║...
-.║___║...
-.║___║...
-.╚═╩═╝...
-.........
-.........
-";
 pub struct TilePattern {
     pub grid: Grid<Tile>,
     pub overlapping_patterns: OverlappingPatterns<Tile>,
@@ -98,7 +89,6 @@ impl TilePattern {
 }
 
 pub struct WfcGen {}
-
 impl MapGenerator for WfcGen {
     fn generate(
         &mut self,
@@ -106,24 +96,10 @@ impl MapGenerator for WfcGen {
         mapgen_history: &mut Vec<Map>,
         _level: u32,
     ) -> Map {
-        let pattern_size = 3;
-        let input_size = Size::new(9, 9);
         let output_size = Size::new(50, 50);
-        let tiles = TEST_HOUSE.chars().filter_map(Tile::from_char).collect();
+        let pattern = seed::CITY.tile_pattern();
 
-        // Extract patterns from input
-        let pattern = TilePattern::from_vec(
-            // WFC Input
-            tiles,
-            input_size,
-            // What size tiles to use examining the input?
-            NonZeroU32::new(pattern_size).unwrap(),
-            // Can we rotate tiles?
-            // &[Orientation::Original, Orientation::Clockwise180],
-            &[Orientation::Original],
-        );
-
-        let forbid = ForceBorderForbid::new(&pattern, pattern_size);
+        let forbid = ForceBorderForbid::new(&pattern, seed::CITY.pattern_size);
 
         // Run Wave Function Collapse until it succeeds
         let grid = loop {
