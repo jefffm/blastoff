@@ -42,11 +42,11 @@ impl Screen {
         resources: &mut Resources,
         map: &Map,
     ) {
-        let viewport = &resources.viewport;
+        let viewport_points: Vec<_> = resources.viewport.points().collect();
 
         // Use the viewport to find and render all visible Map tiles
-        for viewport_point in viewport.points() {
-            let world_point = viewport.to_world_point(viewport_point);
+        for viewport_point in viewport_points {
+            let world_point = resources.viewport.to_world_point(viewport_point);
             // It's important to make sure the point is actually in the map
             // before trying to make an index for it
             if map.contains(world_point) {
@@ -75,7 +75,7 @@ impl Screen {
 
                     data.sort_by(|(_, r1), (_, r2)| r1.render_order.cmp(&r2.render_order));
                     for (pos, render) in data.iter() {
-                        let viewport_point = viewport.to_viewport_point(pos.p);
+                        let viewport_point = resources.viewport.to_viewport_point(pos.p);
                         let screen_point = self.to_screen_point(viewport_point);
                         self.draw(canvas, resources, &render.glyph, screen_point);
                     }

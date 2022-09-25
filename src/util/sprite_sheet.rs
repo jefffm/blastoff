@@ -113,15 +113,9 @@ impl SpriteSheet {
         assert!(self.sprite_grid.contains(sprite));
 
         let sprite_rect = self.sprite_grid[&sprite];
-        let dest_rect = graphics::Rect::new_i32(
-            point.x,
-            point.y,
-            self.sprite_size.width,
-            self.sprite_size.height,
-        );
         graphics::DrawParam::new()
             .src(sprite_rect)
-            .dest_rect(dest_rect)
+            .dest([point.x as f32, point.y as f32])
     }
 
     pub fn push_sprite(

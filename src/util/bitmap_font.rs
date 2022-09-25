@@ -362,6 +362,7 @@ pub struct BitmapFont {
     pub char_size: PixelSize,
     // Rect mesh used to clear backgrounds when needed
     clear_rect: graphics::Mesh,
+    clear_batch: Vec<DrawParam>,
 }
 
 impl BitmapFont {
@@ -395,6 +396,7 @@ impl BitmapFont {
             EMPTY.to_ggez_color(),
         )
         .expect("clear rect");
+
         Self::new(batch, text_map, char_size, clear_rect)
     }
 
@@ -409,8 +411,15 @@ impl BitmapFont {
             text_map,
             char_size,
             clear_rect,
+            clear_batch: Vec::new(),
         }
     }
+    fn param_for(&self, c: char, point: &PixelPoint, draw_param: Option<DrawParam>) -> DrawParam {
+        let base_param = draw_param.unwrap_or_else(DrawParam::new);
+        let rect = self.get_for_char(c);
+        base_param.src(*rect).dest([point.x as f32, point.y as f32])
+    }
+
     pub fn draw_char(
         &self,
         canvas: &mut Canvas,
@@ -418,17 +427,7 @@ impl BitmapFont {
         point: &PixelPoint,
         draw_param: Option<DrawParam>,
     ) {
-        let base_param = draw_param.unwrap_or_else(DrawParam::new);
-        let rect = self.get_for_char(c);
-        let dest_rect = graphics::Rect::new_i32(
-            point.x,
-            point.y,
-            self.char_size.width,
-            self.char_size.height,
-        );
-        let draw_param = base_param.src(*rect).dest_rect(dest_rect);
-
-        canvas.draw(&self.clear_rect, draw_param);
+        let draw_param = self.param_for(c, point, draw_param);
         canvas.draw(&self.batch.image(), draw_param);
     }
 
@@ -439,7 +438,9 @@ impl BitmapFont {
         point: &PixelPoint,
         draw_param: Option<DrawParam>,
     ) {
-        self.draw_char(canvas, c, point, draw_param);
+        let draw_param = self.param_for(c, point, draw_param);
+        canvas.draw(&self.clear_rect, draw_param);
+        canvas.draw(&self.batch.image(), draw_param);
     }
 
     pub fn draw_each_char(
@@ -465,6 +466,21 @@ impl BitmapFont {
         }
     }
 
+    pub fn push_char(&mut self, c: char, point: &PixelPoint, draw_param: Option<DrawParam>) {
+        self.batch.push(self.param_for(c, point, draw_param));
+    }
+
+    pub fn push_char_overwrite(
+        &mut self,
+        c: char,
+        point: &PixelPoint,
+        draw_param: Option<DrawParam>,
+    ) {
+        let draw_param = self.param_for(c, point, draw_param);
+        self.clear_batch.push(draw_param);
+        self.batch.push(draw_param);
+    }
+
     fn string_to_draw_params(
         &self,
         text: &str,
@@ -473,17 +489,13 @@ impl BitmapFont {
     ) -> Vec<DrawParam> {
         let base_param = draw_param.unwrap_or_else(DrawParam::new);
         text.chars()
-            // TODO: how to handle whitespace??
             .map(|c| self.get_for_char(c))
             .enumerate()
             .map(|(i, rect)| {
-                let dest_rect = graphics::Rect::new_i32(
-                    point.x + (i as i32 * self.char_size.width),
-                    point.y,
-                    self.char_size.width,
-                    self.char_size.height,
-                );
-                base_param.src(*rect).dest_rect(dest_rect)
+                base_param.src(*rect).dest([
+                    point.x as f32 + (i as f32 * self.char_size.width as f32),
+                    point.y as f32,
+                ])
             })
             .collect()
     }
@@ -499,7 +511,10 @@ impl BitmapFont {
 
 impl Drawable for BitmapFont {
     fn draw(&self, canvas: &mut Canvas, param: impl Into<DrawParam>) {
-        canvas.draw(&self.batch, param)
+        for clear_param in &self.clear_batch {
+            canvas.draw(&self.clear_rect, *clear_param);
+        }
+        canvas.draw(&self.batch, param);
     }
 
     fn dimensions(&self, gfx: &impl Has<graphics::GraphicsContext>) -> Option<graphics::Rect> {
