@@ -62,12 +62,6 @@ pub enum PauseMenuResult {
     NoSelection { selected: PauseMenuSelection },
     Selected { selected: PauseMenuSelection },
 }
-pub fn draw_pause_menu(
-    _canvas: &mut Canvas,
-    _selection: &PauseMenuSelection,
-    _resources: &mut Resources,
-) {
-}
 
 pub struct PauseMenu {
     state: MenuResult<PauseMenuSelection>,
@@ -85,12 +79,12 @@ impl Scene<Resources, Controls> for PauseMenu {
         let selection = self.state.selection();
         let entries = selection.entries();
 
-        let _result = match controls.read() {
-            None => PauseMenuResult::NoSelection {
+        self.state = match controls.read() {
+            None => MenuResult::NoSelection {
                 selected: *selection,
             },
             Some(key) => match key {
-                KeyCode::Escape => PauseMenuResult::NoSelection {
+                KeyCode::Escape => MenuResult::NoSelection {
                     selected: PauseMenuSelection::Continue,
                 },
                 KeyCode::Up => {
@@ -98,7 +92,7 @@ impl Scene<Resources, Controls> for PauseMenu {
                         .iter()
                         .position(|&x| x == *selection)
                         .expect("MainMenuSelection");
-                    PauseMenuResult::NoSelection {
+                    MenuResult::NoSelection {
                         selected: entries[(idx + entries.len() - 1) % entries.len()],
                     }
                 }
@@ -107,14 +101,14 @@ impl Scene<Resources, Controls> for PauseMenu {
                         .iter()
                         .position(|&x| x == *selection)
                         .expect("MainMenuSelection");
-                    PauseMenuResult::NoSelection {
+                    MenuResult::NoSelection {
                         selected: entries[(idx + 1) % entries.len()],
                     }
                 }
-                KeyCode::Return => PauseMenuResult::Selected {
+                KeyCode::Return => MenuResult::Selected {
                     selected: *selection,
                 },
-                _ => PauseMenuResult::NoSelection {
+                _ => MenuResult::NoSelection {
                     selected: *selection,
                 },
             },
