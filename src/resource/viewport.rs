@@ -20,6 +20,10 @@ impl Viewport {
         self.transform.update_transform(center, self.rect.center())
     }
 
+    pub fn center(&self) -> WorldPoint {
+        self.to_world_point(self.rect.center())
+    }
+
     pub fn to_world_point(&self, point: ViewportPoint) -> WorldPoint {
         let inverse_transform = self.transform.inverse().expect("inverse transform");
         inverse_transform.transform_point(point)
