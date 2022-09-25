@@ -124,27 +124,23 @@ impl Scene<Resources, Controls> for MapGeneration {
         if let Some(key) = controls.read() {
             self.input = match self.state {
                 // Playback Controls
-                MapGenerationState::Playback => {
-                    match (key, controls.control, controls.alt, controls.shift) {
-                        (KeyCode::Left, _, _, false) => Some(MapGenerationInput::Back),
-                        (KeyCode::Right, _, _, false) => Some(MapGenerationInput::Forward),
-                        (KeyCode::Return, _, _, false) => Some(MapGenerationInput::Exit),
-                        (KeyCode::Semicolon, _, _, false) => Some(MapGenerationInput::Inspect),
-                        (KeyCode::I, _, _, false) => Some(MapGenerationInput::Inspect),
-                        _ => None,
-                    }
-                }
+                MapGenerationState::Playback => match key {
+                    KeyCode::Left => Some(MapGenerationInput::Back),
+                    KeyCode::Right => Some(MapGenerationInput::Forward),
+                    KeyCode::Return => Some(MapGenerationInput::Exit),
+                    KeyCode::Semicolon => Some(MapGenerationInput::Inspect),
+                    KeyCode::I => Some(MapGenerationInput::Inspect),
+                    _ => None,
+                },
                 // Inspect Controls
-                MapGenerationState::Inspect => {
-                    match (key, controls.control, controls.alt, controls.shift) {
-                        (KeyCode::Escape, _, _, false) => Some(MapGenerationInput::Resume),
-                        (KeyCode::Up, _, _, false) => Some(MapGenerationInput::PanN),
-                        (KeyCode::Down, _, _, false) => Some(MapGenerationInput::PanS),
-                        (KeyCode::Left, _, _, false) => Some(MapGenerationInput::PanW),
-                        (KeyCode::Right, _, _, false) => Some(MapGenerationInput::PanE),
-                        _ => None,
-                    }
-                }
+                MapGenerationState::Inspect => match key {
+                    KeyCode::Escape => Some(MapGenerationInput::Resume),
+                    KeyCode::Up => Some(MapGenerationInput::PanN),
+                    KeyCode::Down => Some(MapGenerationInput::PanS),
+                    KeyCode::Left => Some(MapGenerationInput::PanW),
+                    KeyCode::Right => Some(MapGenerationInput::PanE),
+                    _ => None,
+                },
             }
         }
     }
