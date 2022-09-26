@@ -30,7 +30,6 @@ impl SubMap {
         rng: &mut bracket_random::prelude::RandomNumberGenerator,
         mapgen_history: &mut Vec<Map>,
     ) -> Map {
-        // TODO: use self.size as a parameter to generate(?)
         self.mapgen.generate(self.size, rng, mapgen_history)
     }
 }
@@ -88,10 +87,15 @@ impl MapGenerator for Combo {
 
             // Iterate over the submap, translate to the Combo map's
             // coordinates, and overwrite the tile if it fits.
-            for (subpoint, subtile) in submap.iter_tiles() {
+            const MAP_DEBUG_TILES_PER_FRAME: usize = 100;
+            for (i, (subpoint, subtile)) in submap.iter_tiles().enumerate() {
                 let map_point = xform.transform_point(subpoint);
                 if map.contains(map_point) {
                     map[&map_point] = *subtile;
+                }
+
+                if i % MAP_DEBUG_TILES_PER_FRAME == 0 {
+                    mapgen_history.push(map.clone())
                 }
             }
 
@@ -109,7 +113,7 @@ impl Spawner for Combo {
         &self,
         map: &Map,
         world: &mut hecs::World,
-        rng: &mut bracket_random::prelude::RandomNumberGenerator,
+        _rng: &mut bracket_random::prelude::RandomNumberGenerator,
     ) {
         for point in map.iter_points() {
             if let Tile::Floor(_) = map[&point] {

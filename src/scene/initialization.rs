@@ -47,20 +47,21 @@ impl Scene<Resources, Controls> for Initialization {
         // Initialize mapgen history
         let mut mapgen_history = Vec::new();
 
+        let map_size = WorldSize::new(100, 100);
         let mapgen = Combo::new(MapTemplate::new(
-            WorldSize::new(100, 100),
-            Tile::Floor(FloorKind::FloorScenery(',')),
+            map_size,
+            Tile::Floor(FloorKind::FloorScenery('~')),
             vec![
                 // First create an entire map of craters
                 SubMap::new(
                     Box::new(WfcGen::new(seed::CRATERS)),
-                    WorldSize::new(100, 100),
+                    map_size,
                     WorldPoint::new(0, 0),
                 ),
                 // Then, create a city in the middle
                 SubMap::new(
                     Box::new(WfcGen::new(seed::CITY)),
-                    WorldSize::new(25, 25),
+                    WorldSize::new(50, 50),
                     WorldPoint::new(25, 25),
                 ),
             ],
@@ -71,7 +72,7 @@ impl Scene<Resources, Controls> for Initialization {
 
         // Load and spawn the map
         let mut world = World::default();
-        let map = loader.load(WorldSize::new(150, 150), &mut world);
+        let map = loader.load(map_size, &mut world);
 
         (self.create_scene)(world, map, mapgen_history)
     }

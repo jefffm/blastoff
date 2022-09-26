@@ -5,6 +5,11 @@ use crate::util::{
     TransformExt,
 };
 
+// 16:9
+pub const SCREEN_WIDTH_PIXELS: i32 = 320 * 4;
+pub const SCREEN_HEIGHT_PIXELS: i32 = 180 * 4;
+pub const TILE_SIZE: PixelSize = PixelSize::new(16, 16);
+
 /// euclid Rect isn't const, so this is manually calculated
 pub const SCREEN_HEIGHT: i32 = SCREEN_HEIGHT_PIXELS / TILE_SIZE.height;
 pub const SCREEN_WIDTH: i32 = SCREEN_WIDTH_PIXELS / TILE_SIZE.width;
@@ -12,7 +17,6 @@ pub const SCREEN_WIDTH: i32 = SCREEN_WIDTH_PIXELS / TILE_SIZE.width;
 pub const SCREEN_SIZE: ScreenSize = ScreenSize::new(SCREEN_WIDTH, SCREEN_HEIGHT);
 pub const SCREEN_RECT: ScreenRect = ScreenRect::new(ScreenPoint::new(0, 0), SCREEN_SIZE);
 
-pub const TILE_SIZE: PixelSize = PixelSize::new(16, 16);
 // Pixel coordinates can be derived from tile coordinates
 pub const PIXEL_RECT: PixelRect = PixelRect::new(
     PixelPoint::new(0, 0),
@@ -39,10 +43,6 @@ pub const UPDATE_INTERVAL_SECS: f32 = 1.0 / (UPDATE_FPS as f32);
 
 pub const TIME_STEP: Duration = Duration::from_nanos(1_000_000_000 / UPDATE_FPS as u64);
 pub const ONE_FRAME: Duration = Duration::from_nanos(1_000_000_000 / 60);
-
-// 16:9
-pub const SCREEN_WIDTH_PIXELS: i32 = 320 * 3;
-pub const SCREEN_HEIGHT_PIXELS: i32 = 180 * 3;
 
 pub const TOP_BOX_HEIGHT: i32 = SCREEN_HEIGHT - VIEWPORT_HEIGHT;
 pub const SIDE_BOX_WIDTH: i32 = SCREEN_WIDTH - VIEWPORT_WIDTH;
