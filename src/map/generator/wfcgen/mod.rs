@@ -97,7 +97,8 @@ impl MapGenerator for WfcGen {
         _level: u32,
     ) -> Map {
         // let wfc_seed = seed::CITY;
-        let wfc_seed = seed::CAVE;
+        // let wfc_seed = seed::CAVE;
+        let wfc_seed = seed::CRATERS;
         let output_size = Size::new(50, 50);
 
         let pattern = wfc_seed.tile_pattern();

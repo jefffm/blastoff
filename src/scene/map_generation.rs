@@ -259,13 +259,13 @@ impl Scene<Resources, Controls> for MapGeneration {
         match self.state {
             MapGenerationState::Playback => resources.font.draw_each_char(
                 canvas,
-                &format!("Playback - R to regenerate, ESC to exit, Spacebar = play/pause"),
+                "Playback - R to regenerate, ESC to exit, Spacebar = play/pause",
                 &PixelPoint::new(0, 0),
                 None,
             ),
             MapGenerationState::Inspect => resources.font.draw_each_char(
                 canvas,
-                &format!("Inspect (arrow keys to move)"),
+                "Inspect (arrow keys to move)",
                 &PixelPoint::new(0, 0),
                 None,
             ),

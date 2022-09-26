@@ -56,7 +56,20 @@ impl Tile {
             '\\' | '\n' => None,
             '.' => Some(Self::Floor(FloorKind::FloorDefault)),
             '_' => Some(Self::Floor(FloorKind::FloorInterior)),
-            c => Some(Self::Wall(WallKind::from(c))),
+            '○' => Some(Self::Wall(WallKind::WallPillar)),
+            '║' => Some(Self::Wall(WallKind::WallNS)),
+            '╝' => Some(Self::Wall(WallKind::WallNW)),
+            '╗' => Some(Self::Wall(WallKind::WallSW)),
+            '╣' => Some(Self::Wall(WallKind::WallNSW)),
+            '╚' => Some(Self::Wall(WallKind::WallNE)),
+            '╔' => Some(Self::Wall(WallKind::WallSE)),
+            '╠' => Some(Self::Wall(WallKind::WallNSE)),
+            '═' => Some(Self::Wall(WallKind::WallEW)),
+            '╦' => Some(Self::Wall(WallKind::WallEWS)),
+            '╩' => Some(Self::Wall(WallKind::WallEWN)),
+            '╬' => Some(Self::Wall(WallKind::WallAllSides)),
+            '#' => Some(Self::Wall(WallKind::WallDefault)),
+            c => Some(Self::Floor(FloorKind::FloorScenery(c))),
         }
     }
 

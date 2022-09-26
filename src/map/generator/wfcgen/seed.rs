@@ -88,6 +88,35 @@ pub const CAVE: WfcSeed = WfcSeed {
     pattern_size: 3,
 };
 
+pub const CRATERS: WfcSeed = WfcSeed {
+    pattern: "\
+,,,,,,,,,,,,,,,,,,
+,,,░,,,,,,,,,,,,*,
+,,,,,,░░,,,,,,,,,,
+,,░░░░░░░,,,,,,,,,
+,,░▒▒▒▒▒░,,,,*,,,,
+,░░▒▓▓▓▒░░,,,,*,,,
+,,░▒▓▓▓▒░,,,,,,,,,
+,,░▒▓▓▓▒░░,,░,,,,,
+,,░▒▒▒▒▒░░,,,,,,,,
+,░░░░░░░░,,,,,,,,,
+,,,░░░░░░,,,,,,,,,
+,░,,,░░,,,,,,,,,,,
+,,,,,,,,,,,,,░░,,,
+,,,,,,,,,,,,░▒▒░,,
+,,,,,,,,,,,,,▒▓▒,,
+,,,,*,,,,,,,░▒▒░,,
+,,,,,,,,,,,,,░,,,,
+,,,,,,,,,,,,,,,,,,",
+    orientation: &[
+        Orientation::Original,
+        Orientation::Clockwise90,
+        Orientation::Clockwise180,
+        Orientation::Clockwise270,
+    ],
+    pattern_size: 3,
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;

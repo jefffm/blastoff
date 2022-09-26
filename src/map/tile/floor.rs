@@ -6,6 +6,7 @@ use crate::color::COMMON;
 pub enum FloorKind {
     FloorDefault,
     FloorInterior,
+    FloorScenery(char),
 }
 
 impl From<char> for FloorKind {
@@ -13,7 +14,7 @@ impl From<char> for FloorKind {
         match c {
             '.' => Self::FloorDefault,
             '_' => Self::FloorInterior,
-            _ => panic!("invalid floor char"),
+            glyph => Self::FloorScenery(glyph),
         }
     }
 }
@@ -23,6 +24,7 @@ impl FloorKind {
         match self {
             Self::FloorDefault => '.',
             Self::FloorInterior => '_',
+            Self::FloorScenery(glyph) => *glyph,
         }
     }
 
