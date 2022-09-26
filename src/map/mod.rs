@@ -34,17 +34,16 @@ pub struct Map {
     revealed: FixedBitSet,
     visible: FixedBitSet,
     content: Vec<Vec<Entity>>,
-    level: u32,
 }
 
 impl Map {
     /// Create a map with a given size filled in with Wall tiles
-    pub fn init(name: String, size: WorldSize, level: u32) -> Self {
-        let tiles = vec![Tile::Wall(WallKind::default()); (size.height * size.width) as usize];
-        Self::new(name, size.width, size.height, tiles, level)
+    pub fn init(name: String, size: WorldSize, default_tile: Tile) -> Self {
+        let tiles = vec![default_tile; (size.height * size.width) as usize];
+        Self::new(name, size.width, size.height, tiles)
     }
 
-    pub fn new(name: String, width: i32, height: i32, tiles: Vec<Tile>, level: u32) -> Self {
+    pub fn new(name: String, width: i32, height: i32, tiles: Vec<Tile>) -> Self {
         let rect = Rect::new(WorldPoint::new(0, 0), Size2D::new(width, height));
         let area = rect.size.area().try_into().unwrap();
 
@@ -60,7 +59,6 @@ impl Map {
             revealed,
             visible,
             content,
-            level,
         }
     }
 
@@ -206,10 +204,6 @@ impl Map {
         self.rect.height()
     }
 
-    pub fn get_level(&self) -> u32 {
-        self.level
-    }
-
     pub fn iter_points(&self) -> impl Iterator<Item = WorldPoint> {
         let xrange = self.rect.x_range();
         let yrange = self.rect.y_range();
@@ -276,7 +270,11 @@ mod tests {
 
     #[test]
     fn map_test() {
-        let map = &mut Map::init(String::from("test"), WorldSize::new(50, 50), 1);
+        let map = &mut Map::init(
+            String::from("test"),
+            WorldSize::new(50, 50),
+            Tile::Floor(FloorKind::FloorDefault),
+        );
 
         // Check that we can traverse the entire map rect
         for x in map.rect.x_range() {
@@ -306,7 +304,6 @@ mod tests {
             5,
             5,
             vec![Tile::Floor(FloorKind::default()); 25],
-            1,
         );
 
         let start = WorldPoint::new(0, 0);
@@ -329,7 +326,7 @@ mod tests {
             tiles[point.to_index(5)] = Tile::Wall(WallKind::default());
         }
 
-        let map = Map::new(String::from("test"), 5, 5, tiles, 1);
+        let map = Map::new(String::from("test"), 5, 5, tiles);
 
         let start = WorldPoint::new(0, 0);
         let end = WorldPoint::new(4, 0);
@@ -360,7 +357,7 @@ mod tests {
             w, w, w, w, w,
         ];
 
-        let mut map = Map::new(String::from("test"), 5, 5, tiles, 1);
+        let mut map = Map::new(String::from("test"), 5, 5, tiles);
 
         let points: Vec<_> = map.iter_points().collect();
         for point in points {
@@ -433,7 +430,7 @@ mod tests {
             w, w, w,
         ];
 
-        let mut map = Map::new(String::from("test"), 3, 3, tiles, 1);
+        let mut map = Map::new(String::from("test"), 3, 3, tiles);
 
         let points: Vec<_> = map.iter_points().collect();
         for point in points {

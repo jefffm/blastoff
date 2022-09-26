@@ -1,6 +1,8 @@
 use bracket_random::prelude::RandomNumberGenerator;
 use hecs::World;
 
+use crate::util::WorldSize;
+
 use super::Map;
 use super::MapGenerator;
 use super::Spawner;
@@ -31,8 +33,8 @@ where
     }
 
     /// Generates the map and returns the Spawner
-    pub fn load(&mut self, level: u32, world: &mut World) -> Map {
-        let map = self.inner.generate(self.rng, self.mapgen_history, level);
+    pub fn load(&mut self, size: WorldSize, world: &mut World) -> Map {
+        let map = self.inner.generate(size, self.rng, self.mapgen_history);
 
         self.inner.spawn(&map, world, self.rng);
 

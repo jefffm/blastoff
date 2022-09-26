@@ -8,14 +8,12 @@ use crate::{
 
 // Create default transforms and render the map as absolute coordinates
 pub fn render_debug_map(
-    ctx: &mut ggez::Context,
+    _ctx: &mut ggez::Context,
     canvas: &mut Canvas,
     viewport: &mut Viewport,
     screen_transform: &ViewportToScreen,
     resources: &mut Resources,
     map: &Map,
-    _show_boundaries: bool,
-    _index: usize,
 ) {
     for viewport_point in viewport.points() {
         let world_point = viewport.to_world_point(viewport_point);

@@ -150,11 +150,15 @@ fn draw_corridor(map: &mut Map, start: &WorldPoint, end: &WorldPoint) {
 impl MapGenerator for Bsp {
     fn generate(
         &mut self,
+        size: WorldSize,
         rng: &mut RandomNumberGenerator,
         mapgen_history: &mut Vec<crate::map::Map>,
-        level: u32,
     ) -> Map {
-        let mut map = Map::init("bsp".into(), self.size, level);
+        let mut map = Map::init(
+            "bsp".into(),
+            self.size,
+            Tile::Floor(FloorKind::FloorDefault),
+        );
 
         // Initialize with a single Rect
         let mut rects = vec![WorldRect::new(WorldPoint::new(0, 0), self.size)];

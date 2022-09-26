@@ -1,12 +1,12 @@
 use hecs::World;
 
 use crate::{
-    game::{self, consts::PIXEL_RECT},
+    game::consts::PIXEL_RECT,
     input::Controls,
-    map::{Loader, Map, WfcGen},
+    map::{seed, Combo, FloorKind, Loader, Map, MapTemplate, SubMap, Tile, WfcGen},
     resource::Resources,
-    scene::{Game, MapGeneration},
-    util::{PixelPoint, Scene, SceneSwitch},
+    scene::Game,
+    util::{PixelPoint, Scene, SceneSwitch, WorldPoint, WorldSize},
 };
 
 pub type CreateSceneFn = fn(World, Map, Vec<Map>) -> SceneSwitch<Resources, Controls>;
@@ -45,19 +45,33 @@ impl Scene<Resources, Controls> for Initialization {
         tracing::info!("Initializing level");
         tracing::info!("Map generation");
         // Initialize mapgen history
-
         let mut mapgen_history = Vec::new();
+
+        let mapgen = Combo::new(MapTemplate::new(
+            WorldSize::new(100, 100),
+            Tile::Floor(FloorKind::FloorScenery(',')),
+            vec![
+                // First create an entire map of craters
+                SubMap::new(
+                    Box::new(WfcGen::new(seed::CRATERS)),
+                    WorldSize::new(100, 100),
+                    WorldPoint::new(0, 0),
+                ),
+                // Then, create a city in the middle
+                SubMap::new(
+                    Box::new(WfcGen::new(seed::CITY)),
+                    WorldSize::new(25, 25),
+                    WorldPoint::new(25, 25),
+                ),
+            ],
+        ));
+
         // Create the loader
-        let mut loader = Loader::new(
-            WfcGen {},
-            // Bsp::new(WorldSize::new(50, 50)),
-            &mut resources.rng,
-            &mut mapgen_history,
-        );
+        let mut loader = Loader::new(mapgen, &mut resources.rng, &mut mapgen_history);
 
         // Load and spawn the map
         let mut world = World::default();
-        let map = loader.load(1, &mut world);
+        let map = loader.load(WorldSize::new(150, 150), &mut world);
 
         (self.create_scene)(world, map, mapgen_history)
     }
@@ -65,7 +79,7 @@ impl Scene<Resources, Controls> for Initialization {
     fn draw(
         &mut self,
         resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _ctx: &mut ggez::Context,
         canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
         resources.font.draw_each_char(

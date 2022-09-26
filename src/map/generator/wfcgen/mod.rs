@@ -3,7 +3,7 @@
 mod forbid;
 pub use forbid::*;
 
-mod seed;
+pub mod seed;
 
 use std::num::NonZeroU32;
 
@@ -12,7 +12,7 @@ use grid_2d::Grid;
 use rand::Rng;
 use wfc::orientation::Orientation;
 use wfc::overlapping::OverlappingPatterns;
-use wfc::wrap::{WrapNone, WrapXY};
+use wfc::wrap::WrapNone;
 use wfc::{retry, ForbidNothing, ForbidPattern, PropagateError, RunOwn, Wrap};
 
 use coord_2d::{Coord, Size};
@@ -21,6 +21,7 @@ use crate::camera::Glyph;
 use crate::color::{Palette, COMMON};
 use crate::component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed};
 use crate::map::{Map, Spawner, Tile};
+use crate::util::WorldSize;
 
 use super::MapGenerator;
 
@@ -88,21 +89,26 @@ impl TilePattern {
     }
 }
 
-pub struct WfcGen {}
+pub struct WfcGen {
+    seed: seed::WfcSeed,
+}
+impl WfcGen {
+    pub fn new(seed: seed::WfcSeed) -> Self {
+        Self { seed }
+    }
+}
+
 impl MapGenerator for WfcGen {
     fn generate(
         &mut self,
+        size: WorldSize,
         rng: &mut RandomNumberGenerator,
         mapgen_history: &mut Vec<Map>,
-        _level: u32,
     ) -> Map {
-        // let wfc_seed = seed::CITY;
-        // let wfc_seed = seed::CAVE;
-        let wfc_seed = seed::CRATERS;
-        let output_size = Size::new(50, 50);
+        let output_size = Size::new(size.width as u32, size.height as u32);
 
-        let pattern = wfc_seed.tile_pattern();
-        let forbid = ForceBorderForbid::new(&pattern, wfc_seed.pattern_size);
+        let pattern = self.seed.tile_pattern();
+        let forbid = ForceBorderForbid::new(&pattern, self.seed.pattern_size);
         // Run Wave Function Collapse until it succeeds
         let grid = loop {
             tracing::info!("Running (or rerunning) wfc gen");
@@ -125,7 +131,6 @@ impl MapGenerator for WfcGen {
             output_size.width() as i32,
             output_size.height() as i32,
             tilevec,
-            1,
         );
         mapgen_history.push(map.clone());
 

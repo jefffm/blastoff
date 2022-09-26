@@ -7,7 +7,7 @@ use hecs::World;
 
 use crate::camera;
 use crate::component::Cardinal;
-use crate::game::consts::{SCREEN_HEIGHT, SCREEN_HEIGHT_PIXELS, TILE_SIZE, UPDATE_INTERVAL_SECS};
+use crate::game::consts::{SCREEN_HEIGHT_PIXELS, TILE_SIZE, UPDATE_INTERVAL_SECS};
 use crate::input::Controls;
 use crate::map::Map;
 use crate::resource::{Resources, Viewport};
@@ -252,8 +252,6 @@ impl Scene<Resources, Controls> for MapGeneration {
             &self.screen_transform,
             resources,
             &self.history[self.cursor.index],
-            true,
-            self.cursor.index,
         );
 
         match self.state {
