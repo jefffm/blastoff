@@ -7,7 +7,7 @@ use hecs::World;
 
 use crate::camera;
 use crate::component::Cardinal;
-use crate::game::consts::UPDATE_INTERVAL_SECS;
+use crate::game::consts::{SCREEN_HEIGHT, SCREEN_HEIGHT_PIXELS, TILE_SIZE, UPDATE_INTERVAL_SECS};
 use crate::input::Controls;
 use crate::map::Map;
 use crate::resource::{Resources, Viewport};
@@ -22,29 +22,60 @@ use crate::{
 
 const MAP_SHOW_TIME: f32 = 2.0; // seconds
 
+#[derive(Debug, Clone, PartialEq)]
+enum PlaybackState {
+    Playing,
+    Paused,
+    Completed,
+}
+
+impl Default for PlaybackState {
+    fn default() -> Self {
+        Self::Playing
+    }
+}
+
 #[derive(Debug, Default, Clone, PartialEq)]
 struct MapGenerationCursor {
+    state: PlaybackState,
     timer: f32,
     index: usize,
     length: usize,
 }
 impl MapGenerationCursor {
-    pub fn new(length: usize) -> Self {
+    pub fn new(length: usize, state: PlaybackState) -> Self {
         Self {
             timer: 0.0,
             index: 0,
             length,
+            state,
         }
     }
 
     pub fn next(&mut self) {
-        self.index = (self.index + 1).min(self.length);
+        self.index = (self.index + 1).min(self.length - 1);
         self.timer = 0.0;
     }
 
     pub fn prev(&mut self) {
-        self.index = (self.index - 1).max(0);
+        self.index = (self.index as i32 - 1).max(0) as usize;
         self.timer = 0.0;
+    }
+
+    pub fn rewind(&mut self) {
+        self.index = 0;
+        self.timer = 0.;
+    }
+
+    pub fn playpause(&mut self) {
+        self.state = match self.state {
+            PlaybackState::Playing => PlaybackState::Paused,
+            PlaybackState::Paused => PlaybackState::Playing,
+            PlaybackState::Completed => {
+                self.rewind();
+                PlaybackState::Playing
+            }
+        }
     }
 }
 
@@ -66,15 +97,17 @@ impl Default for MapGenerationState {
 }
 
 enum MapGenerationInput {
+    PlayPause,
     Back,
     Forward,
-    Inspect,
-    Resume,
+    EnterPlayback,
+    EnterInspect,
     Exit,
     PanN,
     PanS,
     PanE,
     PanW,
+    Regenerate,
 }
 
 #[derive(Default)]
@@ -93,7 +126,7 @@ impl MapGeneration {
         let viewport = Viewport::new(
             ViewportRect::new(
                 ViewportPoint::new(0, 0),
-                ViewportSize::new(SCREEN_RECT.width() - 2, SCREEN_RECT.height() - 2),
+                ViewportSize::new(SCREEN_RECT.width() - 2, SCREEN_RECT.height() - 3),
             ),
             t1,
         );
@@ -106,7 +139,7 @@ impl MapGeneration {
         Self {
             world,
             history,
-            cursor: MapGenerationCursor::new(hist_length),
+            cursor: MapGenerationCursor::new(hist_length, PlaybackState::Playing),
             state: MapGenerationState::default(),
             input: None,
             viewport,
@@ -126,19 +159,25 @@ impl Scene<Resources, Controls> for MapGeneration {
                 // Playback Controls
                 MapGenerationState::Playback => match key {
                     KeyCode::Left => Some(MapGenerationInput::Back),
+                    KeyCode::Comma => Some(MapGenerationInput::Back),
                     KeyCode::Right => Some(MapGenerationInput::Forward),
+                    KeyCode::Period => Some(MapGenerationInput::Forward),
                     KeyCode::Return => Some(MapGenerationInput::Exit),
-                    KeyCode::Semicolon => Some(MapGenerationInput::Inspect),
-                    KeyCode::I => Some(MapGenerationInput::Inspect),
+                    KeyCode::Escape => Some(MapGenerationInput::Exit),
+                    KeyCode::Semicolon => Some(MapGenerationInput::EnterInspect),
+                    KeyCode::I => Some(MapGenerationInput::EnterInspect),
+                    KeyCode::R => Some(MapGenerationInput::Regenerate),
+                    KeyCode::Space => Some(MapGenerationInput::PlayPause),
                     _ => None,
                 },
                 // Inspect Controls
                 MapGenerationState::Inspect => match key {
-                    KeyCode::Escape => Some(MapGenerationInput::Resume),
+                    KeyCode::Escape => Some(MapGenerationInput::EnterPlayback),
                     KeyCode::Up => Some(MapGenerationInput::PanN),
                     KeyCode::Down => Some(MapGenerationInput::PanS),
                     KeyCode::Left => Some(MapGenerationInput::PanW),
                     KeyCode::Right => Some(MapGenerationInput::PanE),
+                    KeyCode::Space => Some(MapGenerationInput::PlayPause),
                     _ => None,
                 },
             }
@@ -150,20 +189,30 @@ impl Scene<Resources, Controls> for MapGeneration {
         _resources: &mut Resources,
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
-        self.cursor.timer += UPDATE_INTERVAL_SECS;
+        if self.is_complete() {
+            self.cursor.state = PlaybackState::Completed;
+        }
+
+        match self.cursor.state {
+            PlaybackState::Playing => {
+                if self.cursor.timer > MAP_SHOW_TIME {
+                    self.cursor.next();
+                }
+
+                self.cursor.timer += UPDATE_INTERVAL_SECS;
+            }
+            PlaybackState::Paused => {}
+            PlaybackState::Completed => {}
+        }
 
         match self.input.take() {
             Some(input) => match input {
                 MapGenerationInput::Back => self.cursor.prev(),
                 MapGenerationInput::Forward => self.cursor.next(),
-                MapGenerationInput::Inspect => {
-                    tracing::info!("Entering inspect mode");
+                MapGenerationInput::EnterInspect => {
                     self.state = MapGenerationState::Inspect;
                 }
-                MapGenerationInput::Resume => {
-                    tracing::info!("Resuming playback");
-                    self.state = MapGenerationState::Playback
-                }
+                MapGenerationInput::EnterPlayback => self.state = MapGenerationState::Playback,
                 MapGenerationInput::Exit => return SceneSwitch::Pop,
                 MapGenerationInput::PanN => self
                     .viewport
@@ -177,18 +226,11 @@ impl Scene<Resources, Controls> for MapGeneration {
                 MapGenerationInput::PanW => self
                     .viewport
                     .update_transform(self.viewport.center() + *Cardinal::W.to_vector()),
+                MapGenerationInput::PlayPause => self.cursor.playpause(),
+                MapGenerationInput::Regenerate => todo!("Map regeneration not implemented yet"),
             },
             None => match self.state {
-                MapGenerationState::Playback => {
-                    if self.cursor.timer > MAP_SHOW_TIME {
-                        self.cursor.next();
-                    }
-
-                    if self.is_complete() {
-                        // If we're done, return to the debug menu
-                        return SceneSwitch::Pop;
-                    }
-                }
+                MapGenerationState::Playback => {}
                 MapGenerationState::Inspect => {}
             },
         }
@@ -217,14 +259,35 @@ impl Scene<Resources, Controls> for MapGeneration {
         match self.state {
             MapGenerationState::Playback => resources.font.draw_each_char(
                 canvas,
-                &format!("Playback ({})", &self.cursor),
+                &format!("Playback - R to regenerate, ESC to exit, Spacebar = play/pause"),
                 &PixelPoint::new(0, 0),
                 None,
             ),
             MapGenerationState::Inspect => resources.font.draw_each_char(
                 canvas,
-                &format!("Inspect ({})", &self.cursor),
+                &format!("Inspect (arrow keys to move)"),
                 &PixelPoint::new(0, 0),
+                None,
+            ),
+        }
+
+        match self.cursor.state {
+            PlaybackState::Playing => resources.font.draw_each_char(
+                canvas,
+                &format!("Playing ({})", &self.cursor),
+                &PixelPoint::new(0, SCREEN_HEIGHT_PIXELS - (2 * TILE_SIZE.height)),
+                None,
+            ),
+            PlaybackState::Paused => resources.font.draw_each_char(
+                canvas,
+                &format!("Paused ({})", &self.cursor),
+                &PixelPoint::new(0, SCREEN_HEIGHT_PIXELS - (2 * TILE_SIZE.height)),
+                None,
+            ),
+            PlaybackState::Completed => resources.font.draw_each_char(
+                canvas,
+                &format!("Completed ({})", &self.cursor),
+                &PixelPoint::new(0, SCREEN_HEIGHT_PIXELS - (2 * TILE_SIZE.height)),
                 None,
             ),
         }
