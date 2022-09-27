@@ -5,6 +5,8 @@ use ggez::{
     graphics::{self, Canvas, DrawParam, Drawable},
 };
 
+use crate::color::{RGBA8Ext, EMPTY};
+
 use super::{PixelPoint, PixelSize, PointExt, SpritePoint, SpriteRect, SpriteSize};
 
 /// Describes the layout of characters in your
@@ -72,6 +74,7 @@ pub struct SpriteSheet {
     batch: graphics::InstanceArray,
     sprite_grid: SpriteGrid,
     sprite_size: PixelSize,
+    clear_rect: graphics::Mesh,
 }
 
 impl SpriteSheet {
@@ -82,14 +85,9 @@ impl SpriteSheet {
     ) -> Self {
         let sprite_grid = SpriteGrid::from_grid(sprite_sheet_size);
         let batch = graphics::InstanceArray::new(gfx, image, 100, true);
-        Self::new(batch, sprite_grid)
-    }
 
-    pub fn new(batch: graphics::InstanceArray, sprite_grid: SpriteGrid) -> Self {
-        let sheet_size = sprite_grid.sheet_size();
-
-        let rect_width = 1.0 / (sheet_size.width as f32);
-        let rect_height = 1.0 / (sheet_size.height as f32);
+        let rect_width = 1.0 / (sprite_sheet_size.width as f32);
+        let rect_height = 1.0 / (sprite_sheet_size.height as f32);
 
         let sprite_size = PixelSize::new(
             (batch.image().width() as f32 * rect_width) as i32,
@@ -98,14 +96,32 @@ impl SpriteSheet {
 
         tracing::info!(
             "Loaded spritesheet of size {:?} with tiles {:?}",
-            sheet_size,
+            sprite_sheet_size,
             sprite_size
         );
 
+        let clear_rect = graphics::Mesh::new_rectangle(
+            gfx,
+            graphics::DrawMode::fill(),
+            graphics::Rect::new_i32(0, 0, sprite_size.width, sprite_size.height),
+            EMPTY.to_ggez_color(),
+        )
+        .expect("create clear rect");
+
+        Self::new(batch, sprite_grid, sprite_size, clear_rect)
+    }
+
+    pub fn new(
+        batch: graphics::InstanceArray,
+        sprite_grid: SpriteGrid,
+        sprite_size: PixelSize,
+        clear_rect: graphics::Mesh,
+    ) -> Self {
         Self {
             batch,
             sprite_grid,
             sprite_size,
+            clear_rect,
         }
     }
 
@@ -116,6 +132,22 @@ impl SpriteSheet {
         graphics::DrawParam::new()
             .src(sprite_rect)
             .dest([point.x as f32, point.y as f32])
+    }
+
+    pub fn draw_sprite(&self, canvas: &mut Canvas, sprite: SpritePoint, point: PixelPoint) {
+        let draw_param = self.sprite(sprite, point);
+        canvas.draw(&self.batch.image(), draw_param);
+    }
+
+    pub fn draw_sprite_overwrite(
+        &self,
+        canvas: &mut Canvas,
+        sprite: SpritePoint,
+        point: PixelPoint,
+    ) {
+        let draw_param = self.sprite(sprite, point);
+        canvas.draw(&self.clear_rect, draw_param);
+        canvas.draw(&self.batch.image(), draw_param);
     }
 
     pub fn push_sprite(
@@ -138,3 +170,20 @@ impl Drawable for SpriteSheet {
         self.batch.dimensions(gfx)
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Sprite {
+    idx: SpritePoint,
+}
+
+impl Sprite {
+    pub const fn new(idx: SpritePoint) -> Self {
+        Self { idx }
+    }
+}
+
+pub const PLAYER: Sprite = Sprite::new(SpritePoint::new(31, 9));
+pub const ANIMAL1: Sprite = Sprite::new(SpritePoint::new(29, 7));
+pub const ANIMAL2: Sprite = Sprite::new(SpritePoint::new(30, 7));
+pub const ANIMAL3: Sprite = Sprite::new(SpritePoint::new(31, 7));
+pub const ANIMAL4: Sprite = Sprite::new(SpritePoint::new(32, 7));

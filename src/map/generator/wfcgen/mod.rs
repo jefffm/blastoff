@@ -21,7 +21,7 @@ use crate::camera::Glyph;
 use crate::color::{Palette, COMMON};
 use crate::component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed};
 use crate::map::{Map, Spawner, Tile};
-use crate::util::WorldSize;
+use crate::util::{WorldSize, PLAYER};
 
 use super::MapGenerator;
 
@@ -145,7 +145,7 @@ impl Spawner for WfcGen {
                 // Add the player
                 world.spawn((
                     Position::new(point),
-                    Renderable::new(Glyph::new('@', COMMON.four, Palette::empty()), 5),
+                    Renderable::new(Glyph::new('@', COMMON.four, Palette::empty()), PLAYER, 5),
                     Viewshed::default().with_init().with_range(100),
                     Player {},
                     Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),

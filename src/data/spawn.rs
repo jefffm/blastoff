@@ -7,7 +7,7 @@ use crate::{
     component::{
         Actor as ActorComponent, ActorKind, InitialBehavior, Player, Position, Renderable, Viewshed,
     },
-    util::WorldPoint,
+    util::{WorldPoint, PLAYER},
 };
 
 #[derive(Debug, PartialEq, Deserialize)]
@@ -41,6 +41,7 @@ impl Spawnable for Actor {
         let position = Position::new(point);
         let renderable = Renderable {
             glyph: Glyph::new(self.glyph, self.fg, self.bg),
+            sprite: PLAYER, // TODO parse sprites from XML somehow
             render_order: self.zorder,
         };
         let viewshed = Viewshed::default().with_range(self.view_range).with_init();

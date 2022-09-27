@@ -5,7 +5,7 @@ use crate::{
     color::{Palette, COMMON},
     component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed},
     map::{Map, Spawner, Tile},
-    util::{TransformExt, WorldPoint, WorldSize, WorldSpace},
+    util::{TransformExt, WorldPoint, WorldSize, WorldSpace, PLAYER},
 };
 
 use super::MapGenerator;
@@ -120,7 +120,7 @@ impl Spawner for Combo {
                 // Add the player
                 world.spawn((
                     Position::new(point),
-                    Renderable::new(Glyph::new('@', COMMON.four, Palette::empty()), 5),
+                    Renderable::new(Glyph::new('@', COMMON.four, Palette::empty()), PLAYER, 5),
                     Viewshed::default().with_init().with_range(100),
                     Player {},
                     Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),
