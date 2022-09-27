@@ -91,7 +91,7 @@ fn main() -> GameResult {
     let font_image = graphics::Image::from_path(&ctx, "/fonts/rex_16x16.png").expect("load font");
     let font = BitmapFont::from_grid(&ctx, font_image, &SpriteSize::new(16, 16));
 
-    let spritesheet_image = graphics::Image::from_path(&ctx, "/tileset/monochrome-transparent.png")
+    let spritesheet_image = graphics::Image::from_path(&ctx, "/tileset/colored-transparent.png")
         .expect("load spritesheet");
     let spritesheet = SpriteSheet::from_grid(&ctx, spritesheet_image, SpriteSize::new(49, 22));
 

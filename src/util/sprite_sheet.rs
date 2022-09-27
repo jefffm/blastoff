@@ -177,7 +177,7 @@ impl Sprite {
     }
 }
 
-pub const PLAYER: Sprite = Sprite::new(SpritePoint::new(31, 9));
+pub const PLAYER: Sprite = Sprite::new(SpritePoint::new(28, 9));
 pub const ANIMAL1: Sprite = Sprite::new(SpritePoint::new(29, 7));
 pub const ANIMAL2: Sprite = Sprite::new(SpritePoint::new(30, 7));
 pub const ANIMAL3: Sprite = Sprite::new(SpritePoint::new(31, 7));

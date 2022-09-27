@@ -12,9 +12,9 @@ pub struct Palette {
 }
 
 pub const EMPTY: RGBA8 = RGBA8 {
-    r: 0,
-    g: 0,
-    b: 0,
+    r: 71,
+    g: 45,
+    b: 60,
     a: 0,
 };
 

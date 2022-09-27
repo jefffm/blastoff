@@ -100,7 +100,7 @@ impl EventHandler for MainState {
 
         canvas.finish(ctx)?;
 
-        let mut outer_canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);
+        let mut outer_canvas = graphics::Canvas::from_frame(ctx, EMPTY.to_ggez_color());
         outer_canvas.set_sampler(graphics::Sampler::nearest_clamp());
 
         let image = self.canvas_image.image(ctx);
