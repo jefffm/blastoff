@@ -28,7 +28,7 @@ pub enum GameState {
 pub struct Game {
     map: Map,
     world: World,
-    input: PlayerInput,
+    input: Option<PlayerInput>,
     state: GameState,
     screen: Screen,
     scheduler: Scheduler,
@@ -40,7 +40,7 @@ impl Game {
         Self {
             map,
             world,
-            input: PlayerInput::Undefined,
+            input: None,
             state: GameState::Ticking,
             screen: Screen::new(ViewportToScreen::from_points(
                 ViewportPoint::new(0, 0),
@@ -65,16 +65,18 @@ impl Game {
 impl Scene<Resources, Controls> for Game {
     fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         self.input = match controls.read() {
-            None => PlayerInput::Undefined,
+            None => None,
             Some(key) => match (key, controls.control, controls.alt, controls.shift) {
-                (KeyCode::Left, _, _, false) => PlayerInput::Game(PlayerAction::MoveWest),
-                (KeyCode::Left, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthWest),
-                (KeyCode::Right, _, _, false) => PlayerInput::Game(PlayerAction::MoveEast),
-                (KeyCode::Right, _, _, true) => PlayerInput::Game(PlayerAction::MoveNorthEast),
-                (KeyCode::Up, _, _, false) => PlayerInput::Game(PlayerAction::MoveNorth),
-                (KeyCode::Up, _, _, true) => PlayerInput::Game(PlayerAction::MoveNorthWest),
-                (KeyCode::Down, _, _, false) => PlayerInput::Game(PlayerAction::MoveSouth),
-                (KeyCode::Down, _, _, true) => PlayerInput::Game(PlayerAction::MoveSouthEast),
+                (KeyCode::Left, _, _, false) => Some(PlayerInput::Game(PlayerAction::MoveWest)),
+                (KeyCode::Left, _, _, true) => Some(PlayerInput::Game(PlayerAction::MoveSouthWest)),
+                (KeyCode::Right, _, _, false) => Some(PlayerInput::Game(PlayerAction::MoveEast)),
+                (KeyCode::Right, _, _, true) => {
+                    Some(PlayerInput::Game(PlayerAction::MoveNorthEast))
+                }
+                (KeyCode::Up, _, _, false) => Some(PlayerInput::Game(PlayerAction::MoveNorth)),
+                (KeyCode::Up, _, _, true) => Some(PlayerInput::Game(PlayerAction::MoveNorthWest)),
+                (KeyCode::Down, _, _, false) => Some(PlayerInput::Game(PlayerAction::MoveSouth)),
+                (KeyCode::Down, _, _, true) => Some(PlayerInput::Game(PlayerAction::MoveSouthEast)),
                 (KeyCode::Key1, _, _, _) => todo!("label NPCs"),
                 (KeyCode::Key2, _, _, _) => todo!("label Hostiles"),
                 (KeyCode::Key3, _, _, _) => todo!("label Items"),
@@ -86,14 +88,14 @@ impl Scene<Resources, Controls> for Game {
                 (KeyCode::X, _, _, _) => todo!("character"),
                 (KeyCode::L, _, _, _) => todo!("look"),
                 (KeyCode::F, _, _, _) => todo!("ranged fire mode"),
-                (KeyCode::Space, _, _, _) => PlayerInput::Game(PlayerAction::PassTurn),
-                (KeyCode::Escape, _, _, _) => PlayerInput::Ui(UiAction::PauseMenu),
+                (KeyCode::Space, _, _, _) => Some(PlayerInput::Game(PlayerAction::PassTurn)),
+                (KeyCode::Escape, _, _, _) => Some(PlayerInput::Ui(UiAction::PauseMenu)),
                 other => {
                     tracing::debug!("unhandled keypress: {:?}", other);
-                    PlayerInput::Undefined
+                    None
                 }
             },
-        }
+        };
     }
 
     fn update(
@@ -101,24 +103,25 @@ impl Scene<Resources, Controls> for Game {
         resources: &mut Resources,
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
-        match &self.input {
-            input::PlayerInput::Ui(action) => match action {
-                input::UiAction::MainMenu => {
-                    return SceneSwitch::Reinit(Box::new(MainMenu::default()));
-                }
-                input::UiAction::PauseMenu => {
-                    return SceneSwitch::Push(Box::new(PauseMenu::default()));
-                }
-                input::UiAction::GameOverMenu => {
-                    return SceneSwitch::Reinit(Box::new(GameOver::default()));
-                }
-            },
-            input::PlayerInput::Game(action) => match self.state {
-                // Skip player input when the engine asks us to
-                GameState::NeedPlayerInput => self.set_player_action(*action),
-                _ => self.state = GameState::Ticking,
-            },
-            input::PlayerInput::Undefined => {}
+        if let Some(input) = &self.input.take() {
+            match input {
+                input::PlayerInput::Ui(action) => match action {
+                    input::UiAction::MainMenu => {
+                        return SceneSwitch::Reinit(Box::new(MainMenu::default()));
+                    }
+                    input::UiAction::PauseMenu => {
+                        return SceneSwitch::Push(Box::new(PauseMenu::default()));
+                    }
+                    input::UiAction::GameOverMenu => {
+                        return SceneSwitch::Reinit(Box::new(GameOver::default()));
+                    }
+                },
+                input::PlayerInput::Game(action) => match self.state {
+                    // Skip player input when the engine asks us to
+                    GameState::NeedPlayerInput => self.set_player_action(*action),
+                    _ => self.state = GameState::Ticking,
+                },
+            }
         };
 
         self.state = process_actors(

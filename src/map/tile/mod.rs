@@ -108,7 +108,7 @@ impl Tile {
     pub fn render(
         &self,
         canvas: &mut Canvas,
-        resources: &Resources,
+        resources: &mut Resources,
         point: ScreenPoint,
         visibility_kind: VisibilityKind,
     ) {
@@ -116,13 +116,10 @@ impl Tile {
         match visibility_kind {
             VisibilityKind::Torch { brightness: _ } => {
                 // TODO: use torch brightness to modify rendering brightness
-                resources
-                    .font
-                    .draw_char(canvas, self.glyph(), &pixel_point, None);
+                resources.font.push_char(self.glyph(), &pixel_point, None);
             }
             VisibilityKind::Remembered => {
-                resources.font.draw_char(
-                    canvas,
+                resources.font.push_char(
                     self.glyph(),
                     &pixel_point,
                     Some(DrawParam::new().color(COMMON.two.to_ggez_color())),

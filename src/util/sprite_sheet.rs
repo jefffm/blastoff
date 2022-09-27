@@ -134,30 +134,25 @@ impl SpriteSheet {
             .dest([point.x as f32, point.y as f32])
     }
 
-    pub fn draw_sprite(&self, canvas: &mut Canvas, sprite: SpritePoint, point: PixelPoint) {
-        let draw_param = self.sprite(sprite, point);
+    pub fn draw_sprite(&self, canvas: &mut Canvas, sprite: Sprite, point: PixelPoint) {
+        let draw_param = self.sprite(sprite.idx, point);
         canvas.draw(&self.batch.image(), draw_param);
     }
 
-    pub fn draw_sprite_overwrite(
-        &self,
-        canvas: &mut Canvas,
-        sprite: SpritePoint,
-        point: PixelPoint,
-    ) {
-        let draw_param = self.sprite(sprite, point);
+    pub fn draw_sprite_overwrite(&self, canvas: &mut Canvas, sprite: Sprite, point: PixelPoint) {
+        let draw_param = self.sprite(sprite.idx, point);
         canvas.draw(&self.clear_rect, draw_param);
         canvas.draw(&self.batch.image(), draw_param);
     }
 
-    pub fn push_sprite(
-        &mut self,
-        sprite: SpritePoint,
-        point: PixelPoint,
-    ) -> &impl graphics::Drawable {
-        self.batch.set(vec![self.sprite(sprite, point)]);
+    pub fn push_sprite(&mut self, sprite: Sprite, point: PixelPoint) -> &impl graphics::Drawable {
+        self.batch.set(vec![self.sprite(sprite.idx, point)]);
 
         &self.batch
+    }
+
+    pub fn clear(&mut self) {
+        self.batch.clear()
     }
 }
 

@@ -1,16 +1,15 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 
 use ggez::graphics::{Canvas, DrawParam};
 use hecs::World;
 
-use crate::camera::Glyph;
 use crate::color::RGBA8Ext;
 use crate::component::{Position, Renderable};
-use crate::game::consts::get_screen_to_pixel_transform;
+use crate::game::consts::{get_screen_to_pixel_transform, USE_SPRITES};
 use crate::game::draw_ui;
 use crate::map::{Map, Tile, VisibilityKind};
 use crate::resource::Resources;
-use crate::util::{ScreenPoint, ViewportPoint, ViewportToScreen};
+use crate::util::{ScreenPoint, ViewportPoint, ViewportToScreen, PLAYER};
 
 enum RenderCell {
     Tile(Tile, VisibilityKind),
@@ -27,15 +26,26 @@ impl Screen {
         Self { transform }
     }
 
-    fn draw(&self, canvas: &mut Canvas, resources: &Resources, glyph: &Glyph, point: ScreenPoint) {
+    fn draw(
+        &self,
+        canvas: &mut Canvas,
+        resources: &mut Resources,
+        renderable: &Renderable,
+        point: ScreenPoint,
+    ) {
         let pixel_point = get_screen_to_pixel_transform().transform_point(point);
 
-        resources.font.draw_char_overwrite(
-            canvas,
-            glyph.glyph,
-            &pixel_point,
-            Some(DrawParam::new().color(glyph.fg.to_ggez_color())),
-        );
+        if USE_SPRITES {
+            let sprite = PLAYER;
+            resources.spritesheet.push_sprite(sprite, pixel_point);
+        } else {
+            let glyph = renderable.glyph;
+            resources.font.push_char(
+                glyph.glyph,
+                &pixel_point,
+                Some(DrawParam::new().color(glyph.fg.to_ggez_color())),
+            );
+        }
     }
 
     pub fn to_screen_point(&self, point: ViewportPoint) -> ScreenPoint {
@@ -107,7 +117,7 @@ impl Screen {
             match cell {
                 RenderCell::Tile(tile, vis) => tile.render(canvas, resources, screen_point, vis),
                 RenderCell::Entity(renderable) => {
-                    self.draw(canvas, resources, &renderable.glyph, screen_point)
+                    self.draw(canvas, resources, &renderable, screen_point)
                 }
             }
         }

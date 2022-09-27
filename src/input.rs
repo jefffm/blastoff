@@ -4,7 +4,6 @@ use ggez::input::keyboard::{KeyCode, KeyInput};
 pub enum PlayerInput {
     Ui(UiAction),
     Game(PlayerAction),
-    Undefined,
 }
 
 #[derive(Debug, Clone)]

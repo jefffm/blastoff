@@ -117,7 +117,7 @@ impl Scene<Resources, Controls> for GameOver {
     fn draw(
         &mut self,
         resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _ctx: &mut ggez::Context,
         canvas: &mut Canvas,
     ) -> ggez::GameResult<()> {
         let selection = self.state.selection();

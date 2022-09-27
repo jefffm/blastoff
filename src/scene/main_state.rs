@@ -82,6 +82,9 @@ impl EventHandler for MainState {
         canvas.set_sampler(graphics::Sampler::nearest_clamp());
         canvas.set_blend_mode(BlendMode::REPLACE);
 
+        &self.scene_stack.resources.font.clear();
+        &self.scene_stack.resources.spritesheet.clear();
+
         // Draw the scene
         self.scene_stack.draw(ctx, &mut canvas);
 
@@ -94,6 +97,7 @@ impl EventHandler for MainState {
             &self.scene_stack.resources.spritesheet,
             graphics::DrawParam::new().dest([0., 0.]),
         );
+
         canvas.finish(ctx)?;
 
         let mut outer_canvas = graphics::Canvas::from_frame(ctx, Color::BLACK);

@@ -51,6 +51,8 @@ pub const RESOURCE_PATH: &str = "assets";
 
 pub const SCALING_FACTOR: f32 = 1.;
 
+pub const USE_SPRITES: bool = false;
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
