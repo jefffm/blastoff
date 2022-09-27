@@ -13,4 +13,7 @@ pub use sprite_sheet::*;
 mod scene_stack;
 pub use scene_stack::*;
 
+mod easing;
+pub use easing::*;
+
 pub struct DrawableWithParam {}

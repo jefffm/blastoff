@@ -1,23 +1,46 @@
-use crate::util::{TransformExt, ViewportPoint, ViewportRect, WorldPoint, WorldToViewport};
+use crate::util::{
+    PointExt, TransformExt, ViewportFloatPoint, ViewportPoint, ViewportRect, WorldFloatPoint,
+    WorldFloatToViewport, WorldPoint, WorldToViewport,
+};
 
 // Viewport tracks the current onscreen rect
 #[derive(Debug, Default)]
 pub struct Viewport {
     rect: ViewportRect,
     transform: WorldToViewport,
+    transform_float: WorldFloatToViewport,
 }
 
 impl Viewport {
     pub fn new(rect: ViewportRect, transform: WorldToViewport) -> Self {
-        Self { rect, transform }
+        let params = transform.to_array();
+        let transform_float = WorldFloatToViewport::new(
+            params[0] as f32,
+            params[1] as f32,
+            params[2] as f32,
+            params[3] as f32,
+            params[4] as f32,
+            params[5] as f32,
+        );
+        Self {
+            rect,
+            transform,
+            transform_float,
+        }
     }
 
     pub fn to_viewport_point(&self, point: WorldPoint) -> ViewportPoint {
         self.transform.transform_point(point)
     }
 
+    pub fn to_viewport_point_f32(&self, point: WorldFloatPoint) -> ViewportFloatPoint {
+        self.transform_float.transform_point(point)
+    }
+
     pub fn update_transform(&mut self, center: WorldPoint) {
-        self.transform.update_transform(center, self.rect.center())
+        self.transform.update_transform(center, self.rect.center());
+        self.transform_float
+            .update_transform(center.as_float(), self.rect.center().as_float());
     }
 
     pub fn center(&self) -> WorldPoint {

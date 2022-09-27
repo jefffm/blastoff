@@ -10,6 +10,7 @@
 use std::{convert::TryInto, fmt::Debug};
 
 use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
+use ggez::mint::Point2;
 use serde::{Deserialize, Serialize};
 
 /// SpriteSpace is coordinates to refer to different sprites in a spritesheet of equal tile sizes
@@ -49,8 +50,11 @@ pub type ViewportToScreen = Transform2D<i32, ViewportSpace, ScreenSpace>;
 pub struct ViewportSpace;
 
 pub type ViewportPoint = Point2D<i32, ViewportSpace>;
+pub type ViewportFloatPoint = Point2D<f32, ViewportSpace>;
 pub type ViewportSize = Size2D<i32, ViewportSpace>;
+pub type ViewportFloatSize = Size2D<f32, ViewportSpace>;
 pub type ViewportRect = Rect<i32, ViewportSpace>;
+pub type ViewportFloatRect = Rect<f32, ViewportSpace>;
 
 /// World space is relative to game world map coordinates
 /// Our world is integer-based because we have a map tile system
@@ -64,6 +68,7 @@ pub type WorldSize = Size2D<i32, WorldSpace>;
 pub type WorldRect = Rect<i32, WorldSpace>;
 
 pub type WorldToViewport = Transform2D<i32, WorldSpace, ViewportSpace>;
+pub type WorldFloatToViewport = Transform2D<f32, WorldSpace, ViewportSpace>;
 
 pub trait TransformExt<T, Src, Dest>
 where
@@ -93,12 +98,27 @@ impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
     }
 }
 
+impl<Src, Dest> TransformExt<f32, Src, Dest> for Transform2D<f32, Src, Dest> {
+    fn from_points(src_point: Point2D<f32, Src>, dest_point: Point2D<f32, Dest>) -> Self {
+        let translation = Self::create_translation(src_point, dest_point);
+        Self::translation(translation.x, translation.y)
+    }
+
+    fn update_transform(&mut self, src_point: Point2D<f32, Src>, dest_point: Point2D<f32, Dest>) {
+        let translation = Self::create_translation(src_point, dest_point);
+        self.m31 = translation.x;
+        self.m32 = translation.y;
+    }
+}
+
 pub trait PointExt<T, U> {
     /// Helper to get the Vec index for any given WorldPoint (assuming the
     /// vector is height * width for this instance of Map).
     fn to_index(&self, width: T) -> usize;
     fn from_index(idx: usize, width: T) -> Point2D<T, U>;
     fn get_vector(self, other: Self) -> Vector2D<T, U>;
+    fn into_mint_f32(&mut self) -> Point2<f32>;
+    fn as_float(&self) -> Point2D<f32, U>;
 }
 
 impl<U> PointExt<i32, U> for Point2D<i32, U> {
@@ -116,6 +136,44 @@ impl<U> PointExt<i32, U> for Point2D<i32, U> {
 
     fn get_vector(self, other: Self) -> Vector2D<i32, U> {
         other - self
+    }
+
+    fn into_mint_f32(&mut self) -> Point2<f32> {
+        Point2::<f32> {
+            x: self.x as f32,
+            y: self.y as f32,
+        }
+    }
+    fn as_float(&self) -> Point2D<f32, U> {
+        Point2D::<f32, U>::new(self.x as f32, self.y as f32)
+    }
+}
+
+impl<U> PointExt<f32, U> for Point2D<f32, U> {
+    fn to_index(&self, width: f32) -> usize {
+        let x = self.x.round() as i32;
+        let y = self.y.round() as i32;
+        let w = width.round() as i32;
+        (y as usize * w as usize) + x as usize
+    }
+
+    fn from_index(idx: usize, width: f32) -> Point2D<f32, U> {
+        let idx: i32 = idx.try_into().unwrap();
+        Self::new(idx as f32 % width, idx as f32 / width)
+    }
+
+    fn get_vector(self, other: Self) -> Vector2D<f32, U> {
+        other - self
+    }
+
+    fn into_mint_f32(&mut self) -> Point2<f32> {
+        Point2::<f32> {
+            x: self.x,
+            y: self.y,
+        }
+    }
+    fn as_float(&self) -> Point2D<f32, U> {
+        *self
     }
 }
 

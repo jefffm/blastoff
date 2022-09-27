@@ -16,6 +16,9 @@ pub use action_decider::*;
 mod behavior;
 pub use behavior::*;
 
+mod animation;
+pub use animation::*;
+
 pub fn build_systems() -> Scheduler {
     Scheduler::builder()
         .with_system(visibility_system)
@@ -23,5 +26,6 @@ pub fn build_systems() -> Scheduler {
         .with_system(viewport_system)
         .with_system(behavior_system)
         .with_system(action_decider_system)
+        .with_system(animation_system)
         .build()
 }

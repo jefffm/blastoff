@@ -101,7 +101,7 @@ impl Scene<Resources, Controls> for Game {
     fn update(
         &mut self,
         resources: &mut Resources,
-        _ctx: &mut ggez::Context,
+        ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         if let Some(input) = &self.input.take() {
             match input {
@@ -131,7 +131,7 @@ impl Scene<Resources, Controls> for Game {
             &mut self.turn_history,
         );
         self.scheduler
-            .execute(&mut self.world, resources, &mut self.map);
+            .execute(&mut self.world, resources, &mut self.map, &ctx);
 
         SceneSwitch::None
     }

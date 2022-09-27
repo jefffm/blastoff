@@ -1,3 +1,4 @@
+use ggez::Context;
 use hecs::{Entity, World};
 
 use crate::{
@@ -102,7 +103,12 @@ pub fn target_point(world: &World, target: Entity) -> WorldPoint {
 ///
 /// Process each intention, resolving each entity's target and deciding
 /// on a next action and behavior for next turn.
-pub fn action_decider_system(world: &mut World, resources: &mut Resources, map: &mut Map) {
+pub fn action_decider_system(
+    world: &mut World,
+    resources: &mut Resources,
+    map: &mut Map,
+    ctx: &Context,
+) {
     let mut intentions: Vec<Intention> = vec![];
 
     // Find all entities without an action set

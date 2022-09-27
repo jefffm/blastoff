@@ -1,3 +1,4 @@
+use ggez::Context;
 use hecs::{Entity, World};
 use std::collections::HashSet;
 use symmetric_shadowcasting::compute_fov;
@@ -10,7 +11,12 @@ use crate::{
 };
 
 // Update the viewport to be centered on the Camera position
-pub fn visibility_system(world: &mut World, _resources: &mut Resources, map: &mut Map) {
+pub fn visibility_system(
+    world: &mut World,
+    _resources: &mut Resources,
+    map: &mut Map,
+    ctx: &Context,
+) {
     let mut updated_ents = HashSet::<Entity>::new();
 
     for (entity, (pos, viewshed)) in world.query_mut::<(&Position, &mut Viewshed)>() {

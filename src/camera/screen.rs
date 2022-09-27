@@ -82,6 +82,8 @@ impl Screen {
                     cells.insert(screen_point, RenderCell::Tile(*tile, vis));
                 }
 
+                // TODO: move Animation component into Renderable and handle appropriately here
+
                 let mut data = map
                     .get_content(&world_point)
                     .iter()

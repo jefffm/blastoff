@@ -1,3 +1,4 @@
+use ggez::Context;
 use hecs::World;
 
 use crate::{
@@ -8,7 +9,12 @@ use crate::{
 };
 
 // Update the viewport to be centered on the Camera position
-pub fn viewport_system(world: &mut World, resources: &mut Resources, _map: &mut Map) {
+pub fn viewport_system(
+    world: &mut World,
+    resources: &mut Resources,
+    _map: &mut Map,
+    ctx: &Context,
+) {
     let mut player_point: Option<WorldPoint> = None;
     for (_, (pos, _player)) in world.query::<(&Position, &Player)>().iter() {
         player_point = Some(pos.point());
