@@ -16,9 +16,6 @@ pub use actor::*;
 mod behavior;
 pub use behavior::*;
 
-mod animation;
-pub use animation::*;
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Camera {}
 

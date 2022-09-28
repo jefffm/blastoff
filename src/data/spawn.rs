@@ -43,6 +43,7 @@ impl Spawnable for Actor {
             glyph: Glyph::new(self.glyph, self.fg, self.bg),
             sprite: PLAYER, // TODO parse sprites from XML somehow
             render_order: self.zorder,
+            sequence: None,
         };
         let viewshed = Viewshed::default().with_range(self.view_range).with_init();
 

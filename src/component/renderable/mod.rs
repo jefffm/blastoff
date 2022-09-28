@@ -1,3 +1,6 @@
+mod animation;
+use animation::*;
+
 use ggez::mint::Point2;
 use keyframe::{
     ease,
@@ -13,20 +16,38 @@ use crate::{
     },
 };
 
-#[derive(Clone, Default)]
-pub struct Animation {
-    sequence: Option<AnimationSequence<Point2<f32>>>,
+use crate::{camera::Glyph, util::Sprite};
+
+#[derive(Clone)]
+pub struct Renderable {
+    pub glyph: Glyph,
+    pub sprite: Sprite,
+    pub render_order: u32,
+    pub sequence: Option<AnimationSequence<Point2<f32>>>,
 }
 
-/// The rendering system looks at this to determine which rect at which position to render
-impl Animation {
+impl Renderable {
+    pub fn new(
+        glyph: Glyph,
+        sprite: Sprite,
+        render_order: u32,
+        sequence: Option<AnimationSequence<Point2<f32>>>,
+    ) -> Self {
+        Self {
+            glyph,
+            sprite,
+            render_order,
+            sequence,
+        }
+    }
+
     pub fn with_move(mut self, src: WorldPoint, dst: WorldPoint) -> Self {
-        let sequence = move_sequence(src, dst, &EasingEnum::EaseInOutCubic, 0.5);
+        let sequence = animation::move_sequence(src, dst, &EasingEnum::EaseInOutCubic, 0.5);
         self.sequence = Some(sequence);
         self
     }
 
-    pub fn update(&mut self, duration: f64) {
+    pub fn update_time(&mut self, duration: f64) {
         if let Some(sequence) = &mut self.sequence {
             if sequence.finished() {
                 self.sequence = None
@@ -45,29 +66,5 @@ impl Animation {
         } else {
             None
         }
-    }
-}
-
-fn move_sequence(
-    mut start_point: WorldPoint,
-    mut end_point: WorldPoint,
-    ease_enum: &EasingEnum,
-    duration: f32,
-) -> AnimationSequence<Point2<f32>> {
-    let start_pos: Point2<f32> = start_point.into_mint_f32();
-    let end_pos: Point2<f32> = end_point.into_mint_f32();
-
-    if let EasingEnum::EaseInOut3Point = ease_enum {
-        let mid_pos = ease(Linear, start_pos, end_pos, 0.33);
-        keyframes![
-            (start_pos, 0.0, EaseInOut),
-            (mid_pos, 0.66 * duration, EaseInOut),
-            (end_pos, duration, EaseInOut)
-        ]
-    } else {
-        keyframes![
-            (start_pos, 0.0, easing_function(ease_enum)),
-            (end_pos, duration, easing_function(ease_enum))
-        ]
     }
 }

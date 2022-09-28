@@ -240,7 +240,12 @@ impl Spawner for Bsp {
         // Add the player
         world.spawn((
             Position::new(center),
-            Renderable::new(Glyph::new('@', COMMON.four, Palette::empty()), PLAYER, 5),
+            Renderable::new(
+                Glyph::new('@', COMMON.four, Palette::empty()),
+                PLAYER,
+                5,
+                None,
+            ),
             viewshed,
             Player {},
             Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),
@@ -265,6 +270,7 @@ impl Spawner for Bsp {
                                 Glyph::new('$', FIRE.four, Palette::empty()),
                                 ANIMAL1,
                                 2,
+                                None,
                             ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
@@ -287,6 +293,7 @@ impl Spawner for Bsp {
                                         Glyph::new('^', FIRE.four, COMMON.two),
                                         ANIMAL1,
                                         1,
+                                        None,
                                     ),
                                 ));
                             }
@@ -302,6 +309,7 @@ impl Spawner for Bsp {
                                 Glyph::new('&', WATER.four, Palette::empty()),
                                 ANIMAL2,
                                 2,
+                                None,
                             ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
@@ -324,6 +332,7 @@ impl Spawner for Bsp {
                                         Glyph::new('~', WATER.one, WATER.two),
                                         ANIMAL3,
                                         1,
+                                        None,
                                     ),
                                 ));
                             }
@@ -339,6 +348,7 @@ impl Spawner for Bsp {
                                 Glyph::new('%', PLANT.four, Palette::empty()),
                                 ANIMAL3,
                                 2,
+                                None,
                             ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
@@ -361,6 +371,7 @@ impl Spawner for Bsp {
                                         Glyph::new('{', PLANT.three, PLANT.one),
                                         ANIMAL2,
                                         1,
+                                        None,
                                     ),
                                 ));
                             }

@@ -44,7 +44,7 @@ pub type ScreenSize = Size2D<i32, ScreenSpace>;
 pub type ScreenRect = Rect<i32, ScreenSpace>;
 
 pub type ViewportToScreen = Transform2D<i32, ViewportSpace, ScreenSpace>;
-
+pub type ViewportFloatToScreen = Transform2D<f32, ViewportSpace, ScreenSpace>;
 /// Viewport space translates the current visible chunk of map for rendering
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ViewportSpace;
@@ -81,8 +81,8 @@ where
     ) -> Vector2D<T, UnknownUnit> {
         dest_point.to_untyped() - src_point.to_untyped()
     }
-
     fn update_transform(&mut self, src_point: Point2D<T, Src>, dest_point: Point2D<T, Dest>);
+    fn transform_float_point(&self, src_point: Point2D<f32, Src>) -> Point2D<T, Dest>;
 }
 
 impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
@@ -95,6 +95,13 @@ impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
         let translation = Self::create_translation(src_point, dest_point);
         self.m31 = translation.x;
         self.m32 = translation.y;
+    }
+
+    fn transform_float_point(&self, src_point: Point2D<f32, Src>) -> Point2D<i32, Dest> {
+        self.transform_point(Point2D::<i32, Src>::new(
+            src_point.x as i32,
+            src_point.y as i32,
+        ))
     }
 }
 

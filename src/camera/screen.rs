@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use ggez::graphics::{Canvas, DrawParam};
-use hecs::World;
+use hecs::{Entity, World};
 
 use crate::color::RGBA8Ext;
 use crate::component::{Position, Renderable};
@@ -9,31 +9,56 @@ use crate::game::consts::{get_screen_to_pixel_transform, USE_SPRITES};
 use crate::game::draw_ui;
 use crate::map::{Map, Tile, VisibilityKind};
 use crate::resource::Resources;
-use crate::util::{ScreenPoint, ViewportPoint, ViewportToScreen, PLAYER};
+use crate::util::{
+    PixelPoint, ScreenPoint, TransformExt, ViewportFloatToScreen, ViewportPoint, ViewportToScreen,
+    WorldFloatPoint, PLAYER,
+};
 
 enum RenderCell {
     Tile(Tile, VisibilityKind),
-    Entity(Renderable),
+    Entity(Entity),
 }
 
 // Viewport tracks the current onscreen rect
 pub struct Screen {
     transform: ViewportToScreen,
+    transform_float: ViewportFloatToScreen,
 }
 
 impl Screen {
     pub fn new(transform: ViewportToScreen) -> Self {
-        Self { transform }
+        // TODO: move this to TransformExt in geometry.rs
+        let params = transform.to_array();
+        let transform_float = ViewportFloatToScreen::new(
+            params[0] as f32,
+            params[1] as f32,
+            params[2] as f32,
+            params[3] as f32,
+            params[4] as f32,
+            params[5] as f32,
+        );
+        Self {
+            transform,
+            transform_float,
+        }
     }
 
     fn draw(
         &self,
         canvas: &mut Canvas,
+        world: &World,
         resources: &mut Resources,
-        renderable: &Renderable,
+        entity: Entity,
         point: ScreenPoint,
     ) {
+        let mut query = world.query_one::<&Renderable>(entity).unwrap();
+
+        let renderable = query.get().unwrap();
         let pixel_point = get_screen_to_pixel_transform().transform_point(point);
+
+        if let Some(animation) = renderable.sequence {
+            let pos = renderable.current_pos();
+        }
 
         if USE_SPRITES {
             let sprite = PLAYER;
@@ -50,6 +75,14 @@ impl Screen {
 
     pub fn to_screen_point(&self, point: ViewportPoint) -> ScreenPoint {
         self.transform.transform_point(point)
+    }
+
+    pub fn worldfloat_to_pixel(&self, resources: &Resources, point: WorldFloatPoint) -> PixelPoint {
+        let vp = resources.viewport.to_viewport_point_f32(point);
+        let sp = self.transform_float.transform_point(vp);
+        let pp = get_screen_to_pixel_transform().transform_float_point(sp);
+
+        pp
     }
 
     pub fn draw_game(
@@ -82,8 +115,6 @@ impl Screen {
                     cells.insert(screen_point, RenderCell::Tile(*tile, vis));
                 }
 
-                // TODO: move Animation component into Renderable and handle appropriately here
-
                 let mut data = map
                     .get_content(&world_point)
                     .iter()
@@ -92,17 +123,21 @@ impl Screen {
                             .query_one::<(&Position, &Renderable)>(*entity)
                             .unwrap();
 
-                        query.get().map(|(pos, render)| (*pos, *render))
+                        query.get().map(|(pos, render)| {
+                            let viewport_point = resources.viewport.to_viewport_point(pos.p);
+                            let screen_point = self.to_screen_point(viewport_point);
+
+                            (*entity, screen_point, render.render_order)
+                        })
                     })
                     .filter(|x| x.is_some())
-                    .collect::<Option<Vec<(Position, Renderable)>>>()
+                    .collect::<Option<Vec<(Entity, ScreenPoint, u32)>>>()
                     .unwrap();
 
-                data.sort_by(|(_, r1), (_, r2)| r1.render_order.cmp(&r2.render_order));
-                for (pos, render) in data.iter() {
-                    let viewport_point = resources.viewport.to_viewport_point(pos.p);
-                    let screen_point = self.to_screen_point(viewport_point);
-                    cells.insert(screen_point, RenderCell::Entity(*render));
+                data.sort_by(|(_, _, r1), (_, _, r2)| r1.cmp(&r2));
+
+                for (entity, screen_point, _render_order) in data.into_iter() {
+                    cells.insert(screen_point, RenderCell::Entity(entity));
                 }
             } else if map.is_revealed(&world_point) {
                 if let Some(tile) = map.get(world_point) {
@@ -118,8 +153,8 @@ impl Screen {
         for (screen_point, cell) in cells.into_iter() {
             match cell {
                 RenderCell::Tile(tile, vis) => tile.render(canvas, resources, screen_point, vis),
-                RenderCell::Entity(renderable) => {
-                    self.draw(canvas, resources, &renderable, screen_point)
+                RenderCell::Entity(entity) => {
+                    self.draw(canvas, world, resources, entity, screen_point)
                 }
             }
         }
