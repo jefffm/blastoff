@@ -116,6 +116,10 @@ impl<Src, Dest> TransformExt<f32, Src, Dest> for Transform2D<f32, Src, Dest> {
         self.m31 = translation.x;
         self.m32 = translation.y;
     }
+
+    fn transform_float_point(&self, src_point: Point2D<f32, Src>) -> Point2D<f32, Dest> {
+        self.transform_point(src_point)
+    }
 }
 
 pub trait PointExt<T, U> {

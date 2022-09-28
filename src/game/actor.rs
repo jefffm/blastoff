@@ -1,7 +1,7 @@
 use hecs::{Entity, World};
 
 use crate::{
-    component::{Actor, ActorKind, Cardinal, Player, Position, Viewshed},
+    component::{Actor, ActorKind, Cardinal, Player, Position, Renderable, Viewshed},
     game::Action,
     input,
     map::Map,
@@ -167,8 +167,10 @@ impl<'a> ActionProcessor<'a> {
 
         // Check if we're bumping into another actor. If they're hostile, melee attack instead. If they're friendly, swap spots with them(?)
         let mut position_swap = false;
-        let query = self.world.query_mut::<(&Actor, &mut Position)>();
-        for (other_entity, (_actor, position)) in query.into_iter() {
+        let query = self
+            .world
+            .query_mut::<(&Actor, &mut Position, &mut Renderable)>();
+        for (other_entity, (_actor, position, renderable)) in query.into_iter() {
             if dest_point == position.point() {
                 // if this isn't a player, prevent the move from happening
                 if !is_player {
@@ -181,6 +183,7 @@ impl<'a> ActionProcessor<'a> {
                     );
                     return;
                 }
+                renderable.set_move(position.point(), source_point);
                 position.set_point(source_point);
                 position_swap = true;
                 break;
@@ -189,11 +192,12 @@ impl<'a> ActionProcessor<'a> {
 
         if position_swap || !self.map.is_blocked(&dest_point) {
             // No entities in the way. Anything else?
-            let (position, viewshed) = self
+            let (position, viewshed, renderable) = self
                 .world
-                .query_one_mut::<(&mut Position, &mut Viewshed)>(*entity)
+                .query_one_mut::<(&mut Position, &mut Viewshed, &mut Renderable)>(*entity)
                 .unwrap();
             viewshed.set_dirty();
+            renderable.set_move(position.point(), source_point);
             position.set_point(dest_point);
         }
     }

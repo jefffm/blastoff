@@ -54,11 +54,14 @@ impl Screen {
         let mut query = world.query_one::<&Renderable>(entity).unwrap();
 
         let renderable = query.get().unwrap();
-        let pixel_point = get_screen_to_pixel_transform().transform_point(point);
 
-        if let Some(animation) = renderable.sequence {
-            let pos = renderable.current_pos();
-        }
+        // TODO: move "current_pos" onto an animation struct instead
+        let pixel_point = if let Some(_animation) = &renderable.sequence {
+            let point = renderable.current_pos().unwrap();
+            self.worldfloat_to_pixel(resources, point)
+        } else {
+            get_screen_to_pixel_transform().transform_point(point)
+        };
 
         if USE_SPRITES {
             let sprite = PLAYER;
@@ -80,9 +83,8 @@ impl Screen {
     pub fn worldfloat_to_pixel(&self, resources: &Resources, point: WorldFloatPoint) -> PixelPoint {
         let vp = resources.viewport.to_viewport_point_f32(point);
         let sp = self.transform_float.transform_point(vp);
-        let pp = get_screen_to_pixel_transform().transform_float_point(sp);
 
-        pp
+        get_screen_to_pixel_transform().transform_float_point(sp)
     }
 
     pub fn draw_game(

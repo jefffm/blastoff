@@ -41,10 +41,9 @@ impl Renderable {
         }
     }
 
-    pub fn with_move(mut self, src: WorldPoint, dst: WorldPoint) -> Self {
-        let sequence = animation::move_sequence(src, dst, &EasingEnum::EaseInOutCubic, 0.5);
+    pub fn set_move(&mut self, src: WorldPoint, dst: WorldPoint) {
+        let sequence = animation::move_sequence(src, dst, &EasingEnum::EaseInOutCubic, 0.1);
         self.sequence = Some(sequence);
-        self
     }
 
     pub fn update_time(&mut self, duration: f64) {
