@@ -1,20 +1,5 @@
-mod animation;
-use animation::*;
-
 use ggez::mint::Point2;
-use keyframe::{
-    ease,
-    functions::{EaseInOut, Linear},
-    keyframes, AnimationSequence,
-};
-
-use crate::{
-    game::consts::get_screen_to_pixel_transform,
-    util::{
-        easing_function, EasingEnum, PixelPoint, PointExt, WorldFloatPoint, WorldPoint,
-        WorldToViewport,
-    },
-};
+use keyframe::AnimationSequence;
 
 use crate::{camera::Glyph, util::Sprite};
 
@@ -41,11 +26,6 @@ impl Renderable {
         }
     }
 
-    pub fn set_move(&mut self, src: WorldPoint, dst: WorldPoint) {
-        let sequence = animation::move_sequence(src, dst, &EasingEnum::EaseInOutCubic, 0.1);
-        self.sequence = Some(sequence);
-    }
-
     pub fn update_time(&mut self, duration: f64) {
         if let Some(sequence) = &mut self.sequence {
             if sequence.finished() {
@@ -53,17 +33,6 @@ impl Renderable {
             } else {
                 sequence.advance_by(duration);
             }
-        }
-    }
-
-    // TODO: right now this only supports tweening a position. Someday it should
-    // also support TweenableRect which can use spritesheets.
-    pub fn current_pos(&self) -> Option<WorldFloatPoint> {
-        if let Some(sequence) = &self.sequence {
-            let point = sequence.now_strict().expect("animation point");
-            Some(WorldFloatPoint::new(point.x, point.y))
-        } else {
-            None
         }
     }
 }

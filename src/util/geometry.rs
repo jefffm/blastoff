@@ -10,7 +10,7 @@
 use std::{convert::TryInto, fmt::Debug};
 
 use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
-use ggez::mint::Point2;
+use ggez::mint::{Point2, Vector2};
 use serde::{Deserialize, Serialize};
 
 /// SpriteSpace is coordinates to refer to different sprites in a spritesheet of equal tile sizes
@@ -34,12 +34,14 @@ pub type PixelRect = Rect<i32, PixelSpace>;
 
 pub type PixelToScreen = Transform2D<i32, PixelSpace, ScreenSpace>;
 pub type ScreenToPixel = Transform2D<i32, ScreenSpace, PixelSpace>;
+pub type ScreenFloatToPixel = Transform2D<f32, ScreenSpace, PixelSpace>;
 
 /// Screen space translates Viewport space into the right position for the GUI
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ScreenSpace;
 
 pub type ScreenPoint = Point2D<i32, ScreenSpace>;
+pub type ScreenFloatPoint = Point2D<f32, ScreenSpace>;
 pub type ScreenSize = Size2D<i32, ScreenSpace>;
 pub type ScreenRect = Rect<i32, ScreenSpace>;
 
@@ -61,11 +63,15 @@ pub type ViewportFloatRect = Rect<f32, ViewportSpace>;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WorldSpace;
 
-pub type WorldFloatPoint = Point2D<f32, WorldSpace>;
 pub type WorldPoint = Point2D<i32, WorldSpace>;
 pub type WorldVector = Vector2D<i32, WorldSpace>;
 pub type WorldSize = Size2D<i32, WorldSpace>;
 pub type WorldRect = Rect<i32, WorldSpace>;
+
+pub type WorldFloatPoint = Point2D<f32, WorldSpace>;
+pub type WorldFloatVector = Vector2D<f32, WorldSpace>;
+pub type WorldFloatSize = Size2D<f32, WorldSpace>;
+pub type WorldFloatRect = Rect<f32, WorldSpace>;
 
 pub type WorldToViewport = Transform2D<i32, WorldSpace, ViewportSpace>;
 pub type WorldFloatToViewport = Transform2D<f32, WorldSpace, ViewportSpace>;
@@ -83,6 +89,7 @@ where
     }
     fn update_transform(&mut self, src_point: Point2D<T, Src>, dest_point: Point2D<T, Dest>);
     fn transform_float_point(&self, src_point: Point2D<f32, Src>) -> Point2D<T, Dest>;
+    fn into_float_transform(&self) -> Transform2D<f32, Src, Dest>;
 }
 
 impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
@@ -99,9 +106,20 @@ impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
 
     fn transform_float_point(&self, src_point: Point2D<f32, Src>) -> Point2D<i32, Dest> {
         self.transform_point(Point2D::<i32, Src>::new(
-            src_point.x as i32,
-            src_point.y as i32,
+            src_point.x.round() as i32,
+            src_point.y.round() as i32,
         ))
+    }
+    fn into_float_transform(&self) -> Transform2D<f32, Src, Dest> {
+        let params = self.to_array();
+        Transform2D::<f32, Src, Dest>::new(
+            params[0] as f32,
+            params[1] as f32,
+            params[2] as f32,
+            params[3] as f32,
+            params[4] as f32,
+            params[5] as f32,
+        )
     }
 }
 
@@ -120,6 +138,10 @@ impl<Src, Dest> TransformExt<f32, Src, Dest> for Transform2D<f32, Src, Dest> {
     fn transform_float_point(&self, src_point: Point2D<f32, Src>) -> Point2D<f32, Dest> {
         self.transform_point(src_point)
     }
+
+    fn into_float_transform(&self) -> Transform2D<f32, Src, Dest> {
+        *self
+    }
 }
 
 pub trait PointExt<T, U> {
@@ -128,8 +150,7 @@ pub trait PointExt<T, U> {
     fn to_index(&self, width: T) -> usize;
     fn from_index(idx: usize, width: T) -> Point2D<T, U>;
     fn get_vector(self, other: Self) -> Vector2D<T, U>;
-    fn into_mint_f32(&mut self) -> Point2<f32>;
-    fn as_float(&self) -> Point2D<f32, U>;
+    fn into_mint_f32(&self) -> Point2<f32>;
 }
 
 impl<U> PointExt<i32, U> for Point2D<i32, U> {
@@ -149,14 +170,11 @@ impl<U> PointExt<i32, U> for Point2D<i32, U> {
         other - self
     }
 
-    fn into_mint_f32(&mut self) -> Point2<f32> {
+    fn into_mint_f32(&self) -> Point2<f32> {
         Point2::<f32> {
             x: self.x as f32,
             y: self.y as f32,
         }
-    }
-    fn as_float(&self) -> Point2D<f32, U> {
-        Point2D::<f32, U>::new(self.x as f32, self.y as f32)
     }
 }
 
@@ -177,14 +195,21 @@ impl<U> PointExt<f32, U> for Point2D<f32, U> {
         other - self
     }
 
-    fn into_mint_f32(&mut self) -> Point2<f32> {
+    fn into_mint_f32(&self) -> Point2<f32> {
         Point2::<f32> {
             x: self.x,
             y: self.y,
         }
     }
-    fn as_float(&self) -> Point2D<f32, U> {
-        *self
+}
+
+pub trait VectorExt<T, U> {
+    fn as_float(&self) -> Vector2D<f32, U>;
+}
+
+impl<U> VectorExt<i32, U> for Vector2D<i32, U> {
+    fn as_float(&self) -> Vector2D<f32, U> {
+        Vector2D::new(self.x as f32, self.y as f32)
     }
 }
 

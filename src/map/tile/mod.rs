@@ -13,7 +13,7 @@ use crate::{
     color::{RGBA8Ext, COMMON, EMPTY},
     game::consts::get_screen_to_pixel_transform,
     resource::Resources,
-    util::ScreenPoint,
+    util::{PixelPoint, ScreenPoint},
 };
 pub enum VisibilityKind {
     Torch { brightness: u32 },
@@ -109,10 +109,9 @@ impl Tile {
         &self,
         canvas: &mut Canvas,
         resources: &mut Resources,
-        point: ScreenPoint,
+        pixel_point: PixelPoint,
         visibility_kind: VisibilityKind,
     ) {
-        let pixel_point = get_screen_to_pixel_transform().transform_point(point);
         match visibility_kind {
             VisibilityKind::Torch { brightness: _ } => {
                 // TODO: use torch brightness to modify rendering brightness

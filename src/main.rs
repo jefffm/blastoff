@@ -8,6 +8,7 @@ use tracing::Level;
 
 use bracket_random::prelude::RandomNumberGenerator;
 
+pub mod animation;
 pub mod camera;
 pub mod color;
 pub mod component;

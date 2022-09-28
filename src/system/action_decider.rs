@@ -95,7 +95,7 @@ pub fn path_next(map: &Map, start: &WorldPoint, end: &WorldPoint) -> Option<Worl
 pub fn target_point(world: &World, target: Entity) -> WorldPoint {
     let mut q2 = world.query_one::<&Position>(target).unwrap();
     let target = q2.get().unwrap();
-    target.point()
+    target.grid_point()
 }
 
 /// Determine which actions to take given behavior
@@ -131,7 +131,7 @@ pub fn action_decider_system(
                 .query_one::<(&Position, &Viewshed)>(intention.entity)
                 .unwrap();
             let (position, viewshed) = q1.get().unwrap();
-            let point = position.point();
+            let point = position.grid_point();
             intention.into_next(world, resources, map, &point, viewshed)
         };
 

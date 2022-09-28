@@ -11,7 +11,10 @@ use crate::game::consts::{SCREEN_HEIGHT_PIXELS, TILE_SIZE, UPDATE_INTERVAL_SECS}
 use crate::input::Controls;
 use crate::map::Map;
 use crate::resource::{Resources, Viewport};
-use crate::util::{PixelPoint, Scene, SceneSwitch};
+use crate::util::{
+    PixelPoint, PointExt, Scene, SceneSwitch, ScreenFloatPoint, VectorExt, ViewportFloatPoint,
+    ViewportFloatToScreen,
+};
 use crate::{
     game::consts::SCREEN_RECT,
     util::{
@@ -118,7 +121,7 @@ pub struct MapGeneration {
     state: MapGenerationState,
     input: Option<MapGenerationInput>,
     viewport: Viewport,
-    screen_transform: ViewportToScreen,
+    screen_transform: ViewportFloatToScreen,
 }
 impl MapGeneration {
     pub fn new(world: World, history: Vec<Map>) -> Self {
@@ -131,8 +134,10 @@ impl MapGeneration {
             t1,
         );
 
-        let screen_transform =
-            ViewportToScreen::from_points(ViewportPoint::new(0, 0), ScreenPoint::new(2, 2));
+        let screen_transform = ViewportFloatToScreen::from_points(
+            ViewportFloatPoint::new(0., 0.),
+            ScreenFloatPoint::new(2., 2.),
+        );
 
         let hist_length = history.len();
 
@@ -214,18 +219,18 @@ impl Scene<Resources, Controls> for MapGeneration {
                 }
                 MapGenerationInput::EnterPlayback => self.state = MapGenerationState::Playback,
                 MapGenerationInput::Exit => return SceneSwitch::Pop,
-                MapGenerationInput::PanN => self
-                    .viewport
-                    .update_transform(self.viewport.center() + *Cardinal::N.to_vector()),
-                MapGenerationInput::PanS => self
-                    .viewport
-                    .update_transform(self.viewport.center() + *Cardinal::S.to_vector()),
-                MapGenerationInput::PanE => self
-                    .viewport
-                    .update_transform(self.viewport.center() + *Cardinal::E.to_vector()),
-                MapGenerationInput::PanW => self
-                    .viewport
-                    .update_transform(self.viewport.center() + *Cardinal::W.to_vector()),
+                MapGenerationInput::PanN => self.viewport.update_transform(
+                    self.viewport.center().to_f32() + Cardinal::N.to_vector().as_float(),
+                ),
+                MapGenerationInput::PanS => self.viewport.update_transform(
+                    self.viewport.center().to_f32() + Cardinal::S.to_vector().as_float(),
+                ),
+                MapGenerationInput::PanE => self.viewport.update_transform(
+                    self.viewport.center().to_f32() + Cardinal::E.to_vector().as_float(),
+                ),
+                MapGenerationInput::PanW => self.viewport.update_transform(
+                    self.viewport.center().to_f32() + Cardinal::W.to_vector().as_float(),
+                ),
                 MapGenerationInput::PlayPause => self.cursor.playpause(),
                 MapGenerationInput::Regenerate => todo!("Map regeneration not implemented yet"),
             },

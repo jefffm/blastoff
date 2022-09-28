@@ -1,18 +1,18 @@
 use std::time::Duration;
 
 use crate::util::{
-    PixelPoint, PixelRect, PixelSize, ScreenPoint, ScreenRect, ScreenSize, ScreenToPixel,
-    TransformExt,
+    PixelPoint, PixelRect, PixelSize, ScreenFloatToPixel, ScreenPoint, ScreenRect, ScreenSize,
+    ScreenToPixel, TransformExt,
 };
 
 // 16:9
-pub const SCREEN_WIDTH_PIXELS: i32 = 320 * 3;
-pub const SCREEN_HEIGHT_PIXELS: i32 = 180 * 3;
+pub const SCREEN_WIDTH_PIXELS: i32 = 320 * 4;
+pub const SCREEN_HEIGHT_PIXELS: i32 = 180 * 4;
 pub const TILE_SIZE: PixelSize = PixelSize::new(16, 16);
 
 /// euclid Rect isn't const, so this is manually calculated
-pub const SCREEN_HEIGHT: i32 = SCREEN_HEIGHT_PIXELS / TILE_SIZE.height;
-pub const SCREEN_WIDTH: i32 = SCREEN_WIDTH_PIXELS / TILE_SIZE.width;
+pub const SCREEN_HEIGHT: i32 = SCREEN_HEIGHT_PIXELS / TILE_SIZE.height; // (320 * 3) / 16 = 60
+pub const SCREEN_WIDTH: i32 = SCREEN_WIDTH_PIXELS / TILE_SIZE.width; // (180 * 3) / 16 = 33.75 = 33 + 0.75 extra
 
 pub const SCREEN_SIZE: ScreenSize = ScreenSize::new(SCREEN_WIDTH, SCREEN_HEIGHT);
 pub const SCREEN_RECT: ScreenRect = ScreenRect::new(ScreenPoint::new(0, 0), SCREEN_SIZE);
@@ -29,6 +29,10 @@ pub const PIXEL_RECT: PixelRect = PixelRect::new(
 pub fn get_screen_to_pixel_transform() -> ScreenToPixel {
     ScreenToPixel::from_points(SCREEN_RECT.origin, PIXEL_RECT.origin)
         .then_scale(TILE_SIZE.width, TILE_SIZE.height)
+}
+
+pub fn get_screen_to_pixel_transform_float() -> ScreenFloatToPixel {
+    get_screen_to_pixel_transform().into_float_transform()
 }
 
 // TODO: derive the viewport height instead
@@ -52,6 +56,8 @@ pub const RESOURCE_PATH: &str = "assets";
 pub const SCALING_FACTOR: f32 = 2.;
 
 pub const USE_SPRITES: bool = true;
+
+pub const MOVEMENT_ANIMATION_DURATION: f32 = 1. / 5.;
 
 #[cfg(test)]
 pub mod tests {

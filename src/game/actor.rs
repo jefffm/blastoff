@@ -10,7 +10,7 @@ use crate::{
     util::{WorldPoint, WorldVector},
 };
 
-use super::TurnsHistory;
+use super::{consts::MOVEMENT_ANIMATION_DURATION, TurnsHistory};
 
 /// The Actor System implements energy-based turn actions using Actor components
 pub fn process_actors(
@@ -148,13 +148,15 @@ impl<'a> ActionProcessor<'a> {
     }
 
     fn move_entity(&mut self, entity: &Entity, vector: &WorldVector) {
+        // Find the starting position
         let source_point = {
             let mut query = self.world.query_one::<&Position>(*entity).unwrap();
             let position = query.get().unwrap();
 
-            position.point()
+            position.grid_point()
         };
 
+        // Is this the player?
         let is_player = {
             let mut query = self.world.query_one::<&Player>(*entity).unwrap();
             query.get().is_some()
@@ -171,7 +173,8 @@ impl<'a> ActionProcessor<'a> {
             .world
             .query_mut::<(&Actor, &mut Position, &mut Renderable)>();
         for (other_entity, (_actor, position, renderable)) in query.into_iter() {
-            if dest_point == position.point() {
+            if dest_point == position.grid_point() {
+                // TODO: there should be a component that determines when objects are impassible
                 // if this isn't a player, prevent the move from happening
                 if !is_player {
                     tracing::trace!(
@@ -183,8 +186,7 @@ impl<'a> ActionProcessor<'a> {
                     );
                     return;
                 }
-                renderable.set_move(position.point(), source_point);
-                position.set_point(source_point);
+                position.move_to(source_point.to_f32(), MOVEMENT_ANIMATION_DURATION);
                 position_swap = true;
                 break;
             }
@@ -197,8 +199,7 @@ impl<'a> ActionProcessor<'a> {
                 .query_one_mut::<(&mut Position, &mut Viewshed, &mut Renderable)>(*entity)
                 .unwrap();
             viewshed.set_dirty();
-            renderable.set_move(position.point(), source_point);
-            position.set_point(dest_point);
+            position.move_to(dest_point.to_f32(), MOVEMENT_ANIMATION_DURATION);
         }
     }
 
@@ -208,9 +209,9 @@ impl<'a> ActionProcessor<'a> {
             .query_one_mut::<(&mut Position, &mut Viewshed)>(*entity)
             .expect("move entity exists");
 
-        if &position.point() != point && !self.map.is_blocked(point) {
+        if &position.grid_point() != point && !self.map.is_blocked(point) {
             viewshed.set_dirty();
-            position.set_point(*point)
+            position.set_grid_point(*point)
         }
     }
 }

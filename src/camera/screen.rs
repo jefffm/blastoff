@@ -5,13 +5,13 @@ use hecs::{Entity, World};
 
 use crate::color::RGBA8Ext;
 use crate::component::{Position, Renderable};
-use crate::game::consts::{get_screen_to_pixel_transform, USE_SPRITES};
+use crate::game::consts::{get_screen_to_pixel_transform_float, USE_SPRITES};
 use crate::game::draw_ui;
 use crate::map::{Map, Tile, VisibilityKind};
 use crate::resource::Resources;
 use crate::util::{
-    PixelPoint, ScreenPoint, TransformExt, ViewportFloatToScreen, ViewportPoint, ViewportToScreen,
-    WorldFloatPoint, PLAYER,
+    PixelPoint, TransformExt, ViewportFloatToScreen, ViewportToScreen, WorldFloatPoint, WorldPoint,
+    PLAYER,
 };
 
 enum RenderCell {
@@ -21,47 +21,23 @@ enum RenderCell {
 
 // Viewport tracks the current onscreen rect
 pub struct Screen {
-    transform: ViewportToScreen,
     transform_float: ViewportFloatToScreen,
 }
 
 impl Screen {
     pub fn new(transform: ViewportToScreen) -> Self {
-        // TODO: move this to TransformExt in geometry.rs
-        let params = transform.to_array();
-        let transform_float = ViewportFloatToScreen::new(
-            params[0] as f32,
-            params[1] as f32,
-            params[2] as f32,
-            params[3] as f32,
-            params[4] as f32,
-            params[5] as f32,
-        );
         Self {
-            transform,
-            transform_float,
+            transform_float: transform.into_float_transform(),
         }
     }
 
-    fn draw(
-        &self,
-        canvas: &mut Canvas,
-        world: &World,
-        resources: &mut Resources,
-        entity: Entity,
-        point: ScreenPoint,
-    ) {
-        let mut query = world.query_one::<&Renderable>(entity).unwrap();
+    fn draw(&self, canvas: &mut Canvas, world: &World, resources: &mut Resources, entity: Entity) {
+        let mut query = world.query_one::<(&Position, &Renderable)>(entity).unwrap();
 
-        let renderable = query.get().unwrap();
+        let (position, renderable) = query.get().unwrap();
 
-        // TODO: move "current_pos" onto an animation struct instead
-        let pixel_point = if let Some(_animation) = &renderable.sequence {
-            let point = renderable.current_pos().unwrap();
-            self.worldfloat_to_pixel(resources, point)
-        } else {
-            get_screen_to_pixel_transform().transform_point(point)
-        };
+        let worldfloat_point = position.render_point();
+        let pixel_point = self.worldfloat_to_pixel(resources, worldfloat_point);
 
         if USE_SPRITES {
             let sprite = PLAYER;
@@ -76,15 +52,18 @@ impl Screen {
         }
     }
 
-    pub fn to_screen_point(&self, point: ViewportPoint) -> ScreenPoint {
-        self.transform.transform_point(point)
-    }
-
+    /// Transform a floating point World Point allllllll the way through into an integer PixelPoint
     pub fn worldfloat_to_pixel(&self, resources: &Resources, point: WorldFloatPoint) -> PixelPoint {
+        // i32 grid WorldPoint translates to a floating point viewport point
         let vp = resources.viewport.to_viewport_point_f32(point);
+
+        // floating point viewport point translates to some division of the screen grid
         let sp = self.transform_float.transform_point(vp);
 
-        get_screen_to_pixel_transform().transform_float_point(sp)
+        // Screen grid floating point translates to some absolute pixel coordinates
+        get_screen_to_pixel_transform_float()
+            .transform_point(sp)
+            .to_i32()
     }
 
     pub fn draw_game(
@@ -95,13 +74,21 @@ impl Screen {
         resources: &mut Resources,
         map: &Map,
     ) {
-        let viewport_points: Vec<_> = resources.viewport.points().collect();
+        // TODO: Floating Point Viewport Translation
+        // Rather than translating points in Viewport, instead we should translate the viewport rect
+        // using the floating point transform in Viewport.
+        //
+        // Then, we determine all Grid world points visible in the rectangle.
+        // For each world point with an origin in the floating point viewport rectangle, draw the rect
 
-        let mut cells: HashMap<ScreenPoint, RenderCell> = HashMap::new();
+        let mut cells: HashMap<WorldPoint, RenderCell> = HashMap::new();
 
         // Use the viewport to find and render all visible Map tiles
+        let viewport_points: Vec<_> = resources.viewport.points().collect();
         for viewport_point in viewport_points {
+            // Use the integer world point to locate which tile to render from the map grid
             let world_point = resources.viewport.to_world_point(viewport_point);
+
             // It's important to make sure the point is actually in the map
             // before trying to make an index for it
             if !map.contains(world_point) {
@@ -110,11 +97,11 @@ impl Screen {
 
             if map.is_visible(&world_point) {
                 if let Some(tile) = map.get(world_point) {
-                    let screen_point = self.to_screen_point(viewport_point);
+                    // Translate the world point into floating point screen coordinates
                     let vis = VisibilityKind::Torch {
                         brightness: resources.rng.roll_dice(1, 40) as u32,
                     };
-                    cells.insert(screen_point, RenderCell::Tile(*tile, vis));
+                    cells.insert(world_point, RenderCell::Tile(*tile, vis));
                 }
 
                 let mut data = map
@@ -125,39 +112,35 @@ impl Screen {
                             .query_one::<(&Position, &Renderable)>(*entity)
                             .unwrap();
 
-                        query.get().map(|(pos, render)| {
-                            let viewport_point = resources.viewport.to_viewport_point(pos.p);
-                            let screen_point = self.to_screen_point(viewport_point);
-
-                            (*entity, screen_point, render.render_order)
-                        })
+                        query
+                            .get()
+                            .map(|(pos, render)| (*entity, pos.grid_point(), render.render_order))
                     })
                     .filter(|x| x.is_some())
-                    .collect::<Option<Vec<(Entity, ScreenPoint, u32)>>>()
+                    .collect::<Option<Vec<(Entity, WorldPoint, u32)>>>()
                     .unwrap();
 
-                data.sort_by(|(_, _, r1), (_, _, r2)| r1.cmp(&r2));
+                data.sort_by(|(_, _, r1), (_, _, r2)| r1.cmp(r2));
 
                 for (entity, screen_point, _render_order) in data.into_iter() {
                     cells.insert(screen_point, RenderCell::Entity(entity));
                 }
             } else if map.is_revealed(&world_point) {
                 if let Some(tile) = map.get(world_point) {
-                    let screen_point = self.to_screen_point(viewport_point);
                     cells.insert(
-                        screen_point,
+                        world_point,
                         RenderCell::Tile(*tile, VisibilityKind::Remembered),
                     );
                 }
             }
         }
 
-        for (screen_point, cell) in cells.into_iter() {
+        for (world_point, cell) in cells.into_iter() {
+            // Translate each world point on the grid through floating point transforms and into an absolute pixel point
+            let pixel_point = self.worldfloat_to_pixel(resources, world_point.to_f32());
             match cell {
-                RenderCell::Tile(tile, vis) => tile.render(canvas, resources, screen_point, vis),
-                RenderCell::Entity(entity) => {
-                    self.draw(canvas, world, resources, entity, screen_point)
-                }
+                RenderCell::Tile(tile, vis) => tile.render(canvas, resources, pixel_point, vis),
+                RenderCell::Entity(entity) => self.draw(canvas, world, resources, entity),
             }
         }
 

@@ -15,14 +15,13 @@ pub fn draw_ui(
     ctx: &mut ggez::Context,
     canvas: &mut Canvas,
     world: &World,
-    resources: &Resources,
+    resources: &mut Resources,
     map: &Map,
 ) {
     // let _turn_history = &resources.turn_history;
     // ctx.print(1, 2, format!("Steps : {}", turn_history.steps));
     // ctx.print(1, 3, format!("Energy: {}", turn_history.energy_used));
-    resources.font.draw_each_char(
-        canvas,
+    resources.font.push_text(
         &format!("Fps: {:.2}", ctx.time.fps()),
         &PixelPoint::new(SCREEN_WIDTH_PIXELS - 20 * TILE_SIZE.width, 0),
         None,
@@ -30,16 +29,19 @@ pub fn draw_ui(
 
     // Implement text printing for UI
     for (_ent, (_player, actor)) in world.query::<(&Player, &Actor)>().iter() {
-        resources.font.draw_each_char(
-            canvas,
+        resources.font.push_text(
             &format!("Energy: {:?}", actor.energy()),
             &PixelPoint::new(50, 0),
             None,
         );
-        resources.font.draw_each_char(
-            canvas,
+        resources.font.push_text(
             &format!("Turns: {:?}", actor.turns()),
             &PixelPoint::new(50, TILE_SIZE.height),
+            None,
+        );
+        resources.font.push_text(
+            &format!("Camera pos: {:?}", resources.viewport.world_rect().center()),
+            &PixelPoint::new(70, 0),
             None,
         );
     }

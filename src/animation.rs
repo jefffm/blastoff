@@ -5,13 +5,11 @@ use keyframe::{
     keyframes, AnimationSequence,
 };
 
-use crate::util::{
-    easing_function, EasingEnum, PixelPoint, PointExt, WorldFloatPoint, WorldPoint, WorldToViewport,
-};
+use crate::util::{easing_function, EasingEnum, PointExt, WorldFloatPoint};
 
 pub fn move_sequence(
-    mut start_point: WorldPoint,
-    mut end_point: WorldPoint,
+    start_point: WorldFloatPoint,
+    end_point: WorldFloatPoint,
     ease_enum: &EasingEnum,
     duration: f32,
 ) -> AnimationSequence<Point2<f32>> {

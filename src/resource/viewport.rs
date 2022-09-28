@@ -1,32 +1,33 @@
 use crate::util::{
-    PointExt, TransformExt, ViewportFloatPoint, ViewportPoint, ViewportRect, WorldFloatPoint,
-    WorldFloatToViewport, WorldPoint, WorldToViewport,
+    TransformExt, ViewportFloatPoint, ViewportFloatRect, ViewportPoint, ViewportRect,
+    WorldFloatPoint, WorldFloatRect, WorldFloatToViewport, WorldPoint, WorldToViewport,
 };
 
 // Viewport tracks the current onscreen rect
 #[derive(Debug, Default)]
 pub struct Viewport {
     rect: ViewportRect,
+    rect_float: ViewportFloatRect,
     transform: WorldToViewport,
     transform_float: WorldFloatToViewport,
 }
 
 impl Viewport {
     pub fn new(rect: ViewportRect, transform: WorldToViewport) -> Self {
-        let params = transform.to_array();
-        let transform_float = WorldFloatToViewport::new(
-            params[0] as f32,
-            params[1] as f32,
-            params[2] as f32,
-            params[3] as f32,
-            params[4] as f32,
-            params[5] as f32,
-        );
         Self {
             rect,
+            rect_float: rect.to_f32(),
             transform,
-            transform_float,
+            transform_float: transform.into_float_transform(),
         }
+    }
+
+    /// The current visible world points
+    pub fn world_rect(&self) -> WorldFloatRect {
+        self.transform_float
+            .inverse()
+            .unwrap()
+            .outer_transformed_rect(&self.rect_float)
     }
 
     pub fn to_viewport_point(&self, point: WorldPoint) -> ViewportPoint {
@@ -37,18 +38,24 @@ impl Viewport {
         self.transform_float.transform_point(point)
     }
 
-    pub fn update_transform(&mut self, center: WorldPoint) {
-        self.transform.update_transform(center, self.rect.center());
+    pub fn update_transform(&mut self, center: WorldFloatPoint) {
+        self.transform
+            .update_transform(center.to_i32(), self.rect.center());
         self.transform_float
-            .update_transform(center.as_float(), self.rect.center().as_float());
+            .update_transform(center, self.rect_float.center());
     }
 
-    pub fn center(&self) -> WorldPoint {
-        self.to_world_point(self.rect.center())
+    pub fn center(&self) -> WorldFloatPoint {
+        self.to_world_point_float(self.rect_float.center())
     }
 
     pub fn to_world_point(&self, point: ViewportPoint) -> WorldPoint {
         let inverse_transform = self.transform.inverse().expect("inverse transform");
+        inverse_transform.transform_point(point)
+    }
+
+    pub fn to_world_point_float(&self, point: ViewportFloatPoint) -> WorldFloatPoint {
+        let inverse_transform = self.transform_float.inverse().expect("inverse transform");
         inverse_transform.transform_point(point)
     }
 

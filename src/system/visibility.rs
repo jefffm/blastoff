@@ -23,7 +23,7 @@ pub fn visibility_system(
         if viewshed.dirty() {
             viewshed.init();
 
-            let point = pos.point();
+            let point = pos.grid_point();
             let origin = (point.x as isize, point.y as isize);
             let range = viewshed.range();
 
