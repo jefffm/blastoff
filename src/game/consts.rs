@@ -53,7 +53,7 @@ pub const SIDE_BOX_WIDTH: i32 = SCREEN_WIDTH - VIEWPORT_WIDTH;
 
 pub const RESOURCE_PATH: &str = "assets";
 
-pub const SCALING_FACTOR: f32 = 2.;
+pub const SCALING_FACTOR: f32 = 1.;
 
 pub const USE_SPRITES: bool = true;
 

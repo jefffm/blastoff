@@ -6,7 +6,6 @@ use crate::util::{
 // Viewport tracks the current onscreen rect
 #[derive(Debug, Default)]
 pub struct Viewport {
-    rect: ViewportRect,
     rect_float: ViewportFloatRect,
     transform: WorldToViewport,
     transform_float: WorldFloatToViewport,
@@ -15,7 +14,6 @@ pub struct Viewport {
 impl Viewport {
     pub fn new(rect: ViewportRect, transform: WorldToViewport) -> Self {
         Self {
-            rect,
             rect_float: rect.to_f32(),
             transform,
             transform_float: transform.into_float_transform(),
@@ -39,8 +37,7 @@ impl Viewport {
     }
 
     pub fn update_transform(&mut self, center: WorldFloatPoint) {
-        self.transform
-            .update_transform(center.to_i32(), self.rect.center());
+        // TODO: this could also clamp to Map boundaries
         self.transform_float
             .update_transform(center, self.rect_float.center());
     }
@@ -60,9 +57,9 @@ impl Viewport {
     }
 
     pub fn points(&self) -> impl Iterator<Item = ViewportPoint> {
-        let xrange = self.rect.x_range();
-        let yrange = self.rect.y_range();
+        let yrange = self.rect_float.to_i32().y_range();
+        let xrange = self.rect_float.to_i32().x_range();
 
-        xrange.flat_map(move |x| yrange.clone().map(move |y| ViewportPoint::new(x, y)))
+        yrange.flat_map(move |y| xrange.clone().map(move |x| ViewportPoint::new(x, y)))
     }
 }

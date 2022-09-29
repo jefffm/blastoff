@@ -14,8 +14,11 @@ pub fn animation_system(
     _map: &mut Map,
     ctx: &Context,
 ) {
-    for (_entity, (position, renderable)) in world.query_mut::<(&mut Position, &mut Renderable)>() {
+    for (_entity, position) in world.query_mut::<&mut Position>() {
         position.update_time(ctx.time.delta().as_secs_f64());
+    }
+
+    for (_entity, renderable) in world.query_mut::<&mut Renderable>() {
         renderable.update_time(ctx.time.delta().as_secs_f64());
     }
 }
