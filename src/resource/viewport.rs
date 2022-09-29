@@ -38,6 +38,8 @@ impl Viewport {
 
     pub fn update_transform(&mut self, center: WorldFloatPoint) {
         // TODO: this could also clamp to Map boundaries
+        self.transform
+            .update_transform(center.to_i32(), self.rect_float.center().to_i32());
         self.transform_float
             .update_transform(center, self.rect_float.center());
     }

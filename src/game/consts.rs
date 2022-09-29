@@ -36,11 +36,11 @@ pub fn get_screen_to_pixel_transform_float() -> ScreenFloatToPixel {
 }
 
 // TODO: derive the viewport height instead
-pub const VIEWPORT_WIDTH: i32 = 50;
+pub const VIEWPORT_WIDTH: i32 = 60;
 pub const VIEWPORT_HEIGHT: i32 = 50;
 
 // Where on the screen is the viewport's origin?
-pub const VIEWPORT_SCREEN_POINT: ScreenPoint = ScreenPoint::new(0, SCREEN_HEIGHT - VIEWPORT_HEIGHT);
+pub const VIEWPORT_SCREEN_POINT: ScreenPoint = ScreenPoint::new(2, 2);
 pub const TITLE_HEADER: &str = "Roguemon";
 pub const UPDATE_FPS: u32 = 60;
 pub const UPDATE_INTERVAL_SECS: f32 = 1.0 / (UPDATE_FPS as f32);
