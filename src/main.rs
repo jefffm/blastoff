@@ -13,13 +13,13 @@ pub mod camera;
 pub mod color;
 pub mod component;
 pub mod data;
+pub mod galaxy;
 pub mod game;
 pub mod input;
 pub mod map;
 pub mod overworld;
 pub mod resource;
 pub mod scene;
-pub mod solar;
 pub mod system;
 pub mod util;
 
@@ -98,6 +98,7 @@ fn main() -> GameResult {
         .expect("load spritesheet");
     let spritesheet = SpriteSheet::from_grid(&ctx, spritesheet_image, SpriteSize::new(49, 22));
 
+    // Global Resources struct used for resources shared across scenes
     let resources = Resources {
         rng: RandomNumberGenerator::seeded(rng_seed),
         viewport: Viewport::new(

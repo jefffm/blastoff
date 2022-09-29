@@ -96,21 +96,21 @@ pub type OverworldFloatToViewport = Transform2D<f32, OverworldSpace, ViewportSpa
 
 /// Overworld space maps to independent map and ecs world instances
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SolarSpace;
+pub struct GalaxySpace;
 
-pub type SolarPoint = Point2D<i32, SolarSpace>;
-pub type SolarVector = Vector2D<i32, SolarSpace>;
-pub type SolarSize = Size2D<i32, SolarSpace>;
-pub type SolarRect = Rect<i32, SolarSpace>;
+pub type GalaxyPoint = Point2D<i32, GalaxySpace>;
+pub type GalaxyVector = Vector2D<i32, GalaxySpace>;
+pub type GalaxySize = Size2D<i32, GalaxySpace>;
+pub type GalaxyRect = Rect<i32, GalaxySpace>;
 
-pub type SolarFloatPoint = Point2D<f32, SolarSpace>;
-pub type SolarFloatVector = Vector2D<f32, SolarSpace>;
-pub type SolarFloatSize = Size2D<f32, SolarSpace>;
-pub type SolarFloatRect = Rect<f32, SolarSpace>;
+pub type GalaxyFloatPoint = Point2D<f32, GalaxySpace>;
+pub type GalaxyFloatVector = Vector2D<f32, GalaxySpace>;
+pub type GalaxyFloatSize = Size2D<f32, GalaxySpace>;
+pub type GalaxyFloatRect = Rect<f32, GalaxySpace>;
 
 /// Overworldwmaps to viewport space in order to render the overworld view
-pub type SolarToViewport = Transform2D<i32, OverworldSpace, SolarSpace>;
-pub type SolarFloatToViewport = Transform2D<f32, OverworldSpace, SolarSpace>;
+pub type GalaxyToViewport = Transform2D<i32, OverworldSpace, GalaxySpace>;
+pub type GalaxyFloatToViewport = Transform2D<f32, OverworldSpace, GalaxySpace>;
 
 pub trait TransformExt<T, Src, Dest>
 where

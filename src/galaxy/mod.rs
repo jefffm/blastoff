@@ -1,30 +1,31 @@
 use std::collections::HashMap;
 
-use crate::{overworld::Overworld, util::SolarPoint};
+use crate::{overworld::Overworld, util::GalaxyPoint};
 
-type SolarMap = HashMap<SolarPoint, Overworld>;
+type GalaxyMap = HashMap<GalaxyPoint, Overworld>;
 
-pub struct SolarSystem {
-    info: SolarSystemInfo,
-    map: SolarMap,
+/// A galaxy contains coordinates pointing to each star system
+pub struct Galaxy {
+    info: GalaxyInfo,
+    map: GalaxyMap,
 }
 
-impl SolarSystem {
-    pub fn new(info: SolarSystemInfo, map: SolarMap) -> Self {
+impl Galaxy {
+    pub fn new(info: GalaxyInfo, map: GalaxyMap) -> Self {
         Self { info, map }
     }
 
-    pub fn info(&self) -> &SolarSystemInfo {
+    pub fn info(&self) -> &GalaxyInfo {
         &self.info
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct SolarSystemInfo {
+pub struct GalaxyInfo {
     name: String,
 }
 
-impl SolarSystemInfo {
+impl GalaxyInfo {
     pub fn new(name: String) -> Self {
         Self { name }
     }
@@ -59,9 +60,8 @@ mod tests {
         let planet = Overworld::new(PlanetInfo::new("yeaaaarg".to_owned()), overworld_map);
 
         let mut solar_map = HashMap::new();
-        solar_map.insert(SolarPoint::new(0, 0), planet);
-        let solar_system =
-            SolarSystem::new(SolarSystemInfo::new("test system".to_owned()), solar_map);
+        solar_map.insert(GalaxyPoint::new(0, 0), planet);
+        let solar_system = Galaxy::new(GalaxyInfo::new("test system".to_owned()), solar_map);
 
         assert_eq!(solar_system.info.name, "test system");
     }
