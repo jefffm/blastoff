@@ -16,8 +16,10 @@ pub mod data;
 pub mod game;
 pub mod input;
 pub mod map;
+pub mod overworld;
 pub mod resource;
 pub mod scene;
+pub mod solar;
 pub mod system;
 pub mod util;
 

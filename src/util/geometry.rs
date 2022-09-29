@@ -76,6 +76,42 @@ pub type WorldFloatRect = Rect<f32, WorldSpace>;
 pub type WorldToViewport = Transform2D<i32, WorldSpace, ViewportSpace>;
 pub type WorldFloatToViewport = Transform2D<f32, WorldSpace, ViewportSpace>;
 
+/// Overworld space maps to independent map and ecs world instances
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OverworldSpace;
+
+pub type OverworldPoint = Point2D<i32, OverworldSpace>;
+pub type OverworldVector = Vector2D<i32, OverworldSpace>;
+pub type OverworldSize = Size2D<i32, OverworldSpace>;
+pub type OverworldRect = Rect<i32, OverworldSpace>;
+
+pub type OverworldFloatPoint = Point2D<f32, OverworldSpace>;
+pub type OverworldFloatVector = Vector2D<f32, OverworldSpace>;
+pub type OverworldFloatSize = Size2D<f32, OverworldSpace>;
+pub type OverworldFloatRect = Rect<f32, OverworldSpace>;
+
+/// Overworldwmaps to viewport space in order to render the overworld view
+pub type OverworldToViewport = Transform2D<i32, OverworldSpace, ViewportSpace>;
+pub type OverworldFloatToViewport = Transform2D<f32, OverworldSpace, ViewportSpace>;
+
+/// Overworld space maps to independent map and ecs world instances
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SolarSpace;
+
+pub type SolarPoint = Point2D<i32, SolarSpace>;
+pub type SolarVector = Vector2D<i32, SolarSpace>;
+pub type SolarSize = Size2D<i32, SolarSpace>;
+pub type SolarRect = Rect<i32, SolarSpace>;
+
+pub type SolarFloatPoint = Point2D<f32, SolarSpace>;
+pub type SolarFloatVector = Vector2D<f32, SolarSpace>;
+pub type SolarFloatSize = Size2D<f32, SolarSpace>;
+pub type SolarFloatRect = Rect<f32, SolarSpace>;
+
+/// Overworldwmaps to viewport space in order to render the overworld view
+pub type SolarToViewport = Transform2D<i32, OverworldSpace, SolarSpace>;
+pub type SolarFloatToViewport = Transform2D<f32, OverworldSpace, SolarSpace>;
+
 pub trait TransformExt<T, Src, Dest>
 where
     T: Copy + std::ops::Sub + std::ops::Sub<Output = T>,
