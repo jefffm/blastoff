@@ -11,9 +11,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     color::{RGBA8Ext, COMMON, EMPTY},
-    game::consts::get_screen_to_pixel_transform,
     resource::Resources,
-    util::{PixelPoint, ScreenPoint},
+    util::PixelPoint,
 };
 pub enum VisibilityKind {
     Torch { brightness: u32 },

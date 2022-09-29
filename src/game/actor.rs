@@ -186,7 +186,7 @@ impl<'a> ActionProcessor<'a> {
                     );
                     return;
                 }
-                position.move_to(source_point.to_f32(), MOVEMENT_ANIMATION_DURATION);
+                position.move_to(source_point, MOVEMENT_ANIMATION_DURATION);
                 position_swap = true;
                 break;
             }
@@ -199,7 +199,7 @@ impl<'a> ActionProcessor<'a> {
                 .query_one_mut::<(&mut Position, &mut Viewshed, &mut Renderable)>(*entity)
                 .unwrap();
             viewshed.set_dirty();
-            position.move_to(dest_point.to_f32(), MOVEMENT_ANIMATION_DURATION);
+            position.move_to(dest_point, MOVEMENT_ANIMATION_DURATION);
         }
     }
 

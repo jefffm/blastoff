@@ -25,14 +25,20 @@ impl Position {
     }
 
     /// Move an entity to a given world float component
-    pub fn move_to(&mut self, point: WorldFloatPoint, duration_secs: f32) {
-        self.set_move_now(self.p.to_f32(), point, duration_secs);
+    pub fn move_to(&mut self, point: WorldPoint, duration_secs: f32) {
+        self.set_move_now(self.render_point(), point, duration_secs);
+        self.p = point.to_i32();
+    }
+
+    ///
+    pub fn move_to_smooth(&mut self, point: WorldPoint, duration_secs: f32) {
+        self.set_move_now_smooth(self.render_point(), point, duration_secs);
         self.p = point.to_i32();
     }
 
     /// Move an entity to a given world float component
-    pub fn move_to_queued(&mut self, point: WorldFloatPoint, duration_secs: f32) {
-        self.set_move_queued(self.p.to_f32(), point, duration_secs);
+    pub fn move_to_queued(&mut self, point: WorldPoint, duration_secs: f32) {
+        self.set_move_queued(self.render_point(), point, duration_secs);
         self.p = point.to_i32();
     }
 
@@ -56,7 +62,7 @@ impl Position {
     }
 
     /// Add a move animation for the move
-    fn set_move_now(&mut self, src: WorldFloatPoint, dst: WorldFloatPoint, duration_secs: f32) {
+    fn set_move_now(&mut self, src: WorldFloatPoint, dst: WorldPoint, duration_secs: f32) {
         // If there is an outstanding animation, shorten the length of the animation
         let duration = if !self.sequences.is_empty() {
             // self.sequence_duration_divisor += 1.;
@@ -64,26 +70,40 @@ impl Position {
         } else {
             duration_secs
         };
-        let sequence = animation::move_sequence(src, dst, &EasingEnum::EaseInOutCubic, duration);
+        let sequence =
+            animation::move_sequence(src, dst.to_f32(), &EasingEnum::EaseInOutCubic, duration);
 
         self.sequences.clear();
         self.sequences.push_back(sequence)
     }
 
     /// Add a move animation for the move
-    fn set_move_queued(&mut self, src: WorldFloatPoint, dst: WorldFloatPoint, duration_secs: f32) {
-        if src == dst {
-            return;
-        }
-
+    fn set_move_now_smooth(&mut self, src: WorldFloatPoint, dst: WorldPoint, duration_secs: f32) {
         // If there is an outstanding animation, shorten the length of the animation
         let duration = if !self.sequences.is_empty() {
-            self.sequence_duration_divisor += 1.;
+            // self.sequence_duration_divisor += 1.;
             duration_secs / self.sequence_duration_divisor
         } else {
             duration_secs
         };
-        let sequence = animation::move_sequence(src, dst, &EasingEnum::EaseInOutCubic, duration);
+        let sequence =
+            animation::move_sequence(src, dst.to_f32(), &EasingEnum::EaseOutCubic, duration);
+
+        self.sequences.clear();
+        self.sequences.push_back(sequence)
+    }
+
+    /// Add a move animation for the move
+    fn set_move_queued(&mut self, src: WorldFloatPoint, dst: WorldPoint, duration_secs: f32) {
+        // If there is an outstanding animation, shorten the length of the animation
+        let duration = if !self.sequences.is_empty() {
+            // self.sequence_duration_divisor += 1.;
+            duration_secs / self.sequence_duration_divisor
+        } else {
+            duration_secs
+        };
+        let sequence =
+            animation::move_sequence(src, dst.to_f32(), &EasingEnum::EaseInOutCubic, duration);
         self.sequences.push_back(sequence)
     }
 
@@ -92,7 +112,7 @@ impl Position {
         if let Some(sequence) = self.sequences.front_mut() {
             if sequence.finished() {
                 self.sequences.pop_front();
-                self.sequence_duration_divisor -= 1.;
+                // self.sequence_duration_divisor = (self.sequence_duration_divisor - 1.).max(1.);
             } else {
                 sequence.advance_by(duration);
             }

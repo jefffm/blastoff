@@ -4,7 +4,7 @@ use crate::camera::Glyph;
 use crate::color::{Palette, COMMON, FIRE, PLANT, WATER};
 use crate::component::*;
 use crate::map::{FloorKind, WallKind};
-use crate::util::{Sprite, SpritePoint, ANIMAL1, ANIMAL2, ANIMAL3, ANIMAL4, PLAYER};
+use crate::util::{ANIMAL1, ANIMAL2, ANIMAL3, PLAYER};
 use crate::{
     map::{Map, Spawner, Tile},
     util::{WorldPoint, WorldRect, WorldSize, WorldVector},
