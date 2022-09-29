@@ -10,8 +10,8 @@ pub use game_over::*;
 mod map_generation;
 pub use map_generation::*;
 
-mod game;
-pub use game::*;
+mod sector;
+pub use sector::*;
 
 mod menu;
 pub use menu::*;
@@ -24,3 +24,9 @@ pub use main_state::*;
 
 mod debug_menu;
 pub use debug_menu::*;
+
+mod planet;
+pub use planet::*;
+
+mod galaxy;
+pub use galaxy::*;

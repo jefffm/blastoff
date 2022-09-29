@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use crate::{scene::Game as WorldGameScene, util::OverworldPoint};
+use crate::{scene::Sector, util::OverworldPoint};
 
-type OverworldMap = HashMap<OverworldPoint, WorldGameScene>;
+type OverworldMap = HashMap<OverworldPoint, Sector>;
 
 pub struct Overworld {
     info: PlanetInfo,

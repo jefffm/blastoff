@@ -1,3 +1,5 @@
+//! Sector implements a local quadrant on a given Planet. This scene is the "main" on-the-ground game scene
+
 use ggez::graphics::Canvas;
 use ggez::input::keyboard::KeyCode;
 
@@ -25,7 +27,7 @@ pub enum GameState {
     NeedPlayerInput,
 }
 
-pub struct Game {
+pub struct Sector {
     map: Map,
     world: World,
     input: Option<PlayerInput>,
@@ -35,7 +37,7 @@ pub struct Game {
     turn_history: TurnsHistory,
 }
 
-impl Game {
+impl Sector {
     pub fn new(map: Map, world: World) -> Self {
         Self {
             map,
@@ -52,7 +54,7 @@ impl Game {
     }
 }
 
-impl Game {
+impl Sector {
     /// Find the player component and set the next action on this player
     fn set_player_action(&mut self, player_action: PlayerAction) {
         for (_ent, (_player, actor)) in self.world.query_mut::<(&Player, &mut Actor)>() {
@@ -62,7 +64,7 @@ impl Game {
     }
 }
 
-impl Scene<Resources, Controls> for Game {
+impl Scene<Resources, Controls> for Sector {
     fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         self.input = match controls.read() {
             None => None,

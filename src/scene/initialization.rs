@@ -5,7 +5,7 @@ use crate::{
     input::Controls,
     map::{seed, Combo, FloorKind, Loader, Map, MapTemplate, SubMap, Tile, WfcGen},
     resource::Resources,
-    scene::Game,
+    scene::Sector,
     util::{PixelPoint, Scene, SceneSwitch, WorldPoint, WorldSize},
 };
 
@@ -24,10 +24,11 @@ impl Initialization {
 }
 
 impl Default for Initialization {
+    /// Default implementation for Initialization is called to implement New Game
     fn default() -> Self {
         Self {
             create_scene: |world: World, map: Map, _history: Vec<Map>| {
-                SceneSwitch::Replace(Box::new(Game::new(map, world)))
+                SceneSwitch::Replace(Box::new(Sector::new(map, world)))
             },
         }
     }
@@ -47,6 +48,8 @@ impl Scene<Resources, Controls> for Initialization {
         // Initialize mapgen history
         let mut mapgen_history = Vec::new();
 
+        // TODO: Generate a Planet's Overworld first. Then, use the Overworld point to determine which Sector template to use for initialization.
+        // TODO: Abstract this into a Sector Template
         let map_size = WorldSize::new(100, 100);
         let mapgen = Combo::new(MapTemplate::new(
             map_size,

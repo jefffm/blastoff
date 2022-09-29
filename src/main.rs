@@ -60,7 +60,6 @@ fn main() -> GameResult {
     };
     tracing_subscriber::fmt().with_max_level(level).init();
 
-    // TODO: add resources path using cargo manifest dir https://github.com/joetsoi/OpenMoonstone/blob/master/rust/src/main.rs#L108-L113
     let mut builder = ContextBuilder::new("roguemon", "Jeff Lynn");
     if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
         let path = path::PathBuf::from(manifest_dir).join(consts::RESOURCE_PATH);
