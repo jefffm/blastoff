@@ -4,5 +4,5 @@ pub use loader::*;
 mod spawner;
 pub use spawner::*;
 
-mod mapgen;
-pub use mapgen::*;
+mod sector;
+pub use sector::*;
