@@ -1,9 +1,14 @@
 use std::collections::HashMap;
 
-use crate::{scene::Sector, util::OverworldPoint};
+use hecs::World;
+use serde::{Deserialize, Serialize};
 
-type OverworldMap = HashMap<OverworldPoint, Sector>;
+use crate::{map::Map, util::OverworldPoint};
 
+// TODO: World needs to be serializeable in order to implement save/load
+type OverworldMap = HashMap<OverworldPoint, (Map, World)>;
+
+// #[derive(Serialize, Deserialize)]
 pub struct Overworld {
     info: PlanetInfo,
     map: OverworldMap,
@@ -19,7 +24,7 @@ impl Overworld {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlanetInfo {
     name: String,
 }

@@ -1,10 +1,13 @@
 use std::collections::HashMap;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{overworld::Overworld, util::GalaxyPoint};
 
 type GalaxyMap = HashMap<GalaxyPoint, Overworld>;
 
 /// A galaxy contains coordinates pointing to each star system
+// #[derive(Serialize, Deserialize)]
 pub struct Galaxy {
     info: GalaxyInfo,
     map: GalaxyMap,
@@ -20,7 +23,7 @@ impl Galaxy {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GalaxyInfo {
     name: String,
 }
@@ -40,7 +43,7 @@ mod tests {
     use crate::{
         map::{FloorKind, Map, Tile},
         overworld::PlanetInfo,
-        scene::Game,
+        scene::Sector,
         util::{OverworldPoint, WorldSize},
     };
 
@@ -52,17 +55,15 @@ mod tests {
             WorldSize::new(1, 1),
             Tile::Floor(FloorKind::FloorDefault),
         );
-        let scene = Game::new(map, World::new());
-
         let mut overworld_map = HashMap::new();
-        overworld_map.insert(OverworldPoint::new(0, 0), scene);
+        overworld_map.insert(OverworldPoint::new(0, 0), (map, World::new()));
 
         let planet = Overworld::new(PlanetInfo::new("yeaaaarg".to_owned()), overworld_map);
 
-        let mut solar_map = HashMap::new();
-        solar_map.insert(GalaxyPoint::new(0, 0), planet);
-        let solar_system = Galaxy::new(GalaxyInfo::new("test system".to_owned()), solar_map);
+        let mut galaxy_map = HashMap::new();
+        galaxy_map.insert(GalaxyPoint::new(0, 0), planet);
+        let galaxy = Galaxy::new(GalaxyInfo::new("test system".to_owned()), galaxy_map);
 
-        assert_eq!(solar_system.info.name, "test system");
+        assert_eq!(galaxy.info.name, "test system");
     }
 }

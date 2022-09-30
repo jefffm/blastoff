@@ -52,9 +52,7 @@ impl Sector {
             turn_history: TurnsHistory::default(),
         }
     }
-}
 
-impl Sector {
     /// Find the player component and set the next action on this player
     fn set_player_action(&mut self, player_action: PlayerAction) {
         for (_ent, (_player, actor)) in self.world.query_mut::<(&Player, &mut Actor)>() {
