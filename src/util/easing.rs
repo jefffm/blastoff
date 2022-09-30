@@ -1,8 +1,6 @@
-use ggez::{graphics, mint::Point2};
-use keyframe::{ease, functions::*, keyframes, AnimationSequence, EasingFunction};
+use ggez::graphics;
+use keyframe::{functions::*, EasingFunction};
 use keyframe_derive::CanTween;
-
-use super::{PointExt, WorldPoint};
 
 #[derive(Debug, PartialEq)]
 #[repr(i32)]

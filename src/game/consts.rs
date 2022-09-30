@@ -32,7 +32,7 @@ pub fn get_screen_to_pixel_transform() -> ScreenToPixel {
 }
 
 pub fn get_screen_to_pixel_transform_float() -> ScreenFloatToPixel {
-    get_screen_to_pixel_transform().into_float_transform()
+    get_screen_to_pixel_transform().as_float_transform()
 }
 
 // TODO: derive the viewport height instead

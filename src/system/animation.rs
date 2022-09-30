@@ -3,8 +3,8 @@ use hecs::World;
 
 use crate::{
     component::{Position, Renderable},
-    map::Map,
     resource::Resources,
+    sector::Map,
 };
 
 /// Update all entities with animations with the current delta time

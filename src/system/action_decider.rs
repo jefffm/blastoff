@@ -7,8 +7,8 @@ use crate::{
         Position, Viewshed,
     },
     game::Action,
-    map::Map,
     resource::Resources,
+    sector::Map,
     util::{PointExt, WorldPoint},
 };
 

@@ -10,7 +10,7 @@
 use std::{convert::TryInto, fmt::Debug};
 
 use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
-use ggez::mint::{Point2, Vector2};
+use ggez::mint::Point2;
 use serde::{Deserialize, Serialize};
 
 /// SpriteSpace is coordinates to refer to different sprites in a spritesheet of equal tile sizes
@@ -125,7 +125,7 @@ where
     }
     fn update_transform(&mut self, src_point: Point2D<T, Src>, dest_point: Point2D<T, Dest>);
     fn transform_float_point(&self, src_point: Point2D<f32, Src>) -> Point2D<T, Dest>;
-    fn into_float_transform(&self) -> Transform2D<f32, Src, Dest>;
+    fn as_float_transform(&self) -> Transform2D<f32, Src, Dest>;
 }
 
 impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
@@ -146,7 +146,7 @@ impl<Src, Dest> TransformExt<i32, Src, Dest> for Transform2D<i32, Src, Dest> {
             src_point.y.round() as i32,
         ))
     }
-    fn into_float_transform(&self) -> Transform2D<f32, Src, Dest> {
+    fn as_float_transform(&self) -> Transform2D<f32, Src, Dest> {
         let params = self.to_array();
         Transform2D::<f32, Src, Dest>::new(
             params[0] as f32,
@@ -175,7 +175,7 @@ impl<Src, Dest> TransformExt<f32, Src, Dest> for Transform2D<f32, Src, Dest> {
         self.transform_point(src_point)
     }
 
-    fn into_float_transform(&self) -> Transform2D<f32, Src, Dest> {
+    fn as_float_transform(&self) -> Transform2D<f32, Src, Dest> {
         *self
     }
 }

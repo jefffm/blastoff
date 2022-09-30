@@ -1,5 +1,5 @@
 use ggez::event::EventHandler;
-use ggez::graphics::{BlendMode, Color};
+use ggez::graphics::BlendMode;
 use ggez::{graphics, timer, Context, GameError};
 
 use crate::color::{RGBA8Ext, EMPTY};

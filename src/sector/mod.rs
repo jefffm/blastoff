@@ -1,15 +1,6 @@
 mod tile;
 pub use tile::*;
 
-mod generator;
-pub use generator::*;
-
-mod loader;
-pub use loader::*;
-
-mod spawner;
-pub use spawner::*;
-
 use euclid::{Point2D, Rect, Size2D};
 use fixedbitset::FixedBitSet;
 use hecs::Entity;

@@ -16,8 +16,8 @@ pub use sector::*;
 mod menu;
 pub use menu::*;
 
-mod initialization;
-pub use initialization::*;
+mod loader;
+pub use loader::*;
 
 mod main_state;
 pub use main_state::*;

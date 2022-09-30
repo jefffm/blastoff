@@ -9,18 +9,15 @@ use crate::camera;
 use crate::component::Cardinal;
 use crate::game::consts::{SCREEN_HEIGHT_PIXELS, TILE_SIZE, UPDATE_INTERVAL_SECS};
 use crate::input::Controls;
-use crate::map::Map;
 use crate::resource::{Resources, Viewport};
+use crate::sector::Map;
 use crate::util::{
-    PixelPoint, PointExt, Scene, SceneSwitch, ScreenFloatPoint, VectorExt, ViewportFloatPoint,
+    PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, VectorExt, ViewportFloatPoint,
     ViewportFloatToScreen,
 };
 use crate::{
     game::consts::SCREEN_RECT,
-    util::{
-        ScreenPoint, TransformExt, ViewportPoint, ViewportRect, ViewportSize, ViewportToScreen,
-        WorldToViewport,
-    },
+    util::{TransformExt, ViewportPoint, ViewportRect, ViewportSize, WorldToViewport},
 };
 
 const MAP_SHOW_TIME: f32 = 2.0; // seconds

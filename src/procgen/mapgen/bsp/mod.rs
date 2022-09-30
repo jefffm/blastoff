@@ -2,13 +2,12 @@ use bracket_random::prelude::RandomNumberGenerator;
 
 use crate::camera::Glyph;
 use crate::color::{Palette, COMMON, FIRE, PLANT, WATER};
-use crate::component::*;
-use crate::map::{FloorKind, WallKind};
-use crate::util::{ANIMAL1, ANIMAL2, ANIMAL3, PLAYER};
-use crate::{
-    map::{Map, Spawner, Tile},
-    util::{WorldPoint, WorldRect, WorldSize, WorldVector},
+use crate::procgen::Spawner;
+use crate::sector::{FloorKind, Map, Tile, WallKind};
+use crate::util::{
+    WorldPoint, WorldRect, WorldSize, WorldVector, ANIMAL1, ANIMAL2, ANIMAL3, PLAYER,
 };
+use crate::{component::*, sector};
 
 use super::MapGenerator;
 
@@ -153,7 +152,7 @@ impl MapGenerator for Bsp {
         &mut self,
         size: WorldSize,
         rng: &mut RandomNumberGenerator,
-        mapgen_history: &mut Vec<crate::map::Map>,
+        mapgen_history: &mut Vec<sector::Map>,
     ) -> Map {
         let mut map = Map::init(
             "bsp".into(),

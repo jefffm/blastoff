@@ -2,8 +2,8 @@ use ggez::Context;
 use hecs::World;
 
 use crate::component::{BlocksTile, Door, Position};
-use crate::map::Map;
 use crate::resource::Resources;
+use crate::sector::Map;
 
 pub fn map_indexing_system(
     world: &mut World,

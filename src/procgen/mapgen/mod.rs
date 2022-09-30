@@ -9,7 +9,7 @@ pub use combo::*;
 
 use bracket_random::prelude::RandomNumberGenerator;
 
-use crate::{map::Map, util::WorldSize};
+use crate::{sector::Map, util::WorldSize};
 
 pub trait MapGenerator {
     fn generate(

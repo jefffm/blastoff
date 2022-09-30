@@ -41,9 +41,9 @@ mod tests {
     use hecs::World;
 
     use crate::{
-        map::{FloorKind, Map, Tile},
         overworld::PlanetInfo,
         scene::Sector,
+        sector::{FloorKind, Map, Tile},
         util::{OverworldPoint, WorldSize},
     };
 
@@ -56,7 +56,7 @@ mod tests {
             Tile::Floor(FloorKind::FloorDefault),
         );
         let mut overworld_map = HashMap::new();
-        overworld_map.insert(OverworldPoint::new(0, 0), (map, World::new()));
+        overworld_map.insert(OverworldPoint::new(0, 0), Sector::new(map, World::new()));
 
         let planet = Overworld::new(PlanetInfo::new("yeaaaarg".to_owned()), overworld_map);
 

@@ -7,8 +7,8 @@ use crate::color::RGBA8Ext;
 use crate::component::{Position, Renderable};
 use crate::game::consts::{get_screen_to_pixel_transform_float, USE_SPRITES};
 use crate::game::draw_ui;
-use crate::map::{Map, Tile, VisibilityKind};
 use crate::resource::Resources;
+use crate::sector::{Map, Tile, VisibilityKind};
 use crate::util::{
     PixelPoint, TransformExt, ViewportFloatToScreen, ViewportToScreen, WorldFloatPoint, WorldPoint,
     PLAYER,
@@ -27,7 +27,7 @@ pub struct Screen {
 impl Screen {
     pub fn new(transform: ViewportToScreen) -> Self {
         Self {
-            transform_float: transform.into_float_transform(),
+            transform_float: transform.as_float_transform(),
         }
     }
 

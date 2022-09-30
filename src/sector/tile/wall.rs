@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{color::COMMON, component::Cardinal, map::Map, util::WorldPoint};
+use crate::{color::COMMON, component::Cardinal, sector::Map, util::WorldPoint};
 
 use super::Tile;
 

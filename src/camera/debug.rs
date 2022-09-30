@@ -2,8 +2,8 @@ use ggez::graphics::Canvas;
 
 use crate::{
     game::consts::get_screen_to_pixel_transform_float,
-    map::{Map, VisibilityKind},
     resource::{Resources, Viewport},
+    sector::{Map, VisibilityKind},
     util::{PixelPoint, ViewportFloatToScreen, WorldFloatPoint},
 };
 

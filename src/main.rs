@@ -16,10 +16,11 @@ pub mod data;
 pub mod galaxy;
 pub mod game;
 pub mod input;
-pub mod map;
 pub mod overworld;
+pub mod procgen;
 pub mod resource;
 pub mod scene;
+pub mod sector;
 pub mod system;
 pub mod util;
 

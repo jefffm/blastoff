@@ -16,7 +16,7 @@ impl Viewport {
         Self {
             rect_float: rect.to_f32(),
             transform,
-            transform_float: transform.into_float_transform(),
+            transform_float: transform.as_float_transform(),
         }
     }
 

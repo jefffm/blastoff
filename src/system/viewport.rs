@@ -3,8 +3,8 @@ use hecs::World;
 
 use crate::{
     component::{Camera, Player, Position},
-    map::Map,
     resource::Resources,
+    sector::Map,
     util::WorldPoint,
 };
 

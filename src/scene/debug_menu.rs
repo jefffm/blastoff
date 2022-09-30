@@ -3,7 +3,7 @@ use ggez::input::keyboard::KeyCode;
 use hecs::World;
 use std::fmt;
 
-use crate::map::Map;
+use crate::sector::Map;
 use crate::{
     color::{RGBA8Ext, COMMON},
     game::consts::{PIXEL_RECT, SCREEN_RECT},
@@ -12,7 +12,7 @@ use crate::{
     util::{PixelPoint, Scene, SceneSwitch},
 };
 
-use super::{Initialization, MapGeneration, MenuResult};
+use super::{LoadingScreen, MapGeneration, MenuResult, NeedsSector};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum DebugMenuSelection {
@@ -112,11 +112,14 @@ impl Scene<Resources, Controls> for DebugMenu {
             MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
             MenuResult::Selected { selected } => {
                 let result = match selected {
-                    DebugMenuSelection::MapGeneration => SceneSwitch::Push(Box::new(
-                        Initialization::new(|world: World, _map: Map, history: Vec<Map>| {
-                            SceneSwitch::Replace(Box::new(MapGeneration::new(world, history)))
-                        }),
-                    )),
+                    DebugMenuSelection::MapGeneration => {
+                        SceneSwitch::Push(Box::new(LoadingScreen::new(
+                            |world: World, _map: Map, history: Vec<Map>| {
+                                SceneSwitch::Replace(Box::new(MapGeneration::new(world, history)))
+                            },
+                            NeedsSector {},
+                        )))
+                    }
                     DebugMenuSelection::Quit => {
                         ::std::process::exit(0);
                     }

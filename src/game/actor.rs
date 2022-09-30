@@ -4,9 +4,9 @@ use crate::{
     component::{Actor, ActorKind, Cardinal, Player, Position, Renderable, Viewshed},
     game::Action,
     input,
-    map::Map,
     resource::Resources,
     scene::GameState,
+    sector::Map,
     util::{WorldPoint, WorldVector},
 };
 

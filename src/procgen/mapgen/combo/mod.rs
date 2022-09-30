@@ -4,7 +4,8 @@ use crate::{
     camera::Glyph,
     color::{Palette, COMMON},
     component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed},
-    map::{Map, Spawner, Tile},
+    procgen::Spawner,
+    sector::{self, Map, Tile},
     util::{TransformExt, WorldPoint, WorldSize, WorldSpace, PLAYER},
 };
 
@@ -69,7 +70,7 @@ impl MapGenerator for Combo {
         size: WorldSize,
         // TODO: add default_tile argument
         rng: &mut bracket_random::prelude::RandomNumberGenerator,
-        mapgen_history: &mut Vec<crate::map::Map>,
+        mapgen_history: &mut Vec<sector::Map>,
     ) -> Map {
         let mut map = Map::init(String::from("meta map"), size, self.template.default_tile);
 

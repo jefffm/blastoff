@@ -10,11 +10,12 @@ use crate::{
     util::{GalaxyPoint, Scene},
 };
 
-pub struct GalaxyTravel {
+pub struct GalaxyTravel<G: GalaxyState> {
     galaxy: Galaxy,
+    state: G,
 }
 
-impl Default for GalaxyTravel {
+impl Default for GalaxyTravel<Complete> {
     fn default() -> Self {
         // TODO: Implemnet Overworld::init_from(PlanetInfo)
         let planet = Overworld::new(PlanetInfo::new("yeaaaarg".to_owned()), HashMap::new());
@@ -27,18 +28,21 @@ impl Default for GalaxyTravel {
         // Starting location before selecting a system is just out in space somewhere
         let galaxy = Galaxy::new(GalaxyInfo::new("test system".to_owned()), galaxy_map);
 
-        Self { galaxy }
+        Self {
+            galaxy,
+            state: Complete {},
+        }
     }
 }
 
-impl GalaxyTravel {
-    pub fn new(galaxy: Galaxy) -> Self {
+impl<G: GalaxyState> GalaxyTravel<G> {
+    pub fn new(galaxy: Galaxy, state: G) -> Self {
         // TODO: initialize GalaxyTravel with a handful of star systems + planets to choose from
-        Self { galaxy }
+        Self { galaxy, state }
     }
 }
 
-impl Scene<Resources, Controls> for GalaxyTravel {
+impl<G: GalaxyState> Scene<Resources, Controls> for GalaxyTravel<G> {
     fn input(&mut self, resources: &mut Resources, controls: &mut Controls, started: bool) {
         // TODO: left and right cycle through planets
         todo!()
@@ -61,3 +65,9 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         todo!()
     }
 }
+
+pub struct NeedsPlanets {}
+pub struct Complete {}
+pub trait GalaxyState {}
+impl GalaxyState for NeedsPlanets {}
+impl GalaxyState for Complete {}

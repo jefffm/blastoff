@@ -10,7 +10,7 @@ use crate::{
     util::{PixelPoint, Scene, SceneSwitch},
 };
 
-use super::{Initialization, MenuResult};
+use super::{LoadingScreen, MenuResult, NeedsSector};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MainMenuSelection {
@@ -123,7 +123,7 @@ impl Scene<Resources, Controls> for MainMenu {
             MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
             MenuResult::Selected { selected } => match selected {
                 MainMenuSelection::NewGame => {
-                    SceneSwitch::Push(Box::new(Initialization::default()))
+                    SceneSwitch::Push(Box::new(LoadingScreen::<NeedsSector>::default()))
                 }
                 MainMenuSelection::Continue => SceneSwitch::None, // TODO: implement save/load/continue
                 MainMenuSelection::Quit => {

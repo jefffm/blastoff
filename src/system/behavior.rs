@@ -5,8 +5,8 @@ use crate::{
     component::{
         Actor, Behavior, BehaviorKind, DerivedBehavior, InitialBehavior, Player, Position, Viewshed,
     },
-    map::Map,
     resource::Resources,
+    sector::Map,
 };
 
 /// Check Behavior for all entities and resolve any behaviors that can change

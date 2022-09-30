@@ -11,8 +11,8 @@ use crate::component::{Actor, ActorKind, Player};
 use crate::game::consts::VIEWPORT_SCREEN_POINT;
 use crate::game::{process_actors, TurnsHistory};
 use crate::input::{Controls, PlayerAction, PlayerInput, UiAction};
-use crate::map::Map;
 use crate::resource::Resources;
+use crate::sector::Map;
 
 use crate::input;
 use crate::system::{build_systems, Scheduler};

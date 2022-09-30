@@ -3,7 +3,7 @@ use std::num::NonZeroU32;
 use coord_2d::Size;
 use wfc::orientation::Orientation;
 
-use crate::map::Tile;
+use crate::sector::Tile;
 
 use super::TilePattern;
 

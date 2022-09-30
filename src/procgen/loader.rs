@@ -1,13 +1,13 @@
 use bracket_random::prelude::RandomNumberGenerator;
 use hecs::World;
 
+use crate::sector::Map;
 use crate::util::WorldSize;
 
-use super::Map;
 use super::MapGenerator;
 use super::Spawner;
 
-pub struct Loader<'a, T>
+pub struct SectorProcgenLoader<'a, T>
 where
     T: MapGenerator + Spawner,
 {
@@ -16,7 +16,7 @@ where
     mapgen_history: &'a mut Vec<Map>,
 }
 
-impl<'a, T> Loader<'a, T>
+impl<'a, T> SectorProcgenLoader<'a, T>
 where
     T: MapGenerator + Spawner,
 {

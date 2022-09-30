@@ -5,8 +5,8 @@ use symmetric_shadowcasting::compute_fov;
 
 use crate::{
     component::{Player, Position, Viewshed},
-    map::Map,
     resource::Resources,
+    sector::Map,
     util::{WorldFloatPoint, WorldPoint},
 };
 
@@ -15,7 +15,7 @@ pub fn visibility_system(
     world: &mut World,
     _resources: &mut Resources,
     map: &mut Map,
-    ctx: &Context,
+    _ctx: &Context,
 ) {
     let mut updated_ents = HashSet::<Entity>::new();
 

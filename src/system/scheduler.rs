@@ -1,7 +1,7 @@
 use ggez::Context;
 use hecs::{Entity, World};
 
-use crate::{map::Map, resource::Resources};
+use crate::{resource::Resources, sector::Map};
 
 pub type SystemFn = fn(&mut World, &mut Resources, &mut Map, &Context);
 

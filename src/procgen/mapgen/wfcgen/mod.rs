@@ -20,7 +20,8 @@ use coord_2d::{Coord, Size};
 use crate::camera::Glyph;
 use crate::color::{Palette, COMMON};
 use crate::component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed};
-use crate::map::{Map, Spawner, Tile};
+use crate::procgen::Spawner;
+use crate::sector::{Map, Tile};
 use crate::util::{WorldSize, PLAYER};
 
 use super::MapGenerator;
