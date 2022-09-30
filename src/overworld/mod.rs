@@ -7,9 +7,10 @@ use hecs::World;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    procgen::{MapGenerator, SectorProcgenLoader, Spawner},
     scene::Sector,
     sector,
-    util::{OverworldPoint, OverworldSize},
+    util::{OverworldPoint, OverworldSize, WorldSize},
 };
 
 // TODO: World needs to be serializeable in order to implement save/load
@@ -54,6 +55,21 @@ impl Overworld {
 
     fn set_sector(&mut self, point: &OverworldPoint, sector: SectorData) {
         self.sectors.insert(*point, sector);
+    }
+
+    fn create_sector<'a, T: MapGenerator + Spawner>(
+        &mut self,
+        point: &OverworldPoint,
+        loader: &mut SectorProcgenLoader<'a, T>,
+    ) -> &SectorData {
+        let mut world = hecs::World::new();
+
+        const SECTOR_WIDTH: i32 = 100;
+        const SECTOR_HEIGHT: i32 = 100;
+        let map = loader.load(WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT), &mut world);
+
+        self.set_sector(point, (map, world));
+        self.get_sector(point).unwrap()
     }
 }
 
