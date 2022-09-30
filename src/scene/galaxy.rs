@@ -5,9 +5,8 @@ use std::collections::HashMap;
 use crate::{
     galaxy::{Galaxy, GalaxyInfo},
     input::Controls,
-    overworld::{Overworld, PlanetInfo},
     resource::Resources,
-    util::{GalaxyPoint, Scene},
+    util::Scene,
 };
 
 pub struct GalaxyTravel<G: GalaxyState> {
@@ -17,16 +16,10 @@ pub struct GalaxyTravel<G: GalaxyState> {
 
 impl Default for GalaxyTravel<Complete> {
     fn default() -> Self {
-        // TODO: Implemnet Overworld::init_from(PlanetInfo)
-        let planet = Overworld::new(PlanetInfo::new("yeaaaarg".to_owned()), HashMap::new());
-
-        let mut galaxy_map = HashMap::new();
-        galaxy_map.insert(GalaxyPoint::new(0, 0), planet);
-
         // TODO: Galaxy should take a list of Star Systems/planets as a vec and randomy scatter them across the sky in 2d
         // Or, should 2d represent distance between each planet...? Render planets in a top-down grid like everything else for simplicity
         // Starting location before selecting a system is just out in space somewhere
-        let galaxy = Galaxy::new(GalaxyInfo::new("test system".to_owned()), galaxy_map);
+        let galaxy = Galaxy::new(GalaxyInfo::new("test system".to_owned()), HashMap::new());
 
         Self {
             galaxy,

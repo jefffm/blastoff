@@ -1,49 +1,70 @@
+mod tile;
+pub use tile::*;
+
 use std::collections::HashMap;
 
+use hecs::World;
 use serde::{Deserialize, Serialize};
 
-use crate::{scene::Sector, util::OverworldPoint};
+use crate::{
+    scene::Sector,
+    sector,
+    util::{OverworldPoint, OverworldSize},
+};
 
 // TODO: World needs to be serializeable in order to implement save/load
-type OverworldMap = HashMap<OverworldPoint, Sector>;
+pub type SectorData = (sector::Map, World);
+pub type OverworldSectors = HashMap<OverworldPoint, SectorData>;
+pub type OverworldMap = HashMap<OverworldPoint, OverworldTile>;
 
 // #[derive(Serialize, Deserialize)]
 pub struct Overworld {
     info: PlanetInfo,
     map: OverworldMap,
+    sectors: OverworldSectors,
 }
 
 impl Overworld {
-    // TODO: procgen a world map using PlanetInfo and anything else we might need (rng, spawn tables, other resource data)
-    pub fn init_from(info: PlanetInfo) -> Self {
-        let map = OverworldMap::new();
-        Self { info, map }
+    pub fn from_size(info: PlanetInfo, default_tile: OverworldTile) -> Self {
+        let mut map = HashMap::with_capacity(info.size.area() as usize);
+        let mut sectors = HashMap::with_capacity(info.size.area() as usize);
+
+        Self::new(info, map, sectors)
     }
 
-    pub fn new(info: PlanetInfo, map: OverworldMap) -> Self {
-        Self { info, map }
+    pub fn new(info: PlanetInfo, map: OverworldMap, sectors: OverworldSectors) -> Self {
+        Self { info, map, sectors }
     }
 
     pub fn info(&self) -> &PlanetInfo {
         &self.info
     }
 
-    fn get_scene(&self, point: &OverworldPoint) -> Option<&Sector> {
-        self.map.get(point)
+    fn get_tile(&self, point: &OverworldPoint) -> &OverworldTile {
+        self.map.get(point).unwrap()
     }
 
-    fn set_scene(&mut self, point: &OverworldPoint, sector: Sector) {
-        self.map.insert(*point, sector);
+    fn set_tile(&mut self, point: OverworldPoint, tile: OverworldTile) {
+        self.map.insert(point, tile);
+    }
+
+    fn get_sector(&self, point: &OverworldPoint) -> Option<&SectorData> {
+        self.sectors.get(point)
+    }
+
+    fn set_sector(&mut self, point: &OverworldPoint, sector: SectorData) {
+        self.sectors.insert(*point, sector);
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlanetInfo {
     name: String,
+    size: OverworldSize,
 }
 
 impl PlanetInfo {
-    pub fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(name: String, size: OverworldSize) -> Self {
+        Self { name, size }
     }
 }
