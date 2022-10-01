@@ -4,7 +4,7 @@ use crate::{
     input::Controls,
     overworld::Overworld,
     resource::Resources,
-    util::{Scene, SceneSwitch},
+    util::{PixelPoint, Scene, SceneSwitch},
 };
 
 use super::CutsceneNewPlanet;
@@ -44,7 +44,7 @@ impl Scene<Resources, Controls> for OverworldMap {
                 self.state = OverworldMapState::Ready;
                 SceneSwitch::Push(Box::new(CutsceneNewPlanet::new(self.planet.clone())))
             }
-            OverworldMapState::Ready => todo!(),
+            OverworldMapState::Ready => SceneSwitch::None,
         }
     }
 
@@ -54,6 +54,15 @@ impl Scene<Resources, Controls> for OverworldMap {
         ctx: &mut ggez::Context,
         canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
+        resources
+            .font
+            .push_text(&format!("{}", self.planet), &PixelPoint::new(0, 0), None);
+
+        for (pos, tile) in self.planet.iter_tiles() {
+            // translate point to viewport
+            // draw it
+        }
+
         Ok(())
     }
 }

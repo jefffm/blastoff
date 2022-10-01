@@ -111,6 +111,10 @@ impl Overworld {
         // TODO: match on planet info for elemental types to determine color
         FIRE.four
     }
+
+    pub fn iter_tiles(&self) -> impl Iterator<Item = (&OverworldPoint, &OverworldTile)> {
+        self.map.iter()
+    }
 }
 
 impl fmt::Display for Overworld {
