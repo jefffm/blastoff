@@ -69,30 +69,30 @@ impl Scene<Resources, Controls> for GameOver {
         let selection = self.state.selection();
         let entries = selection.entries();
         self.state = match controls.read() {
-            None => MenuResult::NoSelection {
-                selected: *selection,
+            None => MenuResult::Unconfirmed {
+                selection: *selection,
             },
             Some(key) => match key {
-                KeyCode::Escape => MenuResult::NoSelection {
-                    selected: GameOverSelection::Quit,
+                KeyCode::Escape => MenuResult::Unconfirmed {
+                    selection: GameOverSelection::Quit,
                 },
                 KeyCode::Up => {
                     let idx = entries.iter().position(|&x| x == *selection).unwrap();
-                    MenuResult::NoSelection {
-                        selected: entries[(idx + entries.len() - 1) % entries.len()],
+                    MenuResult::Unconfirmed {
+                        selection: entries[(idx + entries.len() - 1) % entries.len()],
                     }
                 }
                 KeyCode::Down => {
                     let idx = entries.iter().position(|&x| x == *selection).unwrap();
-                    MenuResult::NoSelection {
-                        selected: entries[(idx + 1) % entries.len()],
+                    MenuResult::Unconfirmed {
+                        selection: entries[(idx + 1) % entries.len()],
                     }
                 }
-                KeyCode::Return => MenuResult::Selected {
-                    selected: *selection,
+                KeyCode::Return => MenuResult::Confirmed {
+                    selection: *selection,
                 },
-                _ => MenuResult::NoSelection {
-                    selected: *selection,
+                _ => MenuResult::Unconfirmed {
+                    selection: *selection,
                 },
             },
         }
@@ -104,8 +104,10 @@ impl Scene<Resources, Controls> for GameOver {
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
-            MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
-            MenuResult::Selected { selected } => match selected {
+            MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
+            MenuResult::Confirmed {
+                selection: selected,
+            } => match selected {
                 GameOverSelection::MainMenu => SceneSwitch::Reinit(Box::new(MainMenu::default())),
                 GameOverSelection::Quit => {
                     ::std::process::exit(0);

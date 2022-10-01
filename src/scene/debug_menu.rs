@@ -74,30 +74,30 @@ impl Scene<Resources, Controls> for DebugMenu {
         let entries = selection.entries();
 
         self.state = match controls.read() {
-            None => MenuResult::NoSelection {
-                selected: *selection,
+            None => MenuResult::Unconfirmed {
+                selection: *selection,
             },
             Some(key) => match key {
-                KeyCode::Escape => MenuResult::NoSelection {
-                    selected: DebugMenuSelection::Quit,
+                KeyCode::Escape => MenuResult::Unconfirmed {
+                    selection: DebugMenuSelection::Quit,
                 },
                 KeyCode::Up => {
                     let idx = entries.iter().position(|&x| x == *selection).expect("sel");
-                    MenuResult::NoSelection {
-                        selected: entries[(idx + entries.len() - 1) % entries.len()],
+                    MenuResult::Unconfirmed {
+                        selection: entries[(idx + entries.len() - 1) % entries.len()],
                     }
                 }
                 KeyCode::Down => {
                     let idx = entries.iter().position(|&x| x == *selection).expect("sel");
-                    MenuResult::NoSelection {
-                        selected: entries[(idx + 1) % entries.len()],
+                    MenuResult::Unconfirmed {
+                        selection: entries[(idx + 1) % entries.len()],
                     }
                 }
-                KeyCode::Return => MenuResult::Selected {
-                    selected: *selection,
+                KeyCode::Return => MenuResult::Confirmed {
+                    selection: *selection,
                 },
-                _ => MenuResult::NoSelection {
-                    selected: *selection,
+                _ => MenuResult::Unconfirmed {
+                    selection: *selection,
                 },
             },
         };
@@ -109,8 +109,10 @@ impl Scene<Resources, Controls> for DebugMenu {
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
-            MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
-            MenuResult::Selected { selected } => {
+            MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
+            MenuResult::Confirmed {
+                selection: selected,
+            } => {
                 let result = match selected {
                     DebugMenuSelection::MapGeneration => {
                         SceneSwitch::Push(Box::new(LoadingScreen::new(
@@ -126,7 +128,9 @@ impl Scene<Resources, Controls> for DebugMenu {
                 };
 
                 // Reset the selection so that we can pop back to this menu
-                self.state = MenuResult::NoSelection { selected };
+                self.state = MenuResult::Unconfirmed {
+                    selection: selected,
+                };
 
                 result
             }

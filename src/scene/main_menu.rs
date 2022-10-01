@@ -79,20 +79,20 @@ impl Scene<Resources, Controls> for MainMenu {
         let entries = selection.entries(can_continue);
 
         self.state = match controls.read() {
-            None => MenuResult::NoSelection {
-                selected: *selection,
+            None => MenuResult::Unconfirmed {
+                selection: *selection,
             },
             Some(key) => match key {
-                KeyCode::Escape => MenuResult::NoSelection {
-                    selected: MainMenuSelection::Quit,
+                KeyCode::Escape => MenuResult::Unconfirmed {
+                    selection: MainMenuSelection::Quit,
                 },
                 KeyCode::Up => {
                     let idx = entries
                         .iter()
                         .position(|&x| x == *selection)
                         .expect("MainMenuSelection");
-                    MenuResult::NoSelection {
-                        selected: entries[(idx + entries.len() - 1) % entries.len()],
+                    MenuResult::Unconfirmed {
+                        selection: entries[(idx + entries.len() - 1) % entries.len()],
                     }
                 }
                 KeyCode::Down => {
@@ -100,15 +100,15 @@ impl Scene<Resources, Controls> for MainMenu {
                         .iter()
                         .position(|&x| x == *selection)
                         .expect("MainMenuSelection");
-                    MenuResult::NoSelection {
-                        selected: entries[(idx + 1) % entries.len()],
+                    MenuResult::Unconfirmed {
+                        selection: entries[(idx + 1) % entries.len()],
                     }
                 }
-                KeyCode::Return => MenuResult::Selected {
-                    selected: *selection,
+                KeyCode::Return => MenuResult::Confirmed {
+                    selection: *selection,
                 },
-                _ => MenuResult::NoSelection {
-                    selected: *selection,
+                _ => MenuResult::Unconfirmed {
+                    selection: *selection,
                 },
             },
         };
@@ -117,13 +117,15 @@ impl Scene<Resources, Controls> for MainMenu {
     fn update(
         &mut self,
         resources: &mut Resources,
-        _ctx: &mut ggez::Context,
+        ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
-            MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
-            MenuResult::Selected { selected } => match selected {
+            MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
+            MenuResult::Confirmed {
+                selection: selected,
+            } => match selected {
                 MainMenuSelection::NewGame => {
-                    SceneSwitch::Push(Box::new(GalaxyTravel::create(resources)))
+                    SceneSwitch::Push(Box::new(GalaxyTravel::create(ctx, resources)))
                 }
                 MainMenuSelection::Continue => SceneSwitch::None, // TODO: implement save/load/continue
                 MainMenuSelection::Quit => {

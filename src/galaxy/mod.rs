@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -7,40 +5,42 @@ use crate::{
     util::{GalaxyPoint, GalaxySize},
 };
 
-type GalaxyMap = HashMap<GalaxyPoint, Overworld>;
+type PlanetsVec = Vec<(GalaxyPoint, Overworld)>;
 
 /// A galaxy contains coordinates pointing to each star system
 // #[derive(Serialize, Deserialize)]
 pub struct Galaxy {
     info: GalaxyInfo,
-    map: GalaxyMap,
+    planets: PlanetsVec,
 }
 
+/// Galaxy contains a list of different planets
+///
+/// The planets aren't indexed, so searching for a planet is linear/not-constant
+/// time. We're talking probably 10 or so planets, so it's fine. Just use
+/// [`Self::iter_content`] to search.
 impl Galaxy {
     pub fn from_size(info: GalaxyInfo) -> Self {
-        let map = HashMap::with_capacity(info.size.area() as usize);
+        let planets = Vec::new();
 
-        Self::new(info, map)
+        Self::new(info, planets)
     }
 
-    pub fn with_planets(mut self, planets: Vec<(GalaxyPoint, Overworld)>) -> Self {
-        for (point, planet) in planets.into_iter() {
-            self.map.insert(point, planet);
-        }
-
+    pub fn with_planets(mut self, planets: PlanetsVec) -> Self {
+        self.planets.extend(planets);
         self
     }
 
-    pub fn new(info: GalaxyInfo, map: GalaxyMap) -> Self {
-        Self { info, map }
+    pub fn new(info: GalaxyInfo, planets: PlanetsVec) -> Self {
+        Self { info, planets }
     }
 
     pub fn info(&self) -> &GalaxyInfo {
         &self.info
     }
 
-    pub fn iter_content(&self) -> impl Iterator<Item = (&GalaxyPoint, &Overworld)> {
-        self.map.iter()
+    pub fn iter_content(&self) -> impl Iterator<Item = &(GalaxyPoint, Overworld)> {
+        self.planets.iter()
     }
 }
 
