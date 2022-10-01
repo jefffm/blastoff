@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use bracket_random::prelude::RandomNumberGenerator;
 
 use crate::{
@@ -44,13 +46,12 @@ impl GalaxyGenerator for StaticGalaxy {
                 let y = rng.roll_dice(1, info.height() - 1);
 
                 // TODO: make it so that galaxy generation doesn't accidentally overwrite collisions
-                (GalaxyPoint::new(x, y), planet)
+                (GalaxyPoint::new(x, y), Rc::new(planet))
             })
             .collect();
 
         planets.dedup_by_key(|(point, _)| *point);
 
-        // TODO: Distribute planets across the 2d space
         Galaxy::from_size(info).with_planets(planets)
     }
 }

@@ -16,7 +16,7 @@ use crate::{
     util::{GalaxyPoint, PixelPoint, PointExt, Scene, SceneSwitch},
 };
 
-use super::MenuResult;
+use super::{MenuResult, OverworldMap};
 
 /// The GalaxyTravel Scene allows players to select a planet for landing
 pub struct GalaxyTravel {
@@ -123,9 +123,18 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         resources: &mut Resources,
         ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
-        // TODO: read input and determine where to put the selection rectangle
+        // TODO: On planet selection, transition to Overworld (potentially with a cutscene first?)
 
-        SceneSwitch::None
+        match self.state {
+            MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
+            MenuResult::Confirmed {
+                selection: galaxy_point,
+            } => SceneSwitch::Push(Box::new(OverworldMap::new(
+                self.galaxy
+                    .find(&galaxy_point)
+                    .expect("point to selected galaxy exists"),
+            ))),
+        }
     }
 
     fn draw(

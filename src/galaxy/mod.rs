@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -5,7 +7,7 @@ use crate::{
     util::{GalaxyPoint, GalaxySize},
 };
 
-type PlanetsVec = Vec<(GalaxyPoint, Overworld)>;
+type PlanetsVec = Vec<(GalaxyPoint, Rc<Overworld>)>;
 
 /// A galaxy contains coordinates pointing to each star system
 // #[derive(Serialize, Deserialize)]
@@ -39,8 +41,15 @@ impl Galaxy {
         &self.info
     }
 
-    pub fn iter_content(&self) -> impl Iterator<Item = &(GalaxyPoint, Overworld)> {
+    pub fn iter_content(&self) -> impl Iterator<Item = &(GalaxyPoint, Rc<Overworld>)> {
         self.planets.iter()
+    }
+
+    pub fn find(&self, point: &GalaxyPoint) -> Option<Rc<Overworld>> {
+        self.planets
+            .iter()
+            .find(|(p, _)| p == point)
+            .map(|(_, overworld)| overworld.clone())
     }
 }
 
