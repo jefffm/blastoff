@@ -29,7 +29,7 @@ impl GalaxyGenerator for StaticGalaxy {
 
         // TODO: GalaxyGenerator should decide how to generate a templated number of different types of Planets
         let mut overworld_generator = StaticPlanet {};
-        let planets: Vec<_> = (0..num_planets)
+        let mut planets: Vec<_> = (0..num_planets)
             // First, create all the OverworldInfos
             .map(|_| StaticPlanet::generate_overworld_info(&info, rng))
             .collect::<Vec<_>>()
@@ -47,6 +47,8 @@ impl GalaxyGenerator for StaticGalaxy {
                 (GalaxyPoint::new(x, y), planet)
             })
             .collect();
+
+        planets.dedup_by_key(|(point, _)| *point);
 
         // TODO: Distribute planets across the 2d space
         Galaxy::from_size(info).with_planets(planets)
