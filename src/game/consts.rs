@@ -59,6 +59,11 @@ pub const USE_SPRITES: bool = true;
 
 pub const MOVEMENT_ANIMATION_DURATION: f32 = 1. / 5.;
 
+pub const SECTOR_WIDTH: i32 = 100;
+pub const SECTOR_HEIGHT: i32 = 100;
+
+pub const MAX_PLANET_SPRITE_SIZE: f32 = 64.;
+
 #[cfg(test)]
 pub mod tests {
     use super::*;

@@ -28,5 +28,5 @@ pub use debug_menu::*;
 mod planet;
 pub use planet::*;
 
-mod galaxy;
-pub use galaxy::*;
+mod galaxy_travel;
+pub use galaxy_travel::*;

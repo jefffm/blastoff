@@ -125,28 +125,36 @@ impl SpriteSheet {
         }
     }
 
-    fn sprite(&self, sprite: SpritePoint, point: PixelPoint) -> graphics::DrawParam {
+    fn sprite(
+        &self,
+        sprite: SpritePoint,
+        point: PixelPoint,
+        param: Option<graphics::DrawParam>,
+    ) -> graphics::DrawParam {
         assert!(self.sprite_grid.contains(sprite));
 
         let sprite_rect = self.sprite_grid[&sprite];
-        graphics::DrawParam::new()
+
+        param
+            .unwrap_or_else(graphics::DrawParam::new)
             .src(sprite_rect)
             .dest([point.x as f32, point.y as f32])
     }
 
     pub fn draw_sprite(&self, canvas: &mut Canvas, sprite: Sprite, point: PixelPoint) {
-        let draw_param = self.sprite(sprite.idx, point);
+        let draw_param = self.sprite(sprite.idx, point, sprite.param);
         canvas.draw(&self.batch.image(), draw_param);
     }
 
     pub fn draw_sprite_overwrite(&self, canvas: &mut Canvas, sprite: Sprite, point: PixelPoint) {
-        let draw_param = self.sprite(sprite.idx, point);
+        let draw_param = self.sprite(sprite.idx, point, sprite.param);
         canvas.draw(&self.clear_rect, draw_param);
         canvas.draw(&self.batch.image(), draw_param);
     }
 
     pub fn push_sprite(&mut self, sprite: Sprite, point: PixelPoint) -> &impl graphics::Drawable {
-        self.batch.set(vec![self.sprite(sprite.idx, point)]);
+        self.batch
+            .push(self.sprite(sprite.idx, point, sprite.param));
 
         &self.batch
     }
@@ -169,16 +177,23 @@ impl Drawable for SpriteSheet {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sprite {
     idx: SpritePoint,
+    param: Option<DrawParam>,
 }
 
 impl Sprite {
-    pub const fn new(idx: SpritePoint) -> Self {
-        Self { idx }
+    pub const fn new(idx: SpritePoint, param: Option<DrawParam>) -> Self {
+        Self { idx, param }
+    }
+
+    pub fn with_params(mut self, param: DrawParam) -> Self {
+        self.param = Some(param);
+        self
     }
 }
 
-pub const PLAYER: Sprite = Sprite::new(SpritePoint::new(28, 9));
-pub const ANIMAL1: Sprite = Sprite::new(SpritePoint::new(29, 7));
-pub const ANIMAL2: Sprite = Sprite::new(SpritePoint::new(30, 7));
-pub const ANIMAL3: Sprite = Sprite::new(SpritePoint::new(31, 7));
-pub const ANIMAL4: Sprite = Sprite::new(SpritePoint::new(32, 7));
+pub const PLAYER: Sprite = Sprite::new(SpritePoint::new(28, 9), None);
+pub const ANIMAL1: Sprite = Sprite::new(SpritePoint::new(29, 7), None);
+pub const ANIMAL2: Sprite = Sprite::new(SpritePoint::new(30, 7), None);
+pub const ANIMAL3: Sprite = Sprite::new(SpritePoint::new(31, 7), None);
+pub const ANIMAL4: Sprite = Sprite::new(SpritePoint::new(32, 7), None);
+pub const PLANET: Sprite = Sprite::new(SpritePoint::new(20, 5), None);

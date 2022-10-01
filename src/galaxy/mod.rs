@@ -2,7 +2,10 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{overworld::Overworld, util::GalaxyPoint};
+use crate::{
+    overworld::Overworld,
+    util::{GalaxyPoint, GalaxySize},
+};
 
 type GalaxyMap = HashMap<GalaxyPoint, Overworld>;
 
@@ -14,6 +17,20 @@ pub struct Galaxy {
 }
 
 impl Galaxy {
+    pub fn from_size(info: GalaxyInfo) -> Self {
+        let map = HashMap::with_capacity(info.size.area() as usize);
+
+        Self::new(info, map)
+    }
+
+    pub fn with_planets(mut self, planets: Vec<(GalaxyPoint, Overworld)>) -> Self {
+        for (point, planet) in planets.into_iter() {
+            self.map.insert(point, planet);
+        }
+
+        self
+    }
+
     pub fn new(info: GalaxyInfo, map: GalaxyMap) -> Self {
         Self { info, map }
     }
@@ -21,15 +38,28 @@ impl Galaxy {
     pub fn info(&self) -> &GalaxyInfo {
         &self.info
     }
+
+    pub fn iter_content(&self) -> impl Iterator<Item = (&GalaxyPoint, &Overworld)> {
+        self.map.iter()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GalaxyInfo {
     name: String,
+    size: GalaxySize,
 }
 
 impl GalaxyInfo {
-    pub fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(name: String, size: GalaxySize) -> Self {
+        Self { name, size }
+    }
+
+    pub fn width(&self) -> i32 {
+        self.size.width
+    }
+
+    pub fn height(&self) -> i32 {
+        self.size.height
     }
 }

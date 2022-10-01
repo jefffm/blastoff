@@ -10,7 +10,7 @@ use crate::{
     util::{PixelPoint, Scene, SceneSwitch},
 };
 
-use super::{LoadingScreen, MenuResult, NeedsSector};
+use super::{GalaxyTravel, MenuResult};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MainMenuSelection {
@@ -116,14 +116,14 @@ impl Scene<Resources, Controls> for MainMenu {
 
     fn update(
         &mut self,
-        _resources: &mut Resources,
+        resources: &mut Resources,
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
             MenuResult::NoSelection { selected: _ } => SceneSwitch::None,
             MenuResult::Selected { selected } => match selected {
                 MainMenuSelection::NewGame => {
-                    SceneSwitch::Push(Box::new(LoadingScreen::<NeedsSector>::default()))
+                    SceneSwitch::Push(Box::new(GalaxyTravel::create(resources)))
                 }
                 MainMenuSelection::Continue => SceneSwitch::None, // TODO: implement save/load/continue
                 MainMenuSelection::Quit => {
