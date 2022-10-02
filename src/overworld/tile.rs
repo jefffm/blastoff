@@ -1,6 +1,11 @@
+use ggez::graphics::DrawParam;
 use rgb::RGBA8;
 
-use crate::color::{COMMON, FIRE, PLANT, WATER};
+use crate::{
+    color::{RGBA8Ext, COMMON, FIRE, PLANT, WATER},
+    resource::Resources,
+    util::PixelPoint,
+};
 
 pub enum OverworldTile {
     City,
@@ -29,5 +34,13 @@ impl OverworldTile {
             OverworldTile::Lava => FIRE.three,
             OverworldTile::Jungle => PLANT.three,
         }
+    }
+
+    pub fn render(&self, resources: &mut Resources, point: &PixelPoint) {
+        resources.font.push_char(
+            self.glyph(),
+            &point,
+            Some(DrawParam::default().color(self.fg().to_ggez_color())),
+        );
     }
 }

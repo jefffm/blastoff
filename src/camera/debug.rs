@@ -4,20 +4,20 @@ use crate::{
     game::consts::get_screen_to_pixel_transform_float,
     resource::{Resources, Viewport},
     sector::{Map, VisibilityKind},
-    util::{PixelPoint, ViewportFloatToScreen, WorldFloatPoint},
+    util::{PixelPoint, ViewportFloatToScreen, WorldFloatPoint, WorldSpace},
 };
 
 // Create default transforms and render the map as absolute coordinates
 pub fn render_debug_map(
     _ctx: &mut ggez::Context,
     canvas: &mut Canvas,
-    viewport: &mut Viewport,
+    viewport: &mut Viewport<WorldSpace>,
     screen_transform: &ViewportFloatToScreen,
     resources: &mut Resources,
     map: &Map,
 ) {
     for viewport_point in viewport.points() {
-        let world_point = viewport.to_world_point(viewport_point);
+        let world_point = viewport.to_game_point(viewport_point);
         if let Some(tile) = map.get(world_point) {
             let pixel_point =
                 worldfloat_to_pixel(resources, world_point.to_f32(), screen_transform);

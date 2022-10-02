@@ -4,11 +4,11 @@ use bracket_random::prelude::RandomNumberGenerator;
 mod viewport;
 pub use viewport::*;
 
-use crate::util::{BitmapFont, SpriteSheet};
+use crate::util::{BitmapFont, SpriteSheet, WorldSpace};
 
 pub struct Resources {
     pub rng: RandomNumberGenerator,
-    pub viewport: Viewport,
+    pub viewport: Viewport<WorldSpace>,
     pub font: BitmapFont,
     pub spritesheet: SpriteSheet,
 }

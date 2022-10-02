@@ -60,7 +60,7 @@ pub type ViewportFloatRect = Rect<f32, ViewportSpace>;
 
 /// World space is relative to game world map coordinates
 /// Our world is integer-based because we have a map tile system
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct WorldSpace;
 
 pub type WorldPoint = Point2D<i32, WorldSpace>;
@@ -77,7 +77,7 @@ pub type WorldToViewport = Transform2D<i32, WorldSpace, ViewportSpace>;
 pub type WorldFloatToViewport = Transform2D<f32, WorldSpace, ViewportSpace>;
 
 /// Overworld space maps to independent map and ecs world instances
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct OverworldSpace;
 
 pub type OverworldPoint = Point2D<i32, OverworldSpace>;
@@ -95,7 +95,7 @@ pub type OverworldToViewport = Transform2D<i32, OverworldSpace, ViewportSpace>;
 pub type OverworldFloatToViewport = Transform2D<f32, OverworldSpace, ViewportSpace>;
 
 /// Overworld space maps to independent map and ecs world instances
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct GalaxySpace;
 
 pub type GalaxyPoint = Point2D<i32, GalaxySpace>;

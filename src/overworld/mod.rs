@@ -16,7 +16,8 @@ use crate::{
     scene::Sector,
     sector,
     util::{
-        OverworldPoint, OverworldSize, PixelPoint, PixelRect, PixelSize, Sprite, WorldSize, PLANET,
+        OverworldPoint, OverworldRect, OverworldSize, PixelPoint, PixelRect, PixelSize, Sprite,
+        WorldSize, PLANET,
     },
 };
 
@@ -29,46 +30,65 @@ pub type OverworldMap = HashMap<OverworldPoint, OverworldTile>;
 pub struct Overworld {
     info: PlanetInfo,
     map: OverworldMap,
+    default_map_tile: OverworldTile,
     sectors: OverworldSectors,
 }
 
 impl Overworld {
-    pub fn from_size(info: PlanetInfo, default_tile: OverworldTile) -> Self {
-        let mut map = HashMap::with_capacity(info.size.area() as usize);
-        let mut sectors = HashMap::with_capacity(info.size.area() as usize);
+    pub fn from_size(info: PlanetInfo, default_map_tile: OverworldTile) -> Self {
+        // Tiles are generated upfront via default tiles (and whatever other procgen we use)
+        let map = HashMap::with_capacity(info.size.area() as usize);
 
-        Self::new(info, map, sectors)
+        // Sectors will be generated on-demand as they are visited
+        let sectors = HashMap::with_capacity(info.size.area() as usize);
+
+        Self::new(info, map, default_map_tile, sectors)
     }
 
-    pub fn new(info: PlanetInfo, map: OverworldMap, sectors: OverworldSectors) -> Self {
-        Self { info, map, sectors }
+    pub fn new(
+        info: PlanetInfo,
+        map: OverworldMap,
+        default_map_tile: OverworldTile,
+        sectors: OverworldSectors,
+    ) -> Self {
+        Self {
+            info,
+            map,
+            default_map_tile,
+            sectors,
+        }
     }
 
     pub fn info(&self) -> &PlanetInfo {
         &self.info
     }
 
-    fn get_tile(&self, point: &OverworldPoint) -> &OverworldTile {
-        self.map
-            .get(point)
-            .expect("Initialization should always set a tile for each point in the map")
+    pub fn get_tile(&self, point: &OverworldPoint) -> Option<&OverworldTile> {
+        if self.info.rect.contains(*point) {
+            Some(self.map.get(point).unwrap_or(&self.default_map_tile))
+        } else {
+            None
+        }
     }
 
-    fn set_tile(&mut self, point: OverworldPoint, tile: OverworldTile) {
+    /// sets *JUST* the tile
+    pub fn set_tile(&mut self, point: OverworldPoint, tile: OverworldTile) {
         self.map.insert(point, tile);
     }
 
     /// Try to get the sector at a given point. Returns None if it hasn't been created yet (and see [`Self::create_sector'])
-    fn get_sector(&self, point: &OverworldPoint) -> Option<&SectorData> {
+    /// Consumers should try this, then use unwrap_or_else to call create_sector
+    pub fn get_sector(&self, point: &OverworldPoint) -> Option<&SectorData> {
         self.sectors.get(point)
     }
 
-    fn set_sector(&mut self, point: &OverworldPoint, sector: SectorData) {
+    /// sets the actual sector data for a given point
+    pub fn set_sector(&mut self, point: &OverworldPoint, sector: SectorData) {
         self.sectors.insert(*point, sector);
     }
 
     /// Use procgen to create a new Sector at a given overworld grid point
-    fn create_sector<'a, T: MapGenerator + Spawner>(
+    pub fn create_sector<'a, T: MapGenerator + Spawner>(
         &mut self,
         point: &OverworldPoint,
         loader: &mut SectorProcgenLoader<'a, T>,
@@ -115,6 +135,13 @@ impl Overworld {
     pub fn iter_tiles(&self) -> impl Iterator<Item = (&OverworldPoint, &OverworldTile)> {
         self.map.iter()
     }
+
+    pub fn iter_points(&self) -> impl Iterator<Item = OverworldPoint> {
+        let yrange = self.info.rect.y_range();
+        let xrange = self.info.rect.x_range();
+
+        yrange.flat_map(move |y| xrange.clone().map(move |x| OverworldPoint::new(x, y)))
+    }
 }
 
 impl fmt::Display for Overworld {
@@ -127,10 +154,12 @@ impl fmt::Display for Overworld {
 pub struct PlanetInfo {
     name: String,
     size: OverworldSize,
+    rect: OverworldRect,
 }
 
 impl PlanetInfo {
     pub fn new(name: String, size: OverworldSize) -> Self {
-        Self { name, size }
+        let rect = OverworldRect::new(OverworldPoint::new(0, 0), size);
+        Self { name, size, rect }
     }
 }

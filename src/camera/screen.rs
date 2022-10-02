@@ -87,7 +87,7 @@ impl Screen {
         let viewport_points: Vec<_> = resources.viewport.points().collect();
         for viewport_point in viewport_points {
             // Use the integer world point to locate which tile to render from the map grid
-            let world_point = resources.viewport.to_world_point(viewport_point);
+            let world_point = resources.viewport.to_game_point(viewport_point);
 
             // It's important to make sure the point is actually in the map
             // before trying to make an index for it

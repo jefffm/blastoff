@@ -13,7 +13,7 @@ use crate::resource::{Resources, Viewport};
 use crate::sector::Map;
 use crate::util::{
     PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, VectorExt, ViewportFloatPoint,
-    ViewportFloatToScreen,
+    ViewportFloatToScreen, WorldSpace,
 };
 use crate::{
     game::consts::SCREEN_RECT,
@@ -117,7 +117,7 @@ pub struct MapGeneration {
     cursor: MapGenerationCursor,
     state: MapGenerationState,
     input: Option<MapGenerationInput>,
-    viewport: Viewport,
+    viewport: Viewport<WorldSpace>,
     screen_transform: ViewportFloatToScreen,
 }
 impl MapGeneration {

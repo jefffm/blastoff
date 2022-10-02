@@ -40,7 +40,7 @@ pub fn draw_ui(
             None,
         );
         resources.font.push_text(
-            &format!("Camera pos: {:?}", resources.viewport.world_rect().center()),
+            &format!("Camera pos: {:?}", resources.viewport.game_rect().center()),
             &PixelPoint::new(70, 0),
             None,
         );
