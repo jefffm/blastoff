@@ -63,6 +63,17 @@ impl Overworld {
         &self.info
     }
 
+    pub fn clamp(&self, point: OverworldPoint) -> OverworldPoint {
+        let clamped_x = point.x.max(self.info.rect.min_x());
+        let clamped_y = point.x.max(self.info.rect.min_y());
+
+        OverworldPoint::new(clamped_x, clamped_y)
+    }
+
+    pub fn center(&self) -> OverworldPoint {
+        self.info.center()
+    }
+
     pub fn get_tile(&self, point: &OverworldPoint) -> Option<&OverworldTile> {
         if self.info.rect.contains(*point) {
             Some(self.map.get(point).unwrap_or(&self.default_map_tile))
@@ -161,5 +172,9 @@ impl PlanetInfo {
     pub fn new(name: String, size: OverworldSize) -> Self {
         let rect = OverworldRect::new(OverworldPoint::new(0, 0), size);
         Self { name, size, rect }
+    }
+
+    pub fn center(&self) -> OverworldPoint {
+        self.rect.center()
     }
 }

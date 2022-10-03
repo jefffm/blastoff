@@ -6,9 +6,10 @@ use crate::{
     overworld::Overworld,
     resource::{Resources, Viewport},
     util::{
-        OverworldFloatPoint, OverworldSpace, OverworldToViewport, PixelPoint, Scene, SceneSwitch,
-        ScreenFloatPoint, TransformExt, ViewportFloatPoint, ViewportFloatToScreen, ViewportPoint,
-        ViewportRect, ViewportSize,
+        GalaxyVector, OverworldFloatPoint, OverworldPoint, OverworldSpace, OverworldToViewport,
+        OverworldVector, PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, TransformExt,
+        ViewportFloatPoint, ViewportFloatToScreen, ViewportPoint, ViewportRect, ViewportSize,
+        PLAYER,
     },
 };
 
@@ -32,6 +33,7 @@ pub struct OverworldMap {
     input: Option<OverworldMapInput>,
     viewport: Viewport<OverworldSpace>,
     screen_transform: ViewportFloatToScreen,
+    player_position: OverworldPoint,
 }
 
 impl OverworldMap {
@@ -50,13 +52,28 @@ impl OverworldMap {
             ScreenFloatPoint::new(2., 2.),
         );
 
+        let player_position = planet.center();
         Self {
             state: OverworldMapState::NeedsIntroCutscene,
             planet,
             input: None,
             viewport,
             screen_transform,
+            player_position,
         }
+    }
+
+    // TODO: Use floating point and move animation
+    fn move_player(&mut self, vector: OverworldVector) {
+        self.player_position = self.planet.clamp(self.player_position + vector);
+    }
+
+    fn overworld_to_pixel(&self, point: OverworldFloatPoint) -> PixelPoint {
+        let vp = self.viewport.to_viewport_point_f32(point);
+        let sp = self.screen_transform.transform_point(vp);
+        get_screen_to_pixel_transform_float()
+            .transform_point(sp)
+            .to_i32()
     }
 }
 
@@ -74,15 +91,17 @@ impl Scene<Resources, Controls> for OverworldMap {
                 self.state = OverworldMapState::Ready;
                 SceneSwitch::Push(Box::new(CutsceneNewPlanet::new(self.planet.clone())))
             }
-            OverworldMapState::Ready => match self.input.take() {
-                Some(input) => match input {
-                    OverworldMapInput::MoveN => todo!(),
-                    OverworldMapInput::MoveS => todo!(),
-                    OverworldMapInput::MoveE => todo!(),
-                    OverworldMapInput::MoveW => todo!(),
-                },
-                None => SceneSwitch::None,
-            },
+            OverworldMapState::Ready => {
+                if let Some(input) = self.input.take() {
+                    match input {
+                        OverworldMapInput::MoveN => self.move_player(OverworldVector::new(0, -1)),
+                        OverworldMapInput::MoveS => self.move_player(OverworldVector::new(0, 1)),
+                        OverworldMapInput::MoveE => self.move_player(OverworldVector::new(1, 0)),
+                        OverworldMapInput::MoveW => self.move_player(OverworldVector::new(-1, 0)),
+                    }
+                }
+                SceneSwitch::None
+            }
         }
     }
 
@@ -98,17 +117,17 @@ impl Scene<Resources, Controls> for OverworldMap {
 
         for overworld_point in self.viewport.visible_points() {
             if let Some(tile) = self.planet.get_tile(&overworld_point) {
-                let vp = self
-                    .viewport
-                    .to_viewport_point_f32(overworld_point.to_f32());
-                let sp = self.screen_transform.transform_point(vp);
-                let pixel_point = get_screen_to_pixel_transform_float()
-                    .transform_point(sp)
-                    .to_i32();
-
-                tile.render(resources, &pixel_point);
+                tile.render(
+                    resources,
+                    &self.overworld_to_pixel(overworld_point.to_f32()),
+                );
             }
         }
+
+        resources.spritesheet.push_sprite(
+            PLAYER,
+            self.overworld_to_pixel(self.player_position.to_f32()),
+        );
 
         Ok(())
     }
