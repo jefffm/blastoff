@@ -6,7 +6,7 @@ use std::rc::Rc;
 use ggez::graphics::Canvas;
 use ggez::input::keyboard::KeyCode;
 
-use hecs::World;
+
 
 use crate::camera::Screen;
 
@@ -16,7 +16,7 @@ use crate::game::{process_actors, TurnsHistory};
 use crate::input::{Controls, PlayerAction, PlayerInput, UiAction};
 use crate::overworld::SectorData;
 use crate::resource::Resources;
-use crate::sector::Map;
+
 
 use crate::input;
 use crate::system::{build_systems, Scheduler};

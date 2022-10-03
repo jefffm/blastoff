@@ -39,7 +39,7 @@ impl OverworldTile {
     pub fn render(&self, resources: &mut Resources, point: &PixelPoint) {
         resources.font.push_char(
             self.glyph(),
-            &point,
+            point,
             Some(DrawParam::default().color(self.fg().to_ggez_color())),
         );
     }

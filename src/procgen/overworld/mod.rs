@@ -12,22 +12,22 @@ pub trait OverworldGenerator {
 
 pub struct StaticPlanet {}
 impl OverworldGenerator for StaticPlanet {
-    fn generate(&mut self, info: PlanetInfo, rng: &mut RandomNumberGenerator) -> Overworld {
+    fn generate(&mut self, info: PlanetInfo, _rng: &mut RandomNumberGenerator) -> Overworld {
         // TODO: derive default tile from PlanetInfo
-        let overworld = Overworld::from_size(info, OverworldTile::Barren);
+        
 
-        overworld
+        Overworld::from_size(info, OverworldTile::Barren)
     }
 }
 impl StaticPlanet {
     pub fn generate_overworld_info(
-        info: &GalaxyInfo,
+        _info: &GalaxyInfo,
         rng: &mut RandomNumberGenerator,
     ) -> PlanetInfo {
         let width = rng.roll_dice(3, 6);
         let height = rng.roll_dice(3, 6);
         PlanetInfo::new(
-            format!("Procgen Planet Name #{}", rng.roll_dice(2, 20)).to_owned(),
+            format!("Procgen Planet Name #{}", rng.roll_dice(2, 20)),
             OverworldSize::new(width, height),
         )
     }

@@ -95,7 +95,7 @@ impl Overworld {
     /// Try to get the sector at a given point. Returns None if it hasn't been created yet (and see [`Self::create_sector'])
     /// Consumers should try this, then use unwrap_or_else to call create_sector
     pub fn get_sector(&self, point: &OverworldPoint) -> Option<Rc<RefCell<SectorData>>> {
-        self.sectors.get(point).map(|x| x.clone())
+        self.sectors.get(point).cloned()
     }
 
     /// sets the actual sector data for a given point

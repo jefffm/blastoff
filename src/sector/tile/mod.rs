@@ -106,7 +106,7 @@ impl Tile {
 
     pub fn render(
         &self,
-        canvas: &mut Canvas,
+        _canvas: &mut Canvas,
         resources: &mut Resources,
         pixel_point: PixelPoint,
         visibility_kind: VisibilityKind,

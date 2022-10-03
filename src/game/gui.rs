@@ -13,10 +13,10 @@ use super::consts::{SCREEN_WIDTH_PIXELS, TILE_SIZE};
 /// UI:
 pub fn draw_ui(
     ctx: &mut ggez::Context,
-    canvas: &mut Canvas,
+    _canvas: &mut Canvas,
     world: &World,
     resources: &mut Resources,
-    map: &Map,
+    _map: &Map,
 ) {
     // let _turn_history = &resources.turn_history;
     // ctx.print(1, 2, format!("Steps : {}", turn_history.steps));

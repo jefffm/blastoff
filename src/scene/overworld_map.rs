@@ -7,13 +7,13 @@ use crate::{
     input::Controls,
     overworld::Overworld,
     procgen::{
-        seed::{self, WfcSeed},
+        seed::{self},
         Combo, MapTemplate, SectorProcgenLoader, SubMap, WfcGen,
     },
     resource::{Resources, Viewport},
     sector::{FloorKind, Tile},
     util::{
-        GalaxyVector, OverworldFloatPoint, OverworldPoint, OverworldSpace, OverworldToViewport,
+        OverworldFloatPoint, OverworldPoint, OverworldSpace, OverworldToViewport,
         OverworldVector, PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, TransformExt,
         ViewportFloatPoint, ViewportFloatToScreen, ViewportPoint, ViewportRect, ViewportSize,
         WorldPoint, WorldSize, PLAYER,
@@ -86,7 +86,7 @@ impl OverworldMap {
 }
 
 impl Scene<Resources, Controls> for OverworldMap {
-    fn input(&mut self, resources: &mut Resources, controls: &mut Controls, started: bool) {
+    fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         if let Some(key) = controls.read() {
             self.input = match self.state {
                 OverworldMapState::NeedsIntroCutscene => None,
@@ -106,7 +106,7 @@ impl Scene<Resources, Controls> for OverworldMap {
     fn update(
         &mut self,
         resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
             OverworldMapState::NeedsIntroCutscene => {
@@ -170,8 +170,8 @@ impl Scene<Resources, Controls> for OverworldMap {
     fn draw(
         &mut self,
         resources: &mut Resources,
-        ctx: &mut ggez::Context,
-        canvas: &mut ggez::graphics::Canvas,
+        _ctx: &mut ggez::Context,
+        _canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
         resources.font.push_text(
             &format!("{}", (*self.planet).borrow()),

@@ -150,7 +150,7 @@ fn draw_corridor(map: &mut Map, start: &WorldPoint, end: &WorldPoint) {
 impl MapGenerator for Bsp {
     fn generate(
         &mut self,
-        size: WorldSize,
+        _size: WorldSize,
         rng: &mut RandomNumberGenerator,
         mapgen_history: &mut Vec<sector::Map>,
     ) -> Map {

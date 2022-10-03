@@ -12,8 +12,7 @@ use keyframe::{
 };
 
 use crate::{
-    animation::move_sequence,
-    game::consts::{PIXEL_RECT, TILE_SIZE, UPDATE_INTERVAL_SECS},
+    game::consts::{TILE_SIZE, UPDATE_INTERVAL_SECS},
     input::Controls,
     overworld::Overworld,
     resource::Resources,
@@ -59,14 +58,14 @@ impl CutsceneNewPlanet {
 }
 
 impl Scene<Resources, Controls> for CutsceneNewPlanet {
-    fn input(&mut self, resources: &mut Resources, controls: &mut Controls, started: bool) {
+    fn input(&mut self, _resources: &mut Resources, _controls: &mut Controls, _started: bool) {
         // TODO: implement skip cutscene
     }
 
     fn update(
         &mut self,
-        resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _resources: &mut Resources,
+        _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         if self.timer > CUTSCENE_LENGTH_SECS {
             SceneSwitch::Pop
@@ -80,7 +79,7 @@ impl Scene<Resources, Controls> for CutsceneNewPlanet {
         &mut self,
         resources: &mut Resources,
         ctx: &mut ggez::Context,
-        canvas: &mut ggez::graphics::Canvas,
+        _canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
         let pos = self.planet_pos_animation.now_strict().unwrap();
         let scale = self.planet_scale_animation.now_strict().unwrap();

@@ -31,7 +31,7 @@ impl Screen {
         }
     }
 
-    fn draw(&self, canvas: &mut Canvas, world: &World, resources: &mut Resources, entity: Entity) {
+    fn draw(&self, _canvas: &mut Canvas, world: &World, resources: &mut Resources, entity: Entity) {
         let mut query = world.query_one::<(&Position, &Renderable)>(entity).unwrap();
 
         let (position, renderable) = query.get().unwrap();

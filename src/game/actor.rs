@@ -167,7 +167,7 @@ impl<'a> ActionProcessor<'a> {
             .sector
             .world
             .query_mut::<(&Actor, &mut Position, &mut Renderable)>();
-        for (other_entity, (_actor, position, renderable)) in query.into_iter() {
+        for (other_entity, (_actor, position, _renderable)) in query.into_iter() {
             if dest_point == position.grid_point() {
                 // TODO: there should be a component that determines when objects are impassible
                 // if this isn't a player, prevent the move from happening
@@ -189,7 +189,7 @@ impl<'a> ActionProcessor<'a> {
 
         if position_swap || !self.sector.map.is_blocked(&dest_point) {
             // No entities in the way. Anything else?
-            let (position, viewshed, renderable) = self
+            let (position, viewshed, _renderable) = self
                 .sector
                 .world
                 .query_one_mut::<(&mut Position, &mut Viewshed, &mut Renderable)>(*entity)

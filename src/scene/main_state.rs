@@ -84,8 +84,8 @@ impl EventHandler for MainState {
         canvas.set_sampler(graphics::Sampler::nearest_clamp());
         canvas.set_blend_mode(BlendMode::REPLACE);
 
-        &self.scene_stack.resources.font.clear();
-        &self.scene_stack.resources.spritesheet.clear();
+        self.scene_stack.resources.font.clear();
+        self.scene_stack.resources.spritesheet.clear();
 
         // Draw the scene
         self.scene_stack.draw(ctx, &mut canvas);
