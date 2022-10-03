@@ -178,6 +178,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
+name = "blastoff"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bracket-random",
+ "clap",
+ "coord_2d",
+ "euclid",
+ "fixedbitset",
+ "ggez",
+ "grid_2d",
+ "hecs",
+ "image",
+ "keyframe",
+ "keyframe_derive",
+ "lazy_static",
+ "line_drawing",
+ "morton-encoding",
+ "pathfinding",
+ "png",
+ "rand",
+ "rand_core",
+ "rgb",
+ "rmp-serde",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "symmetric-shadowcasting",
+ "tracing",
+ "tracing-subscriber",
+ "wfc",
+]
+
+[[package]]
 name = "block"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2335,40 +2369,6 @@ dependencies = [
  "hound",
  "lewton",
  "minimp3",
-]
-
-[[package]]
-name = "roguemon"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bracket-random",
- "clap",
- "coord_2d",
- "euclid",
- "fixedbitset",
- "ggez",
- "grid_2d",
- "hecs",
- "image",
- "keyframe",
- "keyframe_derive",
- "lazy_static",
- "line_drawing",
- "morton-encoding",
- "pathfinding",
- "png",
- "rand",
- "rand_core",
- "rgb",
- "rmp-serde",
- "serde",
- "serde_json",
- "serde_yaml",
- "symmetric-shadowcasting",
- "tracing",
- "tracing-subscriber",
- "wfc",
 ]
 
 [[package]]
