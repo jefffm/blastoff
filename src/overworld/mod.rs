@@ -144,8 +144,7 @@ impl Overworld {
     }
 
     pub fn color(&self) -> RGBA8 {
-        // TODO: match on planet info for elemental types to determine color
-        FIRE.four
+        self.info.color()
     }
 
     pub fn iter_tiles(&self) -> impl Iterator<Item = (&OverworldPoint, &OverworldTile)> {
@@ -181,5 +180,10 @@ impl PlanetInfo {
 
     pub fn center(&self) -> OverworldPoint {
         self.rect.center()
+    }
+
+    pub fn color(&self) -> RGBA8 {
+        // TODO: match on planet info for elemental types to determine color
+        FIRE.four
     }
 }

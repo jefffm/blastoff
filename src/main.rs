@@ -49,6 +49,9 @@ struct Cli {
 
     #[clap(short, long, action, default_value_t = false)]
     debug: bool,
+
+    #[clap(long)]
+    seed: Option<u64>,
 }
 
 fn main() -> GameResult {
@@ -80,11 +83,7 @@ fn main() -> GameResult {
         .build()
         .expect("aieee, could not create ggez context!");
 
-    // TODO: add seed parameter to CLI
-    let rng_seed = game::env()
-        .seed
-        .unwrap_or_else(|| rand::thread_rng().next_u64());
-
+    let rng_seed = cli.seed.unwrap_or_else(|| rand::thread_rng().next_u64());
     info!("using rng seed: {}", rng_seed);
 
     info!("linking resources");

@@ -14,7 +14,6 @@ pub struct StaticPlanet {}
 impl OverworldGenerator for StaticPlanet {
     fn generate(&mut self, info: PlanetInfo, _rng: &mut RandomNumberGenerator) -> Overworld {
         // TODO: derive default tile from PlanetInfo
-        
 
         Overworld::from_size(info, OverworldTile::Barren)
     }
@@ -26,6 +25,9 @@ impl StaticPlanet {
     ) -> PlanetInfo {
         let width = rng.roll_dice(3, 6);
         let height = rng.roll_dice(3, 6);
+
+        // TODO: randomly assign a World Type (to determine the majority of terrain types and elements)
+
         PlanetInfo::new(
             format!("Procgen Planet Name #{}", rng.roll_dice(2, 20)),
             OverworldSize::new(width, height),
