@@ -1,12 +1,12 @@
-use hecs::{Entity, World};
+use hecs::Entity;
 
 use crate::{
     component::{Actor, ActorKind, Cardinal, Player, Position, Renderable, Viewshed},
     game::Action,
     input,
+    overworld::SectorData,
     resource::Resources,
     scene::GameState,
-    sector::Map,
     util::{WorldPoint, WorldVector},
 };
 
@@ -14,16 +14,15 @@ use super::{consts::MOVEMENT_ANIMATION_DURATION, TurnsHistory};
 
 /// The Actor System implements energy-based turn actions using Actor components
 pub fn process_actors(
-    world: &mut World,
     resources: &mut Resources,
-    map: &Map,
+    sector: &mut SectorData,
     turn_history: &mut TurnsHistory,
 ) -> GameState {
     let mut actions: Vec<Action> = vec![];
 
     // Collect mut references to all the actors
     let mut actors: Vec<(Entity, &mut Actor)> =
-        world.query_mut::<&mut Actor>().into_iter().collect();
+        sector.world.query_mut::<&mut Actor>().into_iter().collect();
 
     // Sort actors by their priority (ascending). This is a function of energy remaining + how many times they've been skipped
     actors.sort_by(|(_, a), (_, b)| a.priority().cmp(&b.priority()));
@@ -110,7 +109,7 @@ pub fn process_actors(
         actor.recover_energy();
     }
 
-    ActionProcessor::new(world, resources, map).process_actions(&actions);
+    ActionProcessor::new(resources, sector).process_actions(&actions);
     turn_history.add_turn(actions);
 
     if needs_player_input {
@@ -121,18 +120,13 @@ pub fn process_actors(
 }
 
 struct ActionProcessor<'a> {
-    world: &'a mut World,
     resources: &'a mut Resources,
-    map: &'a Map,
+    sector: &'a mut SectorData,
 }
 
 impl<'a> ActionProcessor<'a> {
-    fn new(world: &'a mut World, resources: &'a mut Resources, map: &'a Map) -> Self {
-        Self {
-            world,
-            resources,
-            map,
-        }
+    fn new(resources: &'a mut Resources, sector: &'a mut SectorData) -> Self {
+        Self { resources, sector }
     }
 
     fn process_actions(&mut self, actions: &[Action]) {
@@ -150,7 +144,7 @@ impl<'a> ActionProcessor<'a> {
     fn move_entity(&mut self, entity: &Entity, vector: &WorldVector) {
         // Find the starting position
         let source_point = {
-            let mut query = self.world.query_one::<&Position>(*entity).unwrap();
+            let mut query = self.sector.world.query_one::<&Position>(*entity).unwrap();
             let position = query.get().unwrap();
 
             position.grid_point()
@@ -158,18 +152,19 @@ impl<'a> ActionProcessor<'a> {
 
         // Is this the player?
         let is_player = {
-            let mut query = self.world.query_one::<&Player>(*entity).unwrap();
+            let mut query = self.sector.world.query_one::<&Player>(*entity).unwrap();
             query.get().is_some()
         };
 
         // TODO: clean up "off by one" point clamping for player movement
-        let map_rect = self.map.get_rect();
+        let map_rect = self.sector.map.get_rect();
         let dest_point =
             (source_point + *vector).clamp(map_rect.min(), map_rect.max() - WorldVector::new(1, 1));
 
         // Check if we're bumping into another actor. If they're hostile, melee attack instead. If they're friendly, swap spots with them(?)
         let mut position_swap = false;
         let query = self
+            .sector
             .world
             .query_mut::<(&Actor, &mut Position, &mut Renderable)>();
         for (other_entity, (_actor, position, renderable)) in query.into_iter() {
@@ -192,9 +187,10 @@ impl<'a> ActionProcessor<'a> {
             }
         }
 
-        if position_swap || !self.map.is_blocked(&dest_point) {
+        if position_swap || !self.sector.map.is_blocked(&dest_point) {
             // No entities in the way. Anything else?
             let (position, viewshed, renderable) = self
+                .sector
                 .world
                 .query_one_mut::<(&mut Position, &mut Viewshed, &mut Renderable)>(*entity)
                 .unwrap();
@@ -205,11 +201,12 @@ impl<'a> ActionProcessor<'a> {
 
     fn teleport_entity(&mut self, entity: &Entity, point: &WorldPoint) {
         let (position, viewshed) = self
+            .sector
             .world
             .query_one_mut::<(&mut Position, &mut Viewshed)>(*entity)
             .expect("move entity exists");
 
-        if &position.grid_point() != point && !self.map.is_blocked(point) {
+        if &position.grid_point() != point && !self.sector.map.is_blocked(point) {
             viewshed.set_dirty();
             position.set_grid_point(*point)
         }

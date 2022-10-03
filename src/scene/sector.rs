@@ -1,5 +1,8 @@
 //! Sector implements a local quadrant on a given Planet. This scene is the "main" on-the-ground game scene
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use ggez::graphics::Canvas;
 use ggez::input::keyboard::KeyCode;
 
@@ -11,6 +14,7 @@ use crate::component::{Actor, ActorKind, Player};
 use crate::game::consts::VIEWPORT_SCREEN_POINT;
 use crate::game::{process_actors, TurnsHistory};
 use crate::input::{Controls, PlayerAction, PlayerInput, UiAction};
+use crate::overworld::SectorData;
 use crate::resource::Resources;
 use crate::sector::Map;
 
@@ -28,8 +32,7 @@ pub enum GameState {
 }
 
 pub struct Sector {
-    map: Map,
-    world: World,
+    data: Rc<RefCell<SectorData>>,
     input: Option<PlayerInput>,
     state: GameState,
     screen: Screen,
@@ -38,10 +41,9 @@ pub struct Sector {
 }
 
 impl Sector {
-    pub fn new(map: Map, world: World) -> Self {
+    pub fn new(data: Rc<RefCell<SectorData>>) -> Self {
         Self {
-            map,
-            world,
+            data,
             input: None,
             state: GameState::Ticking,
             screen: Screen::new(ViewportToScreen::from_points(
@@ -55,7 +57,9 @@ impl Sector {
 
     /// Find the player component and set the next action on this player
     fn set_player_action(&mut self, player_action: PlayerAction) {
-        for (_ent, (_player, actor)) in self.world.query_mut::<(&Player, &mut Actor)>() {
+        let mut data = self.data.borrow_mut();
+
+        for (_ent, (_player, actor)) in data.world.query_mut::<(&Player, &mut Actor)>() {
             actor.set_kind(ActorKind::Player(Some(player_action)));
         }
         self.state = GameState::Ticking
@@ -124,14 +128,9 @@ impl Scene<Resources, Controls> for Sector {
             }
         };
 
-        self.state = process_actors(
-            &mut self.world,
-            resources,
-            &self.map,
-            &mut self.turn_history,
-        );
-        self.scheduler
-            .execute(&mut self.world, resources, &mut self.map, &ctx);
+        let mut data = self.data.borrow_mut();
+        self.state = process_actors(resources, &mut data, &mut self.turn_history);
+        self.scheduler.execute(resources, &mut data, ctx);
 
         SceneSwitch::None
     }
@@ -142,8 +141,9 @@ impl Scene<Resources, Controls> for Sector {
         ctx: &mut ggez::Context,
         canvas: &mut Canvas,
     ) -> ggez::GameResult<()> {
+        let data = (*self.data).borrow();
         self.screen
-            .draw_game(ctx, canvas, &self.world, resources, &self.map);
+            .draw_game(ctx, canvas, &data.world, resources, &data.map);
 
         Ok(())
     }

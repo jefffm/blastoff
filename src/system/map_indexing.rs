@@ -1,30 +1,24 @@
 use ggez::Context;
-use hecs::World;
 
 use crate::component::{BlocksTile, Door, Position};
+use crate::overworld::SectorData;
 use crate::resource::Resources;
-use crate::sector::Map;
 
-pub fn map_indexing_system(
-    world: &mut World,
-    _resources: &mut Resources,
-    map: &mut Map,
-    ctx: &Context,
-) {
-    map.reset_blocked();
-    map.reset_content();
+pub fn map_indexing_system(_resources: &mut Resources, sector: &mut SectorData, ctx: &Context) {
+    sector.map.reset_blocked();
+    sector.map.reset_content();
 
-    for (id, pos) in world.query::<&Position>().iter() {
-        map.add_content(&pos.p, &id);
+    for (id, pos) in sector.world.query::<&Position>().iter() {
+        sector.map.add_content(&pos.p, &id);
     }
 
-    for (_, (pos, _blocked)) in world.query::<(&Position, &BlocksTile)>().iter() {
-        map.set_blocked(&pos.p);
+    for (_, (pos, _blocked)) in sector.world.query::<(&Position, &BlocksTile)>().iter() {
+        sector.map.set_blocked(&pos.p);
     }
 
-    for (_, (pos, door)) in world.query::<(&Position, &Door)>().iter() {
+    for (_, (pos, door)) in sector.world.query::<(&Position, &Door)>().iter() {
         if !door.opened {
-            map.set_blocked(&pos.p);
+            sector.map.set_blocked(&pos.p);
         }
     }
 }

@@ -114,12 +114,14 @@ fn main() -> GameResult {
 
     let mut game = MainState::new(resources, &mut ctx);
 
+    // TODO: fix cli.debug arg
     // Push an initial scene to the SceneStack and prepare it for playing
-    if cli.debug {
-        game.init_debug()
-    } else {
-        game.init();
-    }
+    // if cli.debug {
+    //     game.init_debug()
+    // } else {
+    //     game.init();
+    // }
+    game.init();
 
     info!("starting main_loop");
 

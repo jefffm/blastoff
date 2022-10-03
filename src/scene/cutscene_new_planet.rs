@@ -1,4 +1,8 @@
-use std::rc::Rc;
+use std::{
+    borrow::Borrow,
+    cell::{Ref, RefCell},
+    rc::Rc,
+};
 
 use ggez::{graphics::DrawParam, mint::Point2};
 use keyframe::{
@@ -26,14 +30,14 @@ const CUTSCENE_LENGTH_SECS: f32 = 4.;
 
 pub struct CutsceneNewPlanet {
     state: NewPlanetState,
-    planet: Rc<Overworld>,
+    planet: Rc<RefCell<Overworld>>,
     timer: f32,
     planet_pos_animation: AnimationSequence<Point2<f32>>,
     planet_scale_animation: AnimationSequence<f32>,
 }
 
 impl CutsceneNewPlanet {
-    pub fn new(planet: Rc<Overworld>) -> Self {
+    pub fn new(planet: Rc<RefCell<Overworld>>) -> Self {
         Self {
             state: NewPlanetState::Init,
             planet,
@@ -80,8 +84,9 @@ impl Scene<Resources, Controls> for CutsceneNewPlanet {
     ) -> ggez::GameResult<()> {
         let pos = self.planet_pos_animation.now_strict().unwrap();
         let scale = self.planet_scale_animation.now_strict().unwrap();
+        let planet: Ref<Overworld> = (*self.planet).borrow();
         resources.spritesheet.push_sprite(
-            self.planet
+            planet
                 .sprite()
                 // TODO: this overwrites everything defined about the sprite including color
                 .with_params(DrawParam::default().scale([scale, scale])),
@@ -90,7 +95,7 @@ impl Scene<Resources, Controls> for CutsceneNewPlanet {
 
         // Draw text on top
         resources.font.push_text(
-            &format!("You travel to {}", self.planet),
+            &format!("You travel to {}", (*self.planet).borrow()),
             &PixelPoint::new(5 * TILE_SIZE.width, 5 * TILE_SIZE.height),
             None,
         );

@@ -7,6 +7,7 @@ use crate::{
         Position, Viewshed,
     },
     game::Action,
+    overworld::SectorData,
     resource::Resources,
     sector::Map,
     util::{PointExt, WorldPoint},
@@ -103,16 +104,11 @@ pub fn target_point(world: &World, target: Entity) -> WorldPoint {
 ///
 /// Process each intention, resolving each entity's target and deciding
 /// on a next action and behavior for next turn.
-pub fn action_decider_system(
-    world: &mut World,
-    resources: &mut Resources,
-    map: &mut Map,
-    ctx: &Context,
-) {
+pub fn action_decider_system(resources: &mut Resources, sector: &mut SectorData, ctx: &Context) {
     let mut intentions: Vec<Intention> = vec![];
 
     // Find all entities without an action set
-    for (entity, (actor, behavior)) in world.query::<(&Actor, &mut Behavior)>().iter() {
+    for (entity, (actor, behavior)) in sector.world.query::<(&Actor, &mut Behavior)>().iter() {
         if let ActorKind::Computer(None) = actor.kind() {
             let intention = Intention {
                 entity,
@@ -127,15 +123,17 @@ pub fn action_decider_system(
         let entity = intention.entity;
 
         let (behavior_kind, action) = {
-            let mut q1 = world
+            let mut q1 = sector
+                .world
                 .query_one::<(&Position, &Viewshed)>(intention.entity)
                 .unwrap();
             let (position, viewshed) = q1.get().unwrap();
             let point = position.grid_point();
-            intention.into_next(world, resources, map, &point, viewshed)
+            intention.into_next(&sector.world, resources, &sector.map, &point, viewshed)
         };
 
-        let (behavior, actor) = world
+        let (behavior, actor) = sector
+            .world
             .query_one_mut::<(&mut Behavior, &mut Actor)>(entity)
             .expect("actor");
 

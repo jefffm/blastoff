@@ -3,28 +3,26 @@ use ggez::graphics::DrawParam;
 use rgb::RGBA8;
 pub use tile::*;
 
-use std::{collections::HashMap, fmt};
+use std::{cell::RefCell, collections::HashMap, fmt, rc::Rc};
 
-use hecs::World;
 use serde::{Deserialize, Serialize};
 
 use crate::{
     color::{RGBA8Ext, FIRE},
     game::consts::{MAX_PLANET_SPRITE_SIZE, SECTOR_HEIGHT, SECTOR_WIDTH},
     procgen::{MapGenerator, SectorProcgenLoader, Spawner},
-    resource::Resources,
-    scene::Sector,
     sector,
-    util::{
-        OverworldPoint, OverworldRect, OverworldSize, PixelPoint, PixelRect, PixelSize, Sprite,
-        WorldSize, PLANET,
-    },
+    util::{OverworldPoint, OverworldRect, OverworldSize, Sprite, WorldSize, PLANET},
 };
 
 // TODO: World needs to be serializeable in order to implement save/load
-pub type SectorData = (sector::Map, World);
-pub type OverworldSectors = HashMap<OverworldPoint, SectorData>;
+pub type OverworldSectors = HashMap<OverworldPoint, Rc<RefCell<SectorData>>>;
 pub type OverworldMap = HashMap<OverworldPoint, OverworldTile>;
+
+pub struct SectorData {
+    pub map: sector::Map,
+    pub world: hecs::World,
+}
 
 // #[derive(Serialize, Deserialize)]
 pub struct Overworld {
@@ -96,13 +94,13 @@ impl Overworld {
 
     /// Try to get the sector at a given point. Returns None if it hasn't been created yet (and see [`Self::create_sector'])
     /// Consumers should try this, then use unwrap_or_else to call create_sector
-    pub fn get_sector(&self, point: &OverworldPoint) -> Option<&SectorData> {
-        self.sectors.get(point)
+    pub fn get_sector(&self, point: &OverworldPoint) -> Option<Rc<RefCell<SectorData>>> {
+        self.sectors.get(point).map(|x| x.clone())
     }
 
     /// sets the actual sector data for a given point
     pub fn set_sector(&mut self, point: &OverworldPoint, sector: SectorData) {
-        self.sectors.insert(*point, sector);
+        self.sectors.insert(*point, Rc::new(RefCell::new(sector)));
     }
 
     /// Use procgen to create a new Sector at a given overworld grid point
@@ -110,13 +108,13 @@ impl Overworld {
         &mut self,
         point: &OverworldPoint,
         loader: &mut SectorProcgenLoader<'a, T>,
-    ) -> &SectorData {
+    ) -> Rc<RefCell<SectorData>> {
         // Create a new Sector and spawn to a fresh ECS world
         let mut world = hecs::World::new();
         let map = loader.load(WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT), &mut world);
 
         // Set the sector to the given point
-        self.set_sector(point, (map, world));
+        self.set_sector(point, SectorData { map, world });
 
         // aaaand let's also return a reference to it in the map
         self.get_sector(point).unwrap()

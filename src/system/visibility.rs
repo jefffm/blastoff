@@ -1,25 +1,20 @@
 use ggez::Context;
-use hecs::{Entity, World};
+use hecs::Entity;
 use std::collections::HashSet;
 use symmetric_shadowcasting::compute_fov;
 
 use crate::{
     component::{Player, Position, Viewshed},
+    overworld::SectorData,
     resource::Resources,
-    sector::Map,
     util::{WorldFloatPoint, WorldPoint},
 };
 
 // Update the viewport to be centered on the Camera position
-pub fn visibility_system(
-    world: &mut World,
-    _resources: &mut Resources,
-    map: &mut Map,
-    _ctx: &Context,
-) {
+pub fn visibility_system(_resources: &mut Resources, sector: &mut SectorData, _ctx: &Context) {
     let mut updated_ents = HashSet::<Entity>::new();
 
-    for (entity, (pos, viewshed)) in world.query_mut::<(&Position, &mut Viewshed)>() {
+    for (entity, (pos, viewshed)) in sector.world.query_mut::<(&Position, &mut Viewshed)>() {
         if viewshed.dirty() {
             viewshed.init();
 
@@ -37,15 +32,15 @@ pub fn visibility_system(
             // TODO: add something to PointExt to convert into this isize tuple
             let mut is_blocking = |(x, y)| {
                 let point = WorldPoint::new(x as i32, y as i32);
-                if !map.contains(point) {
+                if !sector.map.contains(point) {
                     return true;
                 }
-                map.is_opaque_point(&point)
+                sector.map.is_opaque_point(&point)
             };
 
             let mut mark_visible = |(x, y)| {
                 let point = WorldPoint::new(x as i32, y as i32);
-                if in_range(&point) && map.contains(point) {
+                if in_range(&point) && sector.map.contains(point) {
                     viewshed.insert(point)
                 }
             };
@@ -56,16 +51,16 @@ pub fn visibility_system(
     }
 
     // Update the player viewshed only if it has changed
-    let mut query = world.query::<(&Viewshed, &Player)>();
+    let mut query = sector.world.query::<(&Viewshed, &Player)>();
     let players: Vec<_> = query.iter().collect();
     let update_player_viewsheds = players.iter().any(|(ent, _)| updated_ents.contains(ent));
 
     if update_player_viewsheds {
-        map.reset_visible();
+        sector.map.reset_visible();
         for (_, (viewshed, _)) in players {
             for point in viewshed.points() {
-                map.set_visible(point);
-                map.set_revealed(point);
+                sector.map.set_visible(point);
+                sector.map.set_revealed(point);
             }
         }
     }

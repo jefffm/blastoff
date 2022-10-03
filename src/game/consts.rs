@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use crate::util::{
     PixelPoint, PixelRect, PixelSize, ScreenFloatToPixel, ScreenPoint, ScreenRect, ScreenSize,
-    ScreenToPixel, TransformExt,
+    ScreenToPixel, TransformExt, WorldSize,
 };
 
 // 16:9
@@ -61,6 +61,7 @@ pub const MOVEMENT_ANIMATION_DURATION: f32 = 1. / 5.;
 
 pub const SECTOR_WIDTH: i32 = 100;
 pub const SECTOR_HEIGHT: i32 = 100;
+pub const SECTOR_SIZE: WorldSize = WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT);
 
 pub const MAX_PLANET_SPRITE_SIZE: f32 = 64.;
 

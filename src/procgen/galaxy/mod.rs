@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 use bracket_random::prelude::RandomNumberGenerator;
 
@@ -46,7 +46,7 @@ impl GalaxyGenerator for StaticGalaxy {
                 let y = rng.roll_dice(1, info.height() - 1);
 
                 // TODO: make it so that galaxy generation doesn't accidentally overwrite collisions
-                (GalaxyPoint::new(x, y), Rc::new(planet))
+                (GalaxyPoint::new(x, y), Rc::new(RefCell::new(planet)))
             })
             .collect();
 

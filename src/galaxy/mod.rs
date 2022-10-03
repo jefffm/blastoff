@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
@@ -7,7 +7,7 @@ use crate::{
     util::{GalaxyPoint, GalaxySize},
 };
 
-type PlanetsVec = Vec<(GalaxyPoint, Rc<Overworld>)>;
+type PlanetsVec = Vec<(GalaxyPoint, Rc<RefCell<Overworld>>)>;
 
 /// A galaxy contains coordinates pointing to each star system
 // #[derive(Serialize, Deserialize)]
@@ -41,11 +41,11 @@ impl Galaxy {
         &self.info
     }
 
-    pub fn iter_content(&self) -> impl Iterator<Item = &(GalaxyPoint, Rc<Overworld>)> {
+    pub fn iter_content(&self) -> impl Iterator<Item = &(GalaxyPoint, Rc<RefCell<Overworld>>)> {
         self.planets.iter()
     }
 
-    pub fn find(&self, point: &GalaxyPoint) -> Option<Rc<Overworld>> {
+    pub fn find(&self, point: &GalaxyPoint) -> Option<Rc<RefCell<Overworld>>> {
         self.planets
             .iter()
             .find(|(p, _)| p == point)

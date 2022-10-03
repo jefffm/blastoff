@@ -1,21 +1,26 @@
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 use ggez::input::keyboard::KeyCode;
 
 use crate::{
-    game::consts::{get_screen_to_pixel_transform_float, SCREEN_RECT},
+    game::consts::{get_screen_to_pixel_transform_float, SCREEN_RECT, SECTOR_SIZE},
     input::Controls,
     overworld::Overworld,
+    procgen::{
+        seed::{self, WfcSeed},
+        Combo, MapTemplate, SectorProcgenLoader, SubMap, WfcGen,
+    },
     resource::{Resources, Viewport},
+    sector::{FloorKind, Tile},
     util::{
         GalaxyVector, OverworldFloatPoint, OverworldPoint, OverworldSpace, OverworldToViewport,
         OverworldVector, PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, TransformExt,
         ViewportFloatPoint, ViewportFloatToScreen, ViewportPoint, ViewportRect, ViewportSize,
-        PLAYER,
+        WorldPoint, WorldSize, PLAYER,
     },
 };
 
-use super::CutsceneNewPlanet;
+use super::{CutsceneNewPlanet, Sector};
 
 enum OverworldMapState {
     NeedsIntroCutscene,
@@ -27,11 +32,12 @@ pub enum OverworldMapInput {
     MoveS,
     MoveE,
     MoveW,
+    Activate,
 }
 
 pub struct OverworldMap {
     state: OverworldMapState,
-    planet: Rc<Overworld>,
+    planet: Rc<RefCell<Overworld>>,
     input: Option<OverworldMapInput>,
     viewport: Viewport<OverworldSpace>,
     screen_transform: ViewportFloatToScreen,
@@ -39,7 +45,7 @@ pub struct OverworldMap {
 }
 
 impl OverworldMap {
-    pub fn new(planet: Rc<Overworld>) -> Self {
+    pub fn new(planet: Rc<RefCell<Overworld>>) -> Self {
         let t1 = OverworldToViewport::default();
         let viewport = Viewport::new(
             ViewportRect::new(
@@ -54,7 +60,7 @@ impl OverworldMap {
             ScreenFloatPoint::new(2., 2.),
         );
 
-        let player_position = planet.center();
+        let player_position = (*planet).borrow().center();
         Self {
             state: OverworldMapState::NeedsIntroCutscene,
             planet,
@@ -67,7 +73,7 @@ impl OverworldMap {
 
     // TODO: Use floating point and move animation
     fn move_player(&mut self, vector: OverworldVector) {
-        self.player_position = self.planet.clamp(self.player_position + vector);
+        self.player_position = (*self.planet).borrow().clamp(self.player_position + vector);
     }
 
     fn overworld_to_pixel(&self, point: OverworldFloatPoint) -> PixelPoint {
@@ -90,7 +96,7 @@ impl Scene<Resources, Controls> for OverworldMap {
                     KeyCode::Down => Some(OverworldMapInput::MoveS),
                     KeyCode::Left => Some(OverworldMapInput::MoveW),
                     KeyCode::Right => Some(OverworldMapInput::MoveE),
-                    // KeyCode::Space => Some(OverworldMapInput::Activate),
+                    KeyCode::Space => Some(OverworldMapInput::Activate),
                     _ => None,
                 },
             }
@@ -115,6 +121,44 @@ impl Scene<Resources, Controls> for OverworldMap {
                         OverworldMapInput::MoveS => self.move_player(OverworldVector::new(0, 1)),
                         OverworldMapInput::MoveE => self.move_player(OverworldVector::new(1, 0)),
                         OverworldMapInput::MoveW => self.move_player(OverworldVector::new(-1, 0)),
+                        OverworldMapInput::Activate => {
+                            let mapgen = Combo::new(MapTemplate::new(
+                                SECTOR_SIZE,
+                                Tile::Floor(FloorKind::FloorScenery('~')),
+                                vec![
+                                    // First create an entire map of craters
+                                    SubMap::new(
+                                        Box::new(WfcGen::new(seed::CRATERS)),
+                                        SECTOR_SIZE,
+                                        WorldPoint::new(0, 0),
+                                    ),
+                                    // Then, create a city in the middle
+                                    SubMap::new(
+                                        Box::new(WfcGen::new(seed::CITY)),
+                                        WorldSize::new(50, 50),
+                                        WorldPoint::new(25, 25),
+                                    ),
+                                ],
+                            ));
+
+                            // TODO: this isn't plumbed correctly
+                            // TODO: Make history optional so that it's only used for the debug view
+                            let mut history = Vec::new();
+
+                            // Create the loader
+                            let mut loader =
+                                SectorProcgenLoader::new(mapgen, &mut resources.rng, &mut history);
+
+                            let sector = {
+                                let mut planet = (*self.planet).borrow_mut();
+                                planet.get_sector(&self.player_position).unwrap_or_else(|| {
+                                    planet.create_sector(&self.player_position, &mut loader)
+                                })
+                            };
+
+                            // early return
+                            return SceneSwitch::Push(Box::new(Sector::new(sector)));
+                        }
                     }
                 }
                 SceneSwitch::None
@@ -128,12 +172,14 @@ impl Scene<Resources, Controls> for OverworldMap {
         ctx: &mut ggez::Context,
         canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
-        resources
-            .font
-            .push_text(&format!("{}", self.planet), &PixelPoint::new(0, 0), None);
+        resources.font.push_text(
+            &format!("{}", (*self.planet).borrow()),
+            &PixelPoint::new(0, 0),
+            None,
+        );
 
         for overworld_point in self.viewport.visible_points() {
-            if let Some(tile) = self.planet.get_tile(&overworld_point) {
+            if let Some(tile) = (*self.planet).borrow().get_tile(&overworld_point) {
                 tile.render(
                     resources,
                     &self.overworld_to_pixel(overworld_point.to_f32()),

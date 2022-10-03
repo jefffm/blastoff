@@ -7,23 +7,14 @@ pub use pause_menu::*;
 mod game_over;
 pub use game_over::*;
 
-mod map_generation;
-pub use map_generation::*;
-
 mod sector;
 pub use sector::*;
 
 mod menu;
 pub use menu::*;
 
-mod loading_screen;
-pub use loading_screen::*;
-
 mod main_state;
 pub use main_state::*;
-
-mod debug_menu;
-pub use debug_menu::*;
 
 mod galaxy_travel;
 pub use galaxy_travel::*;
@@ -33,3 +24,15 @@ pub use cutscene_new_planet::*;
 
 mod overworld_map;
 pub use overworld_map::*;
+
+// TODO: fix loading screen
+// mod loading_screen;
+// pub use loading_screen::*;
+
+// TODO: fix map generation debug
+// mod map_generation;
+// pub use map_generation::*;
+
+// TODO: fix debug menu
+// mod debug_menu;
+// pub use debug_menu::*;
