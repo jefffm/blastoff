@@ -122,6 +122,7 @@ impl Scene<Resources, Controls> for OverworldMap {
                         OverworldMapInput::MoveE => self.move_player(OverworldVector::new(1, 0)),
                         OverworldMapInput::MoveW => self.move_player(OverworldVector::new(-1, 0)),
                         OverworldMapInput::Activate => {
+                            // TODO: this logic needs to move somewhere else (like how we had it in LoadingScreen)
                             let mapgen = Combo::new(MapTemplate::new(
                                 SECTOR_SIZE,
                                 Tile::Floor(FloorKind::FloorScenery('~')),
