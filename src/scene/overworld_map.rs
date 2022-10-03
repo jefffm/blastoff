@@ -1,5 +1,7 @@
 use std::rc::Rc;
 
+use ggez::input::keyboard::KeyCode;
+
 use crate::{
     game::consts::{get_screen_to_pixel_transform_float, SCREEN_RECT},
     input::Controls,
@@ -78,7 +80,22 @@ impl OverworldMap {
 }
 
 impl Scene<Resources, Controls> for OverworldMap {
-    fn input(&mut self, resources: &mut Resources, controls: &mut Controls, started: bool) {}
+    fn input(&mut self, resources: &mut Resources, controls: &mut Controls, started: bool) {
+        if let Some(key) = controls.read() {
+            self.input = match self.state {
+                OverworldMapState::NeedsIntroCutscene => None,
+                OverworldMapState::Ready => match key {
+                    // KeyCode::Escape => Some(OverworldMapInput::Exit),
+                    KeyCode::Up => Some(OverworldMapInput::MoveN),
+                    KeyCode::Down => Some(OverworldMapInput::MoveS),
+                    KeyCode::Left => Some(OverworldMapInput::MoveW),
+                    KeyCode::Right => Some(OverworldMapInput::MoveE),
+                    // KeyCode::Space => Some(OverworldMapInput::Activate),
+                    _ => None,
+                },
+            }
+        }
+    }
 
     fn update(
         &mut self,

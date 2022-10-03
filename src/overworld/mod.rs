@@ -64,8 +64,15 @@ impl Overworld {
     }
 
     pub fn clamp(&self, point: OverworldPoint) -> OverworldPoint {
-        let clamped_x = point.x.max(self.info.rect.min_x());
-        let clamped_y = point.x.max(self.info.rect.min_y());
+        // TODO: move this logic to a RectExt trait clamp method
+        let clamped_x = point
+            .x
+            .max(self.info.rect.min_x())
+            .min(self.info.rect.max_x() - 1);
+        let clamped_y = point
+            .y
+            .max(self.info.rect.min_y())
+            .min(self.info.rect.max_y() - 1);
 
         OverworldPoint::new(clamped_x, clamped_y)
     }
