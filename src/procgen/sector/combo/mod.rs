@@ -5,6 +5,7 @@ use crate::{
     color::{Palette, COMMON},
     component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed},
     procgen::Spawner,
+    resource::Resources,
     sector::{self, Map, Tile},
     util::{TransformExt, WorldPoint, WorldSize, WorldSpace, PLAYER},
 };
@@ -26,12 +27,8 @@ impl SubMap {
             dest_point,
         }
     }
-    fn generate(
-        &mut self,
-        rng: &mut bracket_random::prelude::RandomNumberGenerator,
-        mapgen_history: &mut Vec<Map>,
-    ) -> Map {
-        self.mapgen.generate(self.size, rng, mapgen_history)
+    fn generate(&mut self, resources: &mut Resources, mapgen_history: &mut Vec<Map>) -> Map {
+        self.mapgen.generate(self.size, resources, mapgen_history)
     }
 }
 
@@ -68,8 +65,8 @@ impl MapGenerator for Combo {
     fn generate(
         &mut self,
         size: WorldSize,
-        // TODO: add default_tile argument
-        rng: &mut bracket_random::prelude::RandomNumberGenerator,
+        // TODO: add default_tile argument to WorldInfo/SectorInfo
+        resources: &mut Resources,
         mapgen_history: &mut Vec<sector::Map>,
     ) -> Map {
         let mut map = Map::init(String::from("meta map"), size, self.template.default_tile);
@@ -78,7 +75,7 @@ impl MapGenerator for Combo {
 
         // Composite submaps in-order onto the Combo map
         for gen in &mut self.template.submaps {
-            let submap = gen.generate(rng, mapgen_history);
+            let submap = gen.generate(resources, mapgen_history);
 
             // Create a transform to translate submap space into Combo map space
             let xform = Transform2D::<i32, WorldSpace, WorldSpace>::from_points(
@@ -110,12 +107,7 @@ impl MapGenerator for Combo {
 }
 
 impl Spawner for Combo {
-    fn spawn(
-        &self,
-        map: &Map,
-        world: &mut hecs::World,
-        _rng: &mut bracket_random::prelude::RandomNumberGenerator,
-    ) {
+    fn spawn(&self, map: &Map, world: &mut hecs::World, resources: &mut Resources) {
         for point in map.iter_points() {
             if let Tile::Floor(_) = map[&point] {
                 // Add the player

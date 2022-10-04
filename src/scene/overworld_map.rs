@@ -13,10 +13,10 @@ use crate::{
     resource::{Resources, Viewport},
     sector::{FloorKind, Tile},
     util::{
-        OverworldFloatPoint, OverworldPoint, OverworldSpace, OverworldToViewport,
-        OverworldVector, PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, TransformExt,
-        ViewportFloatPoint, ViewportFloatToScreen, ViewportPoint, ViewportRect, ViewportSize,
-        WorldPoint, WorldSize, PLAYER,
+        OverworldFloatPoint, OverworldPoint, OverworldSpace, OverworldToViewport, OverworldVector,
+        PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, TransformExt, ViewportFloatPoint,
+        ViewportFloatToScreen, ViewportPoint, ViewportRect, ViewportSize, WorldPoint, WorldSize,
+        PLAYER,
     },
 };
 
@@ -148,7 +148,7 @@ impl Scene<Resources, Controls> for OverworldMap {
 
                             // Create the loader
                             let mut loader =
-                                SectorProcgenLoader::new(mapgen, &mut resources.rng, &mut history);
+                                SectorProcgenLoader::new(mapgen, resources, &mut history);
 
                             let sector = {
                                 let mut planet = (*self.planet).borrow_mut();

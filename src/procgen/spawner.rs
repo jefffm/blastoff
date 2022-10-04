@@ -1,8 +1,7 @@
-use bracket_random::prelude::RandomNumberGenerator;
 use hecs::World;
 
-use crate::sector::Map;
+use crate::{resource::Resources, sector::Map};
 
 pub trait Spawner {
-    fn spawn(&self, map: &Map, world: &mut World, rng: &mut RandomNumberGenerator);
+    fn spawn(&self, map: &Map, world: &mut World, resources: &mut Resources);
 }

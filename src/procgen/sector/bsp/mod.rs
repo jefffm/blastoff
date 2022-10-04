@@ -3,6 +3,7 @@ use bracket_random::prelude::RandomNumberGenerator;
 use crate::camera::Glyph;
 use crate::color::{Palette, COMMON, FIRE, PLANT, WATER};
 use crate::procgen::Spawner;
+use crate::resource::Resources;
 use crate::sector::{FloorKind, Map, Tile, WallKind};
 use crate::util::{
     WorldPoint, WorldRect, WorldSize, WorldVector, ANIMAL1, ANIMAL2, ANIMAL3, PLAYER,
@@ -151,7 +152,7 @@ impl MapGenerator for Bsp {
     fn generate(
         &mut self,
         _size: WorldSize,
-        rng: &mut RandomNumberGenerator,
+        resources: &mut Resources,
         mapgen_history: &mut Vec<sector::Map>,
     ) -> Map {
         let mut map = Map::init(
@@ -159,6 +160,8 @@ impl MapGenerator for Bsp {
             self.size,
             Tile::Floor(FloorKind::FloorDefault),
         );
+
+        let rng = &mut resources.rng;
 
         // Initialize with a single Rect
         let mut rects = vec![WorldRect::new(WorldPoint::new(0, 0), self.size)];
@@ -230,7 +233,8 @@ impl MapGenerator for Bsp {
     }
 }
 impl Spawner for Bsp {
-    fn spawn(&self, _map: &Map, world: &mut hecs::World, rng: &mut RandomNumberGenerator) {
+    fn spawn(&self, _map: &Map, world: &mut hecs::World, resources: &mut Resources) {
+        let rng = &mut resources.rng;
         let center = self.rooms[0].center();
 
         let mut viewshed = Viewshed::default().with_range(10);

@@ -7,7 +7,6 @@ pub mod seed;
 
 use std::num::NonZeroU32;
 
-use bracket_random::prelude::RandomNumberGenerator;
 use grid_2d::Grid;
 use rand::Rng;
 use wfc::orientation::Orientation;
@@ -21,6 +20,7 @@ use crate::camera::Glyph;
 use crate::color::{Palette, COMMON};
 use crate::component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed};
 use crate::procgen::Spawner;
+use crate::resource::Resources;
 use crate::sector::{Map, Tile};
 use crate::util::{WorldSize, PLAYER};
 
@@ -103,7 +103,7 @@ impl MapGenerator for WfcGen {
     fn generate(
         &mut self,
         size: WorldSize,
-        rng: &mut RandomNumberGenerator,
+        resources: &mut Resources,
         mapgen_history: &mut Vec<Map>,
     ) -> Map {
         let output_size = Size::new(size.width as u32, size.height as u32);
@@ -119,7 +119,7 @@ impl MapGenerator for WfcGen {
                 WrapNone,
                 ForbidNothing,
                 // forbid.clone(),
-                rng.get_rng(), // &mut rand::thread_rng(),
+                resources.rng.get_rng(), // &mut rand::thread_rng(),
             ) {
                 break grid;
             }
@@ -140,7 +140,7 @@ impl MapGenerator for WfcGen {
 }
 
 impl Spawner for WfcGen {
-    fn spawn(&self, map: &Map, world: &mut hecs::World, _rng: &mut RandomNumberGenerator) {
+    fn spawn(&self, map: &Map, world: &mut hecs::World, resources: &mut Resources) {
         for point in map.iter_points() {
             if let Tile::Floor(_) = map[&point] {
                 // Add the player

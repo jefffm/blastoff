@@ -2,6 +2,7 @@ use bracket_random::prelude::RandomNumberGenerator;
 use hecs::World;
 
 use crate::overworld::Overworld;
+use crate::resource::Resources;
 use crate::sector;
 use crate::util::WorldSize;
 
@@ -15,7 +16,7 @@ where
     T: MapGenerator + Spawner,
 {
     inner: T,
-    rng: &'a mut RandomNumberGenerator,
+    resources: &'a mut Resources,
     mapgen_history: &'a mut Vec<sector::Map>,
 }
 
@@ -25,21 +26,23 @@ where
 {
     pub fn new(
         inner: T,
-        rng: &'a mut RandomNumberGenerator,
+        resources: &'a mut Resources,
         mapgen_history: &'a mut Vec<sector::Map>,
     ) -> Self {
         Self {
             inner,
-            rng,
+            resources,
             mapgen_history,
         }
     }
 
     /// Generates the map and returns the Spawner
     pub fn load(&mut self, size: WorldSize, world: &mut World) -> sector::Map {
-        let map = self.inner.generate(size, self.rng, self.mapgen_history);
+        let map = self
+            .inner
+            .generate(size, self.resources, self.mapgen_history);
 
-        self.inner.spawn(&map, world, self.rng);
+        self.inner.spawn(&map, world, self.resources);
 
         map
     }
@@ -50,7 +53,7 @@ where
     T: OverworldGenerator,
 {
     inner: T,
-    rng: &'a mut RandomNumberGenerator,
+    resources: &'a mut Resources,
     overworldgen_history: &'a mut Vec<Overworld>,
 }
 
@@ -59,6 +62,6 @@ where
     T: GalaxyGenerator,
 {
     inner: T,
-    rng: &'a mut RandomNumberGenerator,
+    resources: &'a mut Resources,
     overworldgen_history: &'a mut Vec<Overworld>,
 }
