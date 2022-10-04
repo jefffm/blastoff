@@ -67,11 +67,6 @@ fn main() -> GameResult {
     tracing_subscriber::fmt().with_max_level(level).init();
 
     let mut builder = ContextBuilder::new("roguemon", "Jeff Lynn");
-    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
-        let path = path::PathBuf::from(manifest_dir).join(consts::RESOURCE_PATH);
-        tracing::info!("Adding 'resources' path {:?}", path);
-        builder = builder.add_resource_path(path);
-    }
     let (mut ctx, event_loop) = builder
         .window_setup(conf::WindowSetup::default().title(TITLE_HEADER).vsync(true))
         .window_mode(
@@ -89,17 +84,21 @@ fn main() -> GameResult {
     info!("using rng seed: {}", rng_seed);
 
     info!("linking resources");
-    let cache = assets_manager::AssetCache::new("assets")?;
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR")
+        .map_err(|err| GameError::FilesystemError(err.to_string()))?;
 
-    info!("creating GameState");
+    let path = path::PathBuf::from(manifest_dir).join(consts::RESOURCE_PATH);
+    tracing::info!("Adding 'resources' path {:?}", path);
+    let cache = assets_manager::AssetCache::new(path)?;
+
     let font_image = cache
-        .load::<Image>("fonts.rex_16x16.png")
+        .load::<Image>("fonts.rex_16x16")
         .map_err(|err| GameError::ResourceLoadError(err.to_string()))?
         .read();
     let font = BitmapFont::from_grid(&ctx, font_image.to_image(&ctx), &SpriteSize::new(16, 16));
 
     let spritesheet_image = cache
-        .load::<Image>("fonts.colored-transparent.png")
+        .load::<Image>("tileset.colored-transparent")
         .map_err(|err| GameError::ResourceLoadError(err.to_string()))?
         .read();
     let spritesheet = SpriteSheet::from_grid(

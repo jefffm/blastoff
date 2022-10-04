@@ -30,6 +30,7 @@ impl Image {
 
 impl From<DynamicImage> for Image {
     fn from(img: DynamicImage) -> Self {
+        tracing::warn!("here");
         Self(Arc::new(img))
     }
 }
