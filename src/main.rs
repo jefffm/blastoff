@@ -1,6 +1,7 @@
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
+use ggez::GameError;
 use ggez::{ContextBuilder, GameResult};
 use std::{env, path};
 use tracing::info;
@@ -32,6 +33,7 @@ use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 use clap::Parser;
 use rand::RngCore;
 
+use crate::data::Image;
 use crate::game::consts::SCALING_FACTOR;
 use crate::game::consts::SCREEN_HEIGHT_PIXELS;
 use crate::game::consts::SCREEN_WIDTH_PIXELS;
@@ -87,15 +89,24 @@ fn main() -> GameResult {
     info!("using rng seed: {}", rng_seed);
 
     info!("linking resources");
-    // TODO: load sprite sheet like https://github.com/ggez/ggez/blob/0.8.0-rc0/examples/animation.rs#L237
+    let cache = assets_manager::AssetCache::new("assets")?;
 
     info!("creating GameState");
-    let font_image = graphics::Image::from_path(&ctx, "/fonts/rex_16x16.png").expect("load font");
-    let font = BitmapFont::from_grid(&ctx, font_image, &SpriteSize::new(16, 16));
+    let font_image = cache
+        .load::<Image>("fonts.rex_16x16.png")
+        .map_err(|err| GameError::ResourceLoadError(err.to_string()))?
+        .read();
+    let font = BitmapFont::from_grid(&ctx, font_image.to_image(&ctx), &SpriteSize::new(16, 16));
 
-    let spritesheet_image = graphics::Image::from_path(&ctx, "/tileset/colored-transparent.png")
-        .expect("load spritesheet");
-    let spritesheet = SpriteSheet::from_grid(&ctx, spritesheet_image, SpriteSize::new(49, 22));
+    let spritesheet_image = cache
+        .load::<Image>("fonts.colored-transparent.png")
+        .map_err(|err| GameError::ResourceLoadError(err.to_string()))?
+        .read();
+    let spritesheet = SpriteSheet::from_grid(
+        &ctx,
+        spritesheet_image.to_image(&ctx),
+        SpriteSize::new(49, 22),
+    );
 
     // Global Resources struct used for resources shared across scenes
     let resources = Resources {
