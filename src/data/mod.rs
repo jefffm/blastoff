@@ -9,3 +9,6 @@ pub use galaxy::*;
 
 mod element;
 pub use element::*;
+
+mod enum_probability;
+pub use enum_probability::*;

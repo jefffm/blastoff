@@ -2,7 +2,7 @@
 planet_count:
   n_dice: 6
   die_type: 2
-  bonus: 0
+  bonus: 2
 planet_type:
   n_dice: 6
   die_type: 2

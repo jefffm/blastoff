@@ -51,6 +51,6 @@ mod tests {
             .unwrap()
             .read();
 
-        assert_eq!(galaxy_probability.planet_count, DiceType::new(6, 2, 0));
+        assert_eq!(galaxy_probability.planet_count, DiceType::new(6, 2, 2));
     }
 }
