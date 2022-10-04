@@ -2,12 +2,12 @@ use assets_manager::{loader::YamlLoader, Asset};
 use bracket_random::prelude::DiceType;
 use serde::{Deserialize, Serialize};
 
-use super::{Element, ElementProbability};
+use super::{ElementProbability, PlanetTypeProbability};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GalaxyProbability {
     planet_count: DiceType,
-    planet_type: DiceType,
+    planet_type: PlanetTypeProbability,
     planet_element: ElementProbability,
 }
 

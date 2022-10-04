@@ -4,9 +4,11 @@ planet_count:
   die_type: 2
   bonus: 2
 planet_type:
-  n_dice: 6
-  die_type: 2
-  bonus: 0
+  items:
+    Water: 1.0
+    Fire: 1.0
+    Plant: 1.0
+    Barren: 1.0
 planet_element:
   items:
     Water: 1.0
