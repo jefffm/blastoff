@@ -59,6 +59,10 @@ impl Galaxy {
         self.planet_map.get(point).map(|planet| planet.clone())
     }
 
+    pub fn iter_planets(&self) -> impl Iterator<Item = (&GalaxyPoint, &Rc<RefCell<Overworld>>)> {
+        self.planet_map.iter()
+    }
+
     pub fn find(&self, point: &GalaxyPoint) -> Option<PlanetInfo> {
         self.planet_infos
             .iter()
@@ -110,5 +114,7 @@ impl Default for GalaxyProbability {
 }
 
 impl GalaxyProbability {
-    pub fn roll_galaxy(&self) -> Vec<PlanetInfo> {}
+    // pub fn roll_galaxy(&self) -> Vec<PlanetInfo> {
+    //     0..planet
+    // }
 }

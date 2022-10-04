@@ -1,10 +1,6 @@
 use bracket_random::prelude::RandomNumberGenerator;
 
-use crate::{
-    galaxy::GalaxyInfo,
-    overworld::{Overworld, OverworldTile, PlanetInfo},
-    util::OverworldSize,
-};
+use crate::overworld::{Overworld, OverworldTile, PlanetInfo};
 
 pub trait OverworldGenerator {
     fn generate(&mut self, planet_info: PlanetInfo, rng: &mut RandomNumberGenerator) -> Overworld;

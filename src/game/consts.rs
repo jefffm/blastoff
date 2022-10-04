@@ -64,15 +64,3 @@ pub const SECTOR_HEIGHT: i32 = 100;
 pub const SECTOR_SIZE: WorldSize = WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT);
 
 pub const MAX_PLANET_SPRITE_SIZE: f32 = 64.;
-
-#[cfg(test)]
-pub mod tests {
-    use super::*;
-    #[test]
-    fn geometry() {
-        let screen_point = SCREEN_RECT.center();
-        let pixel_point = get_screen_to_pixel_transform().transform_point(screen_point);
-
-        assert_eq!(pixel_point, PixelPoint::new(480, 256));
-    }
-}

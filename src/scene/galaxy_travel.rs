@@ -49,8 +49,8 @@ impl GalaxyTravel {
         // Initialize selection with whatever's first in the vec
         let state = MenuResult::Unconfirmed {
             selection: galaxy
-                .iter_content()
-                .map(|(point, _overworld)| *point)
+                .iter_planet_infos()
+                .map(|(point, _info)| *point)
                 .next()
                 .expect("any planets exist"),
         };
@@ -75,7 +75,7 @@ impl GalaxyTravel {
 impl Scene<Resources, Controls> for GalaxyTravel {
     fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         let selection = self.state.selection();
-        let planets: Vec<_> = self.galaxy.iter_content().collect();
+        let planets: Vec<_> = self.galaxy.iter_planet_infos().collect();
 
         self.state = match controls.read() {
             None => MenuResult::Unconfirmed {
@@ -126,11 +126,17 @@ impl Scene<Resources, Controls> for GalaxyTravel {
             MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
             MenuResult::Confirmed {
                 selection: galaxy_point,
-            } => SceneSwitch::Push(Box::new(OverworldMap::new(
-                self.galaxy
-                    .find(&galaxy_point)
-                    .expect("point to selected galaxy exists"),
-            ))),
+            } => {
+                if let Some(planet) = self.galaxy.get_planet(&galaxy_point) {
+                    SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
+                } else {
+                    tracing::warn!(
+                        "Tried to navigate to a planet that doesn't exist at {:?}",
+                        galaxy_point
+                    );
+                    SceneSwitch::None
+                }
+            }
         }
     }
 
@@ -141,7 +147,7 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
         // TODO: planets should be arranged in a Bootstrap Carousel-style left/right scrolley thing
-        for (i, (point, planet)) in self.galaxy.iter_content().enumerate() {
+        for (i, (point, planet)) in self.galaxy.iter_planets().enumerate() {
             let y = i as i32 * MAX_PLANET_SPRITE_SIZE as i32;
 
             resources.font.push_text(

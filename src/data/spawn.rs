@@ -86,15 +86,15 @@ mod tests {
   name: Kobold
   glyph: "k"
   fg:
-    r: 1.0
-    g: 1.0
-    b: 1.0
-    a: 1.0
+    r: 0
+    g: 0
+    b: 0
+    a: 255
   bg:
-    r: 1.0
-    g: 1.0
-    b: 1.0
-    a: 1.0
+    r: 255
+    g: 255
+    b: 255
+    a: 255
   view_range: 10
   energy_capacity: 100
   movement_cost: 20
