@@ -11,21 +11,6 @@ pub struct GalaxyProbability {
     planet_element: ElementProbability,
 }
 
-// TODO: move GalaxyProbabiliy Default into the yaml
-impl Default for GalaxyProbability {
-    fn default() -> Self {
-        Self {
-            planet_count: DiceType::new(6, 2, 0),
-            planet_type: DiceType::new(6, 2, 0),
-            planet_element: ElementProbability::new(vec![
-                (Element::Water, 1.0),
-                (Element::Fire, 2.0),
-                (Element::Plant, 5.0),
-            ]),
-        }
-    }
-}
-
 impl Asset for GalaxyProbability {
     const EXTENSION: &'static str = "yaml";
     const EXTENSIONS: &'static [&'static str] = &[Self::EXTENSION];

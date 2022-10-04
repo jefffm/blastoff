@@ -1,0 +1,14 @@
+---
+planet_count:
+  n_dice: 6
+  die_type: 2
+  bonus: 0
+planet_type:
+  n_dice: 6
+  die_type: 2
+  bonus: 0
+planet_element:
+  items:
+    Water: 1.0
+    Fire: 1.0
+    Plant: 1.0

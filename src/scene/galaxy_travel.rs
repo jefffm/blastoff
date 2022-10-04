@@ -44,7 +44,7 @@ impl GalaxyTravel {
         resources: &mut Resources,
     ) -> GalaxyTravel {
         let mut loader = StaticGalaxy {};
-        let galaxy = loader.generate(&mut resources.rng);
+        let galaxy = loader.generate(resources);
 
         // Initialize selection with whatever's first in the vec
         let state = MenuResult::Unconfirmed {

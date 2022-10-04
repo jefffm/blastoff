@@ -4,6 +4,7 @@ use bracket_random::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    data::GalaxyProbability,
     overworld::{Overworld, PlanetInfo},
     util::{GalaxyPoint, GalaxySize},
 };
@@ -94,27 +95,4 @@ impl GalaxyInfo {
     pub fn height(&self) -> i32 {
         self.size.height
     }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GalaxyProbability {
-    planet_count: DiceType,
-    planet_type: DiceType,
-    planet_element: DiceType,
-}
-
-impl Default for GalaxyProbability {
-    fn default() -> Self {
-        Self {
-            planet_count: DiceType::new(6, 2, 0),
-            planet_type: DiceType::new(6, 2, 0),
-            planet_element: DiceType::new(6, 2, 0),
-        }
-    }
-}
-
-impl GalaxyProbability {
-    // pub fn roll_galaxy(&self) -> Vec<PlanetInfo> {
-    //     0..planet
-    // }
 }

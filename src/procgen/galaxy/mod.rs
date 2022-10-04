@@ -1,21 +1,24 @@
 use bracket_random::prelude::RandomNumberGenerator;
 
 use crate::{
-    galaxy::{Galaxy, GalaxyInfo, GalaxyProbability},
+    data::GalaxyProbability,
+    galaxy::{Galaxy, GalaxyInfo},
     overworld::PlanetInfo,
+    resource::Resources,
     util::{GalaxyPoint, GalaxySize, OverworldSize},
 };
 
 use super::StaticPlanet;
 
 pub trait GalaxyGenerator {
-    fn generate(&mut self, rng: &mut RandomNumberGenerator) -> Galaxy;
+    fn generate(&mut self, resources: &mut Resources) -> Galaxy;
 }
 
 pub struct StaticGalaxy {}
 impl GalaxyGenerator for StaticGalaxy {
-    fn generate(&mut self, rng: &mut RandomNumberGenerator) -> Galaxy {
-        let info = generate_galaxy_info(rng);
+    fn generate(&mut self, resources: &mut Resources) -> Galaxy {
+        let info = generate_galaxy_info(resources);
+        let rng = &mut resources.rng;
         let num_planets = rng.roll_dice(3, 6);
 
         // TODO: GalaxyGenerator should decide how to generate a templated number of different types of Planets
@@ -42,16 +45,19 @@ impl GalaxyGenerator for StaticGalaxy {
 }
 
 /// Galaxy Info
-fn generate_galaxy_info(rng: &mut RandomNumberGenerator) -> GalaxyInfo {
+fn generate_galaxy_info(resources: &mut Resources) -> GalaxyInfo {
     // TODO: GalaxyInfo should have probability definitions for which types of planets to create
-    let width = rng.roll_dice(3, 6);
-    let height = rng.roll_dice(3, 6);
+    let width = resources.rng.roll_dice(3, 6);
+    let height = resources.rng.roll_dice(3, 6);
+
+    // Load GalaxyProbability from assets data files
+    let galaxy_probability = resources.load_asset::<GalaxyProbability>("data.galaxy_probability");
 
     GalaxyInfo::new(
         "Procgen Galaxy Name".to_owned(),
         GalaxySize::new(width, height),
         // TODO: load GalaxyProbability from yaml
-        GalaxyProbability::default(),
+        galaxy_probability.read().clone(),
     )
 }
 
