@@ -1,14 +1,9 @@
-use bracket_random::prelude::RandomNumberGenerator;
-
 use crate::{
     data::GalaxyProbability,
     galaxy::{Galaxy, GalaxyInfo},
-    overworld::PlanetInfo,
     resource::Resources,
-    util::{GalaxyPoint, GalaxySize, OverworldSize},
+    util::{GalaxyPoint, GalaxySize},
 };
-
-use super::StaticPlanet;
 
 pub trait GalaxyGenerator {
     fn generate(&mut self, resources: &mut Resources) -> Galaxy;
@@ -21,11 +16,9 @@ impl GalaxyGenerator for StaticGalaxy {
         let rng = &mut resources.rng;
         let num_planets = rng.roll_dice(3, 6);
 
-        // TODO: GalaxyGenerator should decide how to generate a templated number of different types of Planets
-        let mut overworld_generator = StaticPlanet {};
         let mut planets: Vec<_> = (0..num_planets)
             // First, create all the OverworldInfos
-            .map(|_| generate_planet_info(&info, rng))
+            .map(|_| info.probability.roll_planet(rng))
             .collect::<Vec<_>>()
             .into_iter()
             // Then figure out which Galaxy coordinates to use for this planet
@@ -56,18 +49,6 @@ fn generate_galaxy_info(resources: &mut Resources) -> GalaxyInfo {
     GalaxyInfo::new(
         "Procgen Galaxy Name".to_owned(),
         GalaxySize::new(width, height),
-        // TODO: load GalaxyProbability from yaml
         galaxy_probability.read().clone(),
-    )
-}
-
-fn generate_planet_info(_info: &GalaxyInfo, rng: &mut RandomNumberGenerator) -> PlanetInfo {
-    let width = rng.roll_dice(3, 6);
-    let height = rng.roll_dice(3, 6);
-
-    // TODO: use GalaxyInfo to derive a World Type (to determine the majority of terrain types and elements)
-    PlanetInfo::new(
-        format!("Procgen Planet Name #{}", rng.roll_dice(2, 20)),
-        OverworldSize::new(width, height),
     )
 }

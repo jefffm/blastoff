@@ -86,6 +86,7 @@ impl Scene<Resources, Controls> for CutsceneNewPlanet {
         let planet: Ref<Overworld> = (*self.planet).borrow();
         resources.spritesheet.push_sprite(
             planet
+                .info()
                 .sprite()
                 // TODO: this overwrites everything defined about the sprite including color
                 .with_params(DrawParam::default().scale([scale, scale])),

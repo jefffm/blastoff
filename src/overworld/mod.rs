@@ -8,7 +8,8 @@ use std::{cell::RefCell, collections::HashMap, fmt, rc::Rc};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    color::{RGBA8Ext, FIRE},
+    color::{RGBA8Ext, FIRE, PLANT, WATER},
+    data::{Element, PlanetType},
     game::consts::{MAX_PLANET_SPRITE_SIZE, SECTOR_HEIGHT, SECTOR_WIDTH},
     procgen::{MapGenerator, SectorProcgenLoader, Spawner},
     sector,
@@ -120,30 +121,6 @@ impl Overworld {
         self.get_sector(point).unwrap()
     }
 
-    /// Sprites are scaled and colored according to their PlanetInfo
-    /// First, we figure out the scale by deriving a square size from the
-    /// planet's area (planets can technically be rectangles).
-    /// Then we
-    pub fn sprite(&self) -> Sprite {
-        // x normalized = (x – x minimum) / (x maximum – x minimum)
-        let area = self.info.size.area() as f32;
-        let x = area.sqrt();
-
-        // TODO: remove magic numbers from planet sprite
-        let x_min: f32 = 1.;
-        let x_max: f32 = 18. * 18.;
-        let scale = (x - x_min) / (x_max - x_min);
-
-        PLANET.with_params(
-            DrawParam::default()
-                .scale([
-                    MAX_PLANET_SPRITE_SIZE * scale,
-                    MAX_PLANET_SPRITE_SIZE * scale,
-                ])
-                .color(self.color().to_ggez_color()),
-        )
-    }
-
     pub fn color(&self) -> RGBA8 {
         self.info.color()
     }
@@ -162,7 +139,7 @@ impl Overworld {
 
 impl fmt::Display for Overworld {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("Planet {} ({:?})", self.info.name, self.info.size))
+        f.write_str(&format!("Overworld of {}", self.info))
     }
 }
 
@@ -171,12 +148,25 @@ pub struct PlanetInfo {
     name: String,
     size: OverworldSize,
     rect: OverworldRect,
+    planet_type: PlanetType,
+    element: Element,
 }
 
 impl PlanetInfo {
-    pub fn new(name: String, size: OverworldSize) -> Self {
+    pub fn new(
+        name: String,
+        size: OverworldSize,
+        planet_type: PlanetType,
+        element: Element,
+    ) -> Self {
         let rect = OverworldRect::new(OverworldPoint::new(0, 0), size);
-        Self { name, size, rect }
+        Self {
+            name,
+            size,
+            rect,
+            planet_type,
+            element,
+        }
     }
 
     pub fn center(&self) -> OverworldPoint {
@@ -184,7 +174,40 @@ impl PlanetInfo {
     }
 
     pub fn color(&self) -> RGBA8 {
-        // TODO: match on planet info for elemental types to determine color
-        FIRE.four
+        match self.element {
+            Element::Water => WATER.five,
+            Element::Fire => FIRE.five,
+            Element::Plant => PLANT.five,
+        }
+    }
+
+    /// Sprites are scaled and colored according to their PlanetInfo
+    /// First, we figure out the scale by deriving a square size from the
+    /// planet's area (planets can technically be rectangles).
+    /// Then we
+    pub fn sprite(&self) -> Sprite {
+        // x normalized = (x – x minimum) / (x maximum – x minimum)
+        let area = self.size.area() as f32;
+        let x = area.sqrt();
+
+        // TODO: remove magic numbers from planet sprite
+        let x_min: f32 = 1.;
+        let x_max: f32 = 18. * 18.;
+        let scale = (x - x_min) / (x_max - x_min);
+
+        PLANET.with_params(
+            DrawParam::default()
+                .scale([
+                    MAX_PLANET_SPRITE_SIZE * scale,
+                    MAX_PLANET_SPRITE_SIZE * scale,
+                ])
+                .color(self.color().to_ggez_color()),
+        )
+    }
+}
+
+impl fmt::Display for PlanetInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("Planet {} ({:?})", self.name, self.size))
     }
 }

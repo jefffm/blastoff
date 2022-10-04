@@ -147,11 +147,11 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
         // TODO: planets should be arranged in a Bootstrap Carousel-style left/right scrolley thing
-        for (i, (point, planet)) in self.galaxy.iter_planets().enumerate() {
+        for (i, (point, planet_info)) in self.galaxy.iter_planet_infos().enumerate() {
             let y = i as i32 * MAX_PLANET_SPRITE_SIZE as i32;
 
             resources.font.push_text(
-                &format!("{} at {:?}", (*planet).borrow(), point),
+                &format!("{} at {:?}", planet_info, *point),
                 &PixelPoint::new(2 * MAX_PLANET_SPRITE_SIZE as i32, y),
                 None,
             );
@@ -159,7 +159,7 @@ impl Scene<Resources, Controls> for GalaxyTravel {
             let planet_pixel_point = PixelPoint::new(1 * TILE_SIZE.width, y);
             resources
                 .spritesheet
-                .push_sprite((*planet).borrow().sprite(), planet_pixel_point);
+                .push_sprite(planet_info.sprite(), planet_pixel_point);
 
             if let MenuResult::Unconfirmed {
                 selection: selected_point,

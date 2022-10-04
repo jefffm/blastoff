@@ -76,7 +76,7 @@ impl Galaxy {
 pub struct GalaxyInfo {
     name: String,
     size: GalaxySize,
-    probability: GalaxyProbability,
+    pub probability: GalaxyProbability,
 }
 
 impl GalaxyInfo {
