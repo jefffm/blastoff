@@ -74,7 +74,6 @@ impl GalaxyTravel {
 
 impl Scene<Resources, Controls> for GalaxyTravel {
     fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
-        // TODO: left and right cycle through planets
         let selection = self.state.selection();
         let planets: Vec<_> = self.galaxy.iter_content().collect();
 
@@ -123,8 +122,6 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         _resources: &mut Resources,
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
-        // TODO: On planet selection, transition to Overworld (potentially with a cutscene first?)
-
         match self.state {
             MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
             MenuResult::Confirmed {
@@ -143,6 +140,7 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         _ctx: &mut ggez::Context,
         canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
+        // TODO: planets should be arranged in a Bootstrap Carousel-style left/right scrolley thing
         for (i, (point, planet)) in self.galaxy.iter_content().enumerate() {
             let y = i as i32 * MAX_PLANET_SPRITE_SIZE as i32;
 

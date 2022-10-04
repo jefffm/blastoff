@@ -129,6 +129,7 @@ impl Overworld {
         let area = self.info.size.area() as f32;
         let x = area.sqrt();
 
+        // TODO: remove magic numbers from planet sprite
         let x_min: f32 = 1.;
         let x_max: f32 = 18. * 18.;
         let scale = (x - x_min) / (x_max - x_min);
