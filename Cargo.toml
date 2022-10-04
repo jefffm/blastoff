@@ -35,3 +35,4 @@ keyframe_derive = "1.0"
 rmp-serde = "1.1"
 assets_manager = { version = "0.8", features = ["yaml", "image"] }
 assets_manager_macros = "0.2"
+rand_distr = "0.4"
