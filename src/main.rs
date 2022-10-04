@@ -119,6 +119,7 @@ fn main() -> GameResult {
         ),
         font,
         spritesheet,
+        assets: cache,
     };
 
     let mut game = MainState::new(resources, &mut ctx);
