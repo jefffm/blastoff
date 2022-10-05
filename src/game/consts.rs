@@ -6,8 +6,9 @@ use crate::util::{
 };
 
 // 16:9
-pub const SCREEN_WIDTH_PIXELS: i32 = 320 * 4;
-pub const SCREEN_HEIGHT_PIXELS: i32 = 180 * 4;
+pub const SCALING_FACTOR: f32 = 2.;
+pub const SCREEN_WIDTH_PIXELS: i32 = 320 * 3;
+pub const SCREEN_HEIGHT_PIXELS: i32 = 180 * 3;
 pub const TILE_SIZE: PixelSize = PixelSize::new(16, 16);
 
 /// euclid Rect isn't const, so this is manually calculated
@@ -52,8 +53,6 @@ pub const TOP_BOX_HEIGHT: i32 = SCREEN_HEIGHT - VIEWPORT_HEIGHT;
 pub const SIDE_BOX_WIDTH: i32 = SCREEN_WIDTH - VIEWPORT_WIDTH;
 
 pub const RESOURCE_PATH: &str = "assets";
-
-pub const SCALING_FACTOR: f32 = 1.;
 
 pub const USE_SPRITES: bool = true;
 
