@@ -23,7 +23,7 @@ impl GalaxyGenerator for StaticGalaxy {
                 let name = generate_planet_name(resources);
                 tracing::warn!("Generated planet name: {}", &name);
                 let rng = &mut resources.rng;
-                info.probability.roll_planet(name.to_owned(), rng)
+                info.probability.roll_planet(name, rng)
             })
             .collect::<Vec<_>>()
             .into_iter()
@@ -37,6 +37,7 @@ impl GalaxyGenerator for StaticGalaxy {
             })
             .collect();
 
+        // TODO: planet dedup doesn't seem to work(?)
         planets.dedup_by_key(|(point, _)| *point);
 
         Galaxy::from_size(info).with_planet_infos(planets)
@@ -45,7 +46,6 @@ impl GalaxyGenerator for StaticGalaxy {
 
 /// Galaxy Info
 fn generate_galaxy_info(resources: &mut Resources) -> GalaxyInfo {
-    // TODO: GalaxyInfo should have probability definitions for which types of planets to create
     let width = resources.rng.roll_dice(3, 6);
     let height = resources.rng.roll_dice(3, 6);
 

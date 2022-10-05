@@ -28,6 +28,10 @@ impl GalaxyProbability {
         let width = rng.roll_dice(3, 6);
         let height = rng.roll_dice(3, 6);
         let inner = rng.get_rng();
+
+        // TODO: create a PlanetProbability and give it to PlanetInfo for
+        // generating different sectors(?) or are Planets different from
+        // Galaxies? (since this would be tile-type-based)
         PlanetInfo::new(
             name,
             OverworldSize::new(width, height),

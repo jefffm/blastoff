@@ -1,6 +1,5 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
-use bracket_random::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -54,10 +53,12 @@ impl Galaxy {
     /// The entire galaxy is always populated with all possible points and their
     /// corresponding PlanetInfos
     pub fn iter_planet_infos(&self) -> impl Iterator<Item = &(GalaxyPoint, PlanetInfo)> {
+        // TODO: enforce no duplicates
         self.planet_infos.iter()
     }
 
     pub fn set_planet(&mut self, point: GalaxyPoint, overworld: Overworld) {
+        // TODO: assert galaxy point is in Galaxy rect
         self.planet_map
             .insert(point, Rc::new(RefCell::new(overworld)));
     }
