@@ -208,6 +208,6 @@ impl PlanetInfo {
 
 impl fmt::Display for PlanetInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("Planet {} ({:?})", self.name, self.size))
+        f.write_str(&format!("{} ({:?})", self.name, self.size))
     }
 }

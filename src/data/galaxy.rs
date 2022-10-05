@@ -3,7 +3,7 @@ use bracket_random::prelude::{DiceType, RandomNumberGenerator};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use crate::{overworld::PlanetInfo, util::OverworldSize};
+use crate::{overworld::PlanetInfo, procgen::generate_planet_name, util::OverworldSize};
 
 use super::{ElementProbability, PlanetTypeProbability};
 
@@ -24,19 +24,12 @@ impl Asset for GalaxyProbability {
 }
 
 impl GalaxyProbability {
-    pub fn roll_galaxy(&self, rng: &mut RandomNumberGenerator) -> Vec<PlanetInfo> {
-        (0..rng.roll(self.planet_count))
-            .into_iter()
-            .map(|_| self.roll_planet(rng))
-            .collect()
-    }
-
-    pub fn roll_planet(&self, rng: &mut RandomNumberGenerator) -> PlanetInfo {
+    pub fn roll_planet(&self, name: String, rng: &mut RandomNumberGenerator) -> PlanetInfo {
         let width = rng.roll_dice(3, 6);
         let height = rng.roll_dice(3, 6);
         let inner = rng.get_rng();
         PlanetInfo::new(
-            "TODO PLANET NAMING".to_owned(),
+            name,
             OverworldSize::new(width, height),
             self.planet_type.next_element(inner),
             self.planet_element.next_element(inner),
