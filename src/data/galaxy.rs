@@ -1,9 +1,9 @@
 use assets_manager::{loader::YamlLoader, Asset};
 use bracket_random::prelude::{DiceType, RandomNumberGenerator};
-use rand::Rng;
+
 use serde::{Deserialize, Serialize};
 
-use crate::{overworld::PlanetInfo, procgen::generate_planet_name, util::OverworldSize};
+use crate::{overworld::PlanetInfo, util::OverworldSize};
 
 use super::{ElementProbability, PlanetTypeProbability};
 

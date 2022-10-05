@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     data::GalaxyProbability,
     overworld::{Overworld, PlanetInfo},
+    procgen::{OverworldGenerator, OverworldProcgenLoader},
     util::{GalaxyPoint, GalaxySize},
 };
 
@@ -56,8 +57,26 @@ impl Galaxy {
         self.planet_infos.iter()
     }
 
+    pub fn set_planet(&mut self, point: GalaxyPoint, overworld: Overworld) {
+        self.planet_map
+            .insert(point, Rc::new(RefCell::new(overworld)));
+    }
+
     pub fn get_planet(&self, point: &GalaxyPoint) -> Option<Rc<RefCell<Overworld>>> {
-        self.planet_map.get(point).map(|planet| planet.clone())
+        self.planet_map.get(point).cloned()
+    }
+
+    /// Use procgen to create a new Sector at a given overworld grid point
+    pub fn create_planet<'a, T: OverworldGenerator>(
+        &mut self,
+        point: &GalaxyPoint,
+        loader: &mut OverworldProcgenLoader<'a, T>,
+    ) -> Rc<RefCell<Overworld>> {
+        let planet_info = self.find(point).expect("planet should have an info");
+        let overworld = loader.load(planet_info);
+
+        self.set_planet(*point, overworld);
+        self.get_planet(point).unwrap()
     }
 
     pub fn iter_planets(&self) -> impl Iterator<Item = (&GalaxyPoint, &Rc<RefCell<Overworld>>)> {

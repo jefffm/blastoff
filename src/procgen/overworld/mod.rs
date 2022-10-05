@@ -1,19 +1,22 @@
 mod name;
 pub use name::*;
 
-use bracket_random::prelude::RandomNumberGenerator;
-
-use crate::overworld::{Overworld, OverworldTile, PlanetInfo};
+use crate::{
+    overworld::{Overworld, PlanetInfo},
+    resource::Resources,
+};
 
 pub trait OverworldGenerator {
-    fn generate(&mut self, planet_info: PlanetInfo, rng: &mut RandomNumberGenerator) -> Overworld;
+    fn generate(&mut self, planet_info: PlanetInfo, resources: &mut Resources) -> Overworld;
 }
 
 pub struct StaticPlanet {}
 impl OverworldGenerator for StaticPlanet {
-    fn generate(&mut self, info: PlanetInfo, _rng: &mut RandomNumberGenerator) -> Overworld {
-        // TODO: derive default tile from PlanetInfo
+    fn generate(&mut self, info: PlanetInfo, _resources: &mut Resources) -> Overworld {
+        let overworld = Overworld::from_info(info);
 
-        Overworld::from_size(info, OverworldTile::Barren)
+        // TODO: generate terrain using overworld info and rng
+
+        overworld
     }
 }

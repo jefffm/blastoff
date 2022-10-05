@@ -11,7 +11,7 @@ use crate::{
     galaxy::Galaxy,
     game::consts::{MAX_PLANET_SPRITE_SIZE, TILE_SIZE},
     input::Controls,
-    procgen::{GalaxyGenerator, StaticGalaxy},
+    procgen::{GalaxyGenerator, OverworldProcgenLoader, StaticGalaxy, StaticPlanet},
     resource::Resources,
     util::{GalaxyPoint, PixelPoint, PointExt, Scene, SceneSwitch},
 };
@@ -119,7 +119,7 @@ impl Scene<Resources, Controls> for GalaxyTravel {
 
     fn update(
         &mut self,
-        _resources: &mut Resources,
+        resources: &mut Resources,
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
@@ -128,13 +128,14 @@ impl Scene<Resources, Controls> for GalaxyTravel {
                 selection: galaxy_point,
             } => {
                 if let Some(planet) = self.galaxy.get_planet(&galaxy_point) {
+                    // If the planet already exists, don't recreate it!
                     SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
                 } else {
-                    tracing::warn!(
-                        "Tried to navigate to a planet that doesn't exist at {:?}",
-                        galaxy_point
-                    );
-                    SceneSwitch::None
+                    // Create the planet when selected
+                    let overworld_gen = StaticPlanet {};
+                    let mut loader = OverworldProcgenLoader::new(overworld_gen, resources);
+                    let planet = self.galaxy.create_planet(&galaxy_point, &mut loader);
+                    SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
                 }
             }
         }

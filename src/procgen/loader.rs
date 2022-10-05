@@ -1,6 +1,7 @@
 use hecs::World;
 
 use crate::overworld::Overworld;
+use crate::overworld::PlanetInfo;
 use crate::resource::Resources;
 use crate::sector;
 use crate::util::WorldSize;
@@ -53,7 +54,18 @@ where
 {
     inner: T,
     resources: &'a mut Resources,
-    overworldgen_history: &'a mut Vec<Overworld>,
+}
+
+impl<'a, T> OverworldProcgenLoader<'a, T>
+where
+    T: OverworldGenerator,
+{
+    pub fn new(inner: T, resources: &'a mut Resources) -> Self {
+        Self { inner, resources }
+    }
+    pub fn load(&mut self, info: PlanetInfo) -> Overworld {
+        self.inner.generate(info, self.resources)
+    }
 }
 
 pub struct GalaxyProcgenLoader<'a, T>

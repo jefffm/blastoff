@@ -34,12 +34,13 @@ pub struct Overworld {
 }
 
 impl Overworld {
-    pub fn from_size(info: PlanetInfo, default_map_tile: OverworldTile) -> Self {
+    pub fn from_info(info: PlanetInfo) -> Self {
         // Tiles are generated upfront via default tiles (and whatever other procgen we use)
         let map = HashMap::with_capacity(info.size.area() as usize);
 
         // Sectors will be generated on-demand as they are visited
         let sectors = HashMap::with_capacity(info.size.area() as usize);
+        let default_map_tile = info.default_tile();
 
         Self::new(info, map, default_map_tile, sectors)
     }
@@ -181,11 +182,20 @@ impl PlanetInfo {
         }
     }
 
-    /// Sprites are scaled and colored according to their PlanetInfo
-    /// First, we figure out the scale by deriving a square size from the
-    /// planet's area (planets can technically be rectangles).
-    /// Then we
+    pub fn default_tile(&self) -> OverworldTile {
+        match self.planet_type {
+            PlanetType::Barren => OverworldTile::Barren,
+            PlanetType::Ice => todo!(),
+            PlanetType::Terran => todo!(),
+            PlanetType::Water => OverworldTile::Water,
+            PlanetType::Plant => OverworldTile::Jungle,
+            PlanetType::Fire => OverworldTile::Lava,
+        }
+    }
+
     pub fn sprite(&self) -> Sprite {
+        // Determine the sprite scale by deriving a square size from the
+        // planet's area (planets can technically be rectangles).
         // x normalized = (x – x minimum) / (x maximum – x minimum)
         let area = self.size.area() as f32;
         let x = area.sqrt();
