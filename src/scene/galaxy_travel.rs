@@ -179,13 +179,13 @@ impl Scene<Resources, Controls> for GalaxyTravel {
 
 /// Translate the desired selected planet to a window of visible planets
 /// Maybe something like 1-dimensional viewport rendering: the "center" is selected, while the cursor has a window size (3, 5, 7)
-pub struct Carousel<T> {
+pub struct Carousel<'a, T> {
     selected_idx: usize,
-    items: Vec<T>,
+    items: &'a [T],
 }
 
-impl<T> Carousel<T> {
-    pub fn new(selected_idx: usize, items: Vec<T>) -> Self {
+impl<'a, T> Carousel<'a, T> {
+    pub fn new(selected_idx: usize, items: &'a [T]) -> Self {
         Self {
             selected_idx,
             items,
@@ -193,7 +193,7 @@ impl<T> Carousel<T> {
     }
 
     /// return a slice of visible planets with the selected planet centered
-    pub fn visible(&self, size: usize) -> Vec<&T> {
+    pub fn visible(&self, size: usize) -> impl Iterator<Item = &T> {
         assert!(
             size % 2 != 0,
             "size should be an odd number (it needs to have a center)"
@@ -209,12 +209,7 @@ impl<T> Carousel<T> {
         // Preventing overflow with addition, find the first item of the visible window
         let slice_start = ((self.selected_idx + self.items.len()) - pad_count) % self.items.len();
 
-        self.items
-            .iter()
-            .cycle()
-            .skip(slice_start)
-            .take(size)
-            .collect()
+        self.items.iter().cycle().skip(slice_start).take(size)
     }
 
     pub fn selected(&self) -> &T {
@@ -247,7 +242,8 @@ mod tests {
 
     #[test]
     fn cursor() {
-        let mut cursor = Carousel::new(1, vec![1, 2, 3, 4, 5]);
+        let items = vec![1, 2, 3, 4, 5];
+        let mut cursor = Carousel::new(1, &items);
         assert_eq!(*cursor.selected(), 2);
         assert_eq!(*cursor.next_item(), 3);
         assert_eq!(*cursor.next_item(), 4);
@@ -260,6 +256,9 @@ mod tests {
         assert_eq!(*cursor.prev_item(), 1);
 
         assert_eq!(*cursor.selected(), 1);
-        assert_eq!(cursor.visible(5), vec![&4, &5, &1, &2, &3]);
+        assert_eq!(
+            cursor.visible(5).collect::<Vec<_>>(),
+            vec![&4, &5, &1, &2, &3]
+        );
     }
 }
