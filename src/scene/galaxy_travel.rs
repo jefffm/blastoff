@@ -149,9 +149,17 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         canvas: &mut ggez::graphics::Canvas,
     ) -> ggez::GameResult<()> {
         let selected_point = self.state.selection();
+        let planet_infos: Vec<&(GalaxyPoint, PlanetInfo)> =
+            self.galaxy.iter_planet_infos().collect();
+        let selected_idx = planet_infos
+            .iter()
+            .position(|(point, _)| point == selected_point)
+            .expect("Selected point should be a point in this galaxy");
 
-        // TODO: planets should be arranged in a Bootstrap Carousel-style left/right scrolley thing
-        for (i, (point, planet_info)) in self.galaxy.iter_planet_infos().enumerate() {
+        let carousel = Carousel::new(selected_idx, &planet_infos);
+        // TODO: create carousel size constant
+        let visible = carousel.visible(5);
+        for (i, (point, planet_info)) in visible.enumerate() {
             let y = i as i32 * MAX_PLANET_SPRITE_SIZE as i32;
 
             resources.font.push_text(
