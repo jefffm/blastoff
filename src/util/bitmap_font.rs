@@ -377,7 +377,7 @@ impl BitmapFont {
             sprite_sheet_size.width as usize,
             sprite_sheet_size.height as usize,
         );
-        let batch = graphics::InstanceArray::new(gfx, image, 100, true);
+        let batch = graphics::InstanceArray::new(gfx, image, 100);
 
         let sheet_size = text_map.sheet_size();
 

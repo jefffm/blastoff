@@ -84,7 +84,7 @@ impl SpriteSheet {
         sprite_sheet_size: SpriteSize,
     ) -> Self {
         let sprite_grid = SpriteGrid::from_grid(sprite_sheet_size);
-        let batch = graphics::InstanceArray::new(gfx, image, 100, true);
+        let batch = graphics::InstanceArray::new(gfx, image, 100);
 
         let rect_width = 1.0 / (sprite_sheet_size.width as f32);
         let rect_height = 1.0 / (sprite_sheet_size.height as f32);
