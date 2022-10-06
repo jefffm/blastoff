@@ -11,6 +11,7 @@ use crate::{
     galaxy::Galaxy,
     game::consts::{MAX_PLANET_SPRITE_SIZE, TILE_SIZE},
     input::Controls,
+    overworld::PlanetInfo,
     procgen::{GalaxyGenerator, OverworldProcgenLoader, StaticGalaxy, StaticPlanet},
     resource::Resources,
     util::{GalaxyPoint, PixelPoint, PointExt, Scene, SceneSwitch},
@@ -173,5 +174,92 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         }
 
         Ok(())
+    }
+}
+
+/// Translate the desired selected planet to a window of visible planets
+/// Maybe something like 1-dimensional viewport rendering: the "center" is selected, while the cursor has a window size (3, 5, 7)
+pub struct Carousel<T> {
+    selected_idx: usize,
+    items: Vec<T>,
+}
+
+impl<T> Carousel<T> {
+    pub fn new(selected_idx: usize, items: Vec<T>) -> Self {
+        Self {
+            selected_idx,
+            items,
+        }
+    }
+
+    /// return a slice of visible planets with the selected planet centered
+    pub fn visible(&self, size: usize) -> Vec<&T> {
+        assert!(
+            size % 2 != 0,
+            "size should be an odd number (it needs to have a center)"
+        );
+
+        assert!(
+            size <= self.items.len(),
+            "Size should be less than the number of items",
+        );
+        // How many extra items to pad on each side?
+        let pad_count = (size - 1) / 2;
+
+        // Preventing overflow with addition, find the first item of the visible window
+        let slice_start = ((self.selected_idx + self.items.len()) - pad_count) % self.items.len();
+
+        self.items
+            .iter()
+            .cycle()
+            .skip(slice_start)
+            .take(size)
+            .collect()
+    }
+
+    pub fn selected(&self) -> &T {
+        &self.items[self.selected_idx]
+    }
+
+    fn advance(&mut self) {
+        self.selected_idx = (self.selected_idx + 1) % self.items.len();
+    }
+
+    fn go_back(&mut self) {
+        // Prevent idx from going negative by adding the vec length to the idx first
+        self.selected_idx = ((self.selected_idx + self.items.len()) - 1) % self.items.len();
+    }
+
+    pub fn next_item(&mut self) -> &T {
+        self.advance();
+        self.selected()
+    }
+
+    pub fn prev_item(&mut self) -> &T {
+        self.go_back();
+        self.selected()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cursor() {
+        let mut cursor = Carousel::new(1, vec![1, 2, 3, 4, 5]);
+        assert_eq!(*cursor.selected(), 2);
+        assert_eq!(*cursor.next_item(), 3);
+        assert_eq!(*cursor.next_item(), 4);
+        assert_eq!(*cursor.next_item(), 5);
+        assert_eq!(*cursor.next_item(), 1);
+        assert_eq!(*cursor.prev_item(), 5);
+        assert_eq!(*cursor.prev_item(), 4);
+        assert_eq!(*cursor.prev_item(), 3);
+        assert_eq!(*cursor.prev_item(), 2);
+        assert_eq!(*cursor.prev_item(), 1);
+
+        assert_eq!(*cursor.selected(), 1);
+        assert_eq!(cursor.visible(5), vec![&4, &5, &1, &2, &3]);
     }
 }
