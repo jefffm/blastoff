@@ -29,10 +29,8 @@ pub use overworld_map::*;
 // mod loading_screen;
 // pub use loading_screen::*;
 
-// TODO: fix map generation debug
-// mod map_generation;
-// pub use map_generation::*;
+mod map_generation;
+pub use map_generation::*;
 
-// TODO: fix debug menu
-// mod debug_menu;
-// pub use debug_menu::*;
+mod debug_menu;
+pub use debug_menu::*;

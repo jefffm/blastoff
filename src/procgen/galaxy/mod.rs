@@ -46,6 +46,7 @@ impl GalaxyGenerator for StaticGalaxy {
 
 /// Galaxy Info
 fn generate_galaxy_info(resources: &mut Resources) -> GalaxyInfo {
+    // TODO: galaxy size constant
     let width = resources.rng.roll_dice(3, 6);
     let height = resources.rng.roll_dice(3, 6);
 

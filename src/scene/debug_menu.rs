@@ -1,9 +1,11 @@
 use ggez::graphics::{Canvas, DrawParam};
 use ggez::input::keyboard::KeyCode;
-use hecs::World;
 use std::fmt;
 
-use crate::sector::Map;
+use crate::game::consts::{SECTOR_HEIGHT, SECTOR_SIZE, SECTOR_WIDTH};
+use crate::procgen::{seed, Combo, MapTemplate, SectorProcgenLoader, SubMap, WfcGen};
+use crate::sector::{FloorKind, Tile};
+use crate::util::{WorldPoint, WorldSize};
 use crate::{
     color::{RGBA8Ext, COMMON},
     game::consts::{PIXEL_RECT, SCREEN_RECT},
@@ -12,18 +14,20 @@ use crate::{
     util::{PixelPoint, Scene, SceneSwitch},
 };
 
-use super::{LoadingScreen, MapGeneration, MenuResult, NeedsSector};
+use super::{MenuResult, SectorGeneration};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum DebugMenuSelection {
-    MapGeneration = 0,
-    Quit = 1,
+    SectorGeneration = 0,
+    // OverworldGeneration = 1,
+    // GalaxyGeneration = 2,
+    Quit = 3,
 }
 
 impl fmt::Display for DebugMenuSelection {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let text = match self {
-            DebugMenuSelection::MapGeneration => "Map Generation",
+            DebugMenuSelection::SectorGeneration => "Sector Generation",
             DebugMenuSelection::Quit => "Quit",
         };
         f.write_str(text)
@@ -52,7 +56,7 @@ impl DebugMenuSelection {
     }
 
     pub fn entries(&self) -> Vec<Self> {
-        vec![Self::MapGeneration, Self::Quit]
+        vec![Self::SectorGeneration, Self::Quit]
     }
 }
 
@@ -63,14 +67,13 @@ pub struct DebugMenu {
 impl Default for DebugMenu {
     fn default() -> Self {
         Self {
-            state: MenuResult::new(DebugMenuSelection::MapGeneration),
+            state: MenuResult::new(DebugMenuSelection::SectorGeneration),
         }
     }
 }
 impl Scene<Resources, Controls> for DebugMenu {
     fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         let selection = self.state.selection();
-
         let entries = selection.entries();
 
         self.state = match controls.read() {
@@ -105,7 +108,7 @@ impl Scene<Resources, Controls> for DebugMenu {
 
     fn update(
         &mut self,
-        _resources: &mut Resources,
+        resources: &mut Resources,
         _ctx: &mut ggez::Context,
     ) -> SceneSwitch<Resources, Controls> {
         match self.state {
@@ -114,13 +117,40 @@ impl Scene<Resources, Controls> for DebugMenu {
                 selection: selected,
             } => {
                 let result = match selected {
-                    DebugMenuSelection::MapGeneration => {
-                        SceneSwitch::Push(Box::new(LoadingScreen::new(
-                            |world: World, _map: Map, history: Vec<Map>| {
-                                SceneSwitch::Replace(Box::new(MapGeneration::new(world, history)))
-                            },
-                            NeedsSector {},
-                        )))
+                    DebugMenuSelection::SectorGeneration => {
+                        // TODO: this logic needs to move somewhere else (like how we had it in LoadingScreen)
+                        let mapgen = Combo::new(MapTemplate::new(
+                            SECTOR_SIZE,
+                            Tile::Floor(FloorKind::FloorScenery('~')),
+                            vec![
+                                // First create an entire map of craters
+                                SubMap::new(
+                                    Box::new(WfcGen::new(seed::CRATERS)),
+                                    SECTOR_SIZE,
+                                    WorldPoint::new(0, 0),
+                                ),
+                                // Then, create a city in the middle
+                                SubMap::new(
+                                    Box::new(WfcGen::new(seed::CITY)),
+                                    WorldSize::new(50, 50),
+                                    WorldPoint::new(25, 25),
+                                ),
+                            ],
+                        ));
+
+                        let mut history = Vec::new();
+
+                        // Create the loader
+                        let mut loader = SectorProcgenLoader::new(mapgen, resources, &mut history);
+
+                        let mut world = hecs::World::new();
+                        let _sector = {
+                            // Create a new Sector and spawn to a fresh ECS world
+                            loader.load(WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT), &mut world)
+                        };
+
+                        tracing::info!("Pushing MapGeneration to the Scene stack");
+                        SceneSwitch::Push(Box::new(SectorGeneration::new(world, history)))
                     }
                     DebugMenuSelection::Quit => {
                         ::std::process::exit(0);

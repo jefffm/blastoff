@@ -16,7 +16,6 @@ impl OverworldGenerator for StaticPlanet {
         let overworld = Overworld::from_info(info);
 
         // TODO: generate terrain using overworld info and rng
-
         overworld
     }
 }

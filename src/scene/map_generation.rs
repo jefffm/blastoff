@@ -111,7 +111,7 @@ enum MapGenerationInput {
 }
 
 #[derive(Default)]
-pub struct MapGeneration {
+pub struct SectorGeneration {
     world: World,
     history: Vec<Map>,
     cursor: MapGenerationCursor,
@@ -120,7 +120,7 @@ pub struct MapGeneration {
     viewport: Viewport<WorldSpace>,
     screen_transform: ViewportFloatToScreen,
 }
-impl MapGeneration {
+impl SectorGeneration {
     pub fn new(world: World, history: Vec<Map>) -> Self {
         let t1 = WorldToViewport::default();
         let viewport = Viewport::new(
@@ -154,7 +154,7 @@ impl MapGeneration {
     }
 }
 
-impl Scene<Resources, Controls> for MapGeneration {
+impl Scene<Resources, Controls> for SectorGeneration {
     fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
         if let Some(key) = controls.read() {
             self.input = match self.state {

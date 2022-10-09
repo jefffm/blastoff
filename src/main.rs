@@ -66,7 +66,7 @@ fn main() -> GameResult {
     };
     tracing_subscriber::fmt().with_max_level(level).init();
 
-    let mut builder = ContextBuilder::new("roguemon", "Jeff Lynn");
+    let builder = ContextBuilder::new("roguemon", "Jeff Lynn");
     let (mut ctx, event_loop) = builder
         .window_setup(conf::WindowSetup::default().title(TITLE_HEADER).vsync(true))
         .window_mode(
@@ -124,14 +124,12 @@ fn main() -> GameResult {
 
     let mut game = MainState::new(resources, &mut ctx);
 
-    // TODO: fix cli.debug arg
     // Push an initial scene to the SceneStack and prepare it for playing
-    // if cli.debug {
-    //     game.init_debug()
-    // } else {
-    //     game.init();
-    // }
-    game.init();
+    if cli.debug {
+        game.init_debug()
+    } else {
+        game.init();
+    }
 
     info!("starting main_loop");
 
