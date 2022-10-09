@@ -252,7 +252,7 @@ impl Scene<Resources, Controls> for SectorGeneration {
     fn draw(
         &mut self,
         resources: &mut Resources,
-        ctx: &mut ggez::Context,
+        _ctx: &mut ggez::Context,
         canvas: &mut Canvas,
     ) -> ggez::GameResult<()> {
         let map = &self.history[self.cursor.index];

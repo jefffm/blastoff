@@ -129,6 +129,7 @@ impl<'a> ActionProcessor<'a> {
         Self { resources, sector }
     }
 
+    /// Match each action enum to invoke its implementation
     fn process_actions(&mut self, actions: &[Action]) {
         for action in actions {
             match action {
@@ -141,6 +142,7 @@ impl<'a> ActionProcessor<'a> {
         }
     }
 
+    /// Implementation for Move-type Actions
     fn move_entity(&mut self, entity: &Entity, vector: &WorldVector) {
         // Find the starting position
         let source_point = {
@@ -199,6 +201,7 @@ impl<'a> ActionProcessor<'a> {
         }
     }
 
+    /// Implementation for instant movement Actions
     fn teleport_entity(&mut self, entity: &Entity, point: &WorldPoint) {
         let (position, viewshed) = self
             .sector

@@ -1,6 +1,6 @@
 mod wall;
 
-use ggez::graphics::{Canvas, DrawParam};
+use ggez::graphics::{DrawParam};
 use rgb::RGBA8;
 pub use wall::*;
 

@@ -13,9 +13,9 @@ pub trait OverworldGenerator {
 pub struct StaticPlanet {}
 impl OverworldGenerator for StaticPlanet {
     fn generate(&mut self, info: PlanetInfo, _resources: &mut Resources) -> Overworld {
-        let overworld = Overworld::from_info(info);
+        
 
         // TODO: generate terrain using overworld info and rng
-        overworld
+        Overworld::from_info(info)
     }
 }

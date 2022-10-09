@@ -97,8 +97,9 @@ fn main() -> GameResult {
         .read();
     let font = BitmapFont::from_grid(&ctx, font_image.to_image(&ctx), &SpriteSize::new(16, 16));
 
+    // TODO: Spritesheet Definitions should be configured via yaml or something
     let spritesheet_image = cache
-        .load::<Image>("tileset.colored-transparent")
+        .load::<Image>("tileset.monochrome-transparent")
         .map_err(|err| GameError::ResourceLoadError(err.to_string()))?
         .read();
     let spritesheet = SpriteSheet::from_grid(

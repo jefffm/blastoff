@@ -18,6 +18,6 @@ impl Resources {
     pub fn load_asset<T: Compound>(&self, id: &str) -> Handle<T> {
         self.assets
             .load::<T>(id)
-            .expect(&format!("asset load from {:?}", id))
+            .unwrap_or_else(|_| panic!("asset load from {:?}", id))
     }
 }
