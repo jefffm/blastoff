@@ -7,8 +7,6 @@ pub use wfcgen::*;
 mod combo;
 pub use combo::*;
 
-use bracket_random::prelude::RandomNumberGenerator;
-
 use crate::{resource::Resources, sector::Map, util::WorldSize};
 
 pub trait MapGenerator {

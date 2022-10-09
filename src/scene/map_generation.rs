@@ -5,15 +5,16 @@ use ggez::graphics::Canvas;
 use ggez::input::keyboard::KeyCode;
 use hecs::World;
 
-use crate::camera;
 use crate::component::Cardinal;
-use crate::game::consts::{SCREEN_HEIGHT_PIXELS, TILE_SIZE, UPDATE_INTERVAL_SECS};
+use crate::game::consts::{
+    get_screen_to_pixel_transform_float, SCREEN_HEIGHT_PIXELS, TILE_SIZE, UPDATE_INTERVAL_SECS,
+};
 use crate::input::Controls;
 use crate::resource::{Resources, Viewport};
 use crate::sector::Map;
 use crate::util::{
     PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, VectorExt, ViewportFloatPoint,
-    ViewportFloatToScreen, WorldSpace,
+    ViewportFloatToScreen, WorldFloatPoint, WorldSpace,
 };
 use crate::{
     game::consts::SCREEN_RECT,
@@ -152,6 +153,14 @@ impl SectorGeneration {
     pub fn is_complete(&self) -> bool {
         self.cursor.index >= self.history.len()
     }
+
+    fn world_to_pixel(&self, point: WorldFloatPoint) -> PixelPoint {
+        let vp = self.viewport.to_viewport_point_f32(point);
+        let sp = self.screen_transform.transform_point(vp);
+        get_screen_to_pixel_transform_float()
+            .transform_point(sp)
+            .to_i32()
+    }
 }
 
 impl Scene<Resources, Controls> for SectorGeneration {
@@ -246,15 +255,16 @@ impl Scene<Resources, Controls> for SectorGeneration {
         ctx: &mut ggez::Context,
         canvas: &mut Canvas,
     ) -> ggez::GameResult<()> {
-        // TODO: implement zooming for map debug
-        camera::render_debug_map(
-            ctx,
-            canvas,
-            &mut self.viewport,
-            &self.screen_transform,
-            resources,
-            &self.history[self.cursor.index],
-        );
+        let map = &self.history[self.cursor.index];
+        for point in self.viewport.visible_points() {
+            if let Some(tile) = map.get(point) {
+                tile.render(
+                    resources,
+                    self.world_to_pixel(point.to_f32()),
+                    crate::sector::VisibilityKind::Torch { brightness: 100 },
+                );
+            }
+        }
 
         match self.state {
             MapGenerationState::Playback => resources.font.draw_each_char(

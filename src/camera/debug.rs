@@ -1,5 +1,3 @@
-use ggez::graphics::Canvas;
-
 use crate::{
     game::consts::get_screen_to_pixel_transform_float,
     resource::{Resources, Viewport},
@@ -10,7 +8,6 @@ use crate::{
 // Create default transforms and render the map as absolute coordinates
 pub fn render_debug_map(
     _ctx: &mut ggez::Context,
-    canvas: &mut Canvas,
     viewport: &mut Viewport<WorldSpace>,
     screen_transform: &ViewportFloatToScreen,
     resources: &mut Resources,
@@ -22,7 +19,6 @@ pub fn render_debug_map(
             let pixel_point =
                 worldfloat_to_pixel(resources, world_point.to_f32(), screen_transform);
             tile.render(
-                canvas,
                 resources,
                 pixel_point,
                 VisibilityKind::Torch { brightness: 50 },

@@ -107,7 +107,7 @@ impl MapGenerator for Combo {
 }
 
 impl Spawner for Combo {
-    fn spawn(&self, map: &Map, world: &mut hecs::World, resources: &mut Resources) {
+    fn spawn(&self, map: &Map, world: &mut hecs::World, _resources: &mut Resources) {
         for point in map.iter_points() {
             if let Tile::Floor(_) = map[&point] {
                 // Add the player

@@ -31,7 +31,7 @@ impl Screen {
         }
     }
 
-    fn draw(&self, _canvas: &mut Canvas, world: &World, resources: &mut Resources, entity: Entity) {
+    fn draw(&self, world: &World, resources: &mut Resources, entity: Entity) {
         let mut query = world.query_one::<(&Position, &Renderable)>(entity).unwrap();
 
         let (position, renderable) = query.get().unwrap();
@@ -139,8 +139,8 @@ impl Screen {
             // Translate each world point on the grid through floating point transforms and into an absolute pixel point
             let pixel_point = self.worldfloat_to_pixel(resources, world_point.to_f32());
             match cell {
-                RenderCell::Tile(tile, vis) => tile.render(canvas, resources, pixel_point, vis),
-                RenderCell::Entity(entity) => self.draw(canvas, world, resources, entity),
+                RenderCell::Tile(tile, vis) => tile.render(resources, pixel_point, vis),
+                RenderCell::Entity(entity) => self.draw(world, resources, entity),
             }
         }
 
