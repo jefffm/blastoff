@@ -1,0 +1,8 @@
+---
+sector_type:
+  items:
+    Barren: 1.0
+    Civilization: 0.2
+    ImpassibleTerrain: 0.1
+    ImpassibleLiquid: 0.2
+    PassibleLiquid: 0.3

@@ -64,7 +64,7 @@ impl Overworld {
     }
 
     pub fn clamp(&self, point: OverworldPoint) -> OverworldPoint {
-        // TODO: move this logic to a RectExt trait clamp method
+        // TODO: move clamping logic to a RectExt trait clamp method
         let clamped_x = point
             .x
             .max(self.info.rect.min_x())
@@ -111,8 +111,11 @@ impl Overworld {
         point: &OverworldPoint,
         loader: &mut SectorProcgenLoader<'a, T>,
     ) -> Rc<RefCell<SectorData>> {
+        // TODO: it's confusing how Overworld and procgen/overworld/ interact. Consolidate?
         // Create a new Sector and spawn to a fresh ECS world
         let mut world = hecs::World::new();
+
+        // TODO: Overworld should create a SectorInfo for each world before creation
         let map = loader.load(WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT), &mut world);
 
         // Set the sector to the given point
@@ -144,6 +147,7 @@ impl fmt::Display for Overworld {
     }
 }
 
+// TODO: PlanetInfo needs a SectorProbability struct
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlanetInfo {
     name: String,

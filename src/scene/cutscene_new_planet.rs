@@ -1,5 +1,4 @@
 use std::{
-    borrow::Borrow,
     cell::{Ref, RefCell},
     rc::Rc,
 };
@@ -19,16 +18,9 @@ use crate::{
     util::{easing_function, EasingEnum, PixelPoint, PointExt, Scene, SceneSwitch},
 };
 
-enum NewPlanetState {
-    Init,
-    Playing,
-    Complete,
-}
-
 const CUTSCENE_LENGTH_SECS: f32 = 4.;
 
 pub struct CutsceneNewPlanet {
-    state: NewPlanetState,
     planet: Rc<RefCell<Overworld>>,
     timer: f32,
     planet_pos_animation: AnimationSequence<Point2<f32>>,
@@ -38,7 +30,6 @@ pub struct CutsceneNewPlanet {
 impl CutsceneNewPlanet {
     pub fn new(planet: Rc<RefCell<Overworld>>) -> Self {
         Self {
-            state: NewPlanetState::Init,
             planet,
             timer: 0.,
             planet_pos_animation: planet_travel_position_animation(

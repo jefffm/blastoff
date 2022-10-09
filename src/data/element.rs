@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::EnumProbability;
+use super::ProbabilityDistribution;
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, Eq, PartialOrd, Ord)]
 pub enum Element {
@@ -9,4 +9,4 @@ pub enum Element {
     Plant,
 }
 
-pub type ElementProbability = EnumProbability<Element>;
+pub type ElementProbability = ProbabilityDistribution<Element>;
