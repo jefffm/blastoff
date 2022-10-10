@@ -19,14 +19,10 @@ pub enum SectorType {
 /// (so as to make geographic features look nice)
 pub type SectorTypeProbability = ProbabilityDistribution<SectorType>;
 
-/// Probability of spawning a given actor
-/// TODO: ActorProbability is all wrong. Instead, we should have spawn probabilities for each monster based on level, tile type, world size, and any other assorted collection of factors
-pub type ActorProbability = ProbabilityDistribution<String>;
-
 /// Probability definitions for what to create in each sector
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SectorProbability {
-    spawn_actor: ActorProbability,
+    // TODO: not sure what is needed in sector probability (items? level distribution?)
 }
 
 impl Asset for SectorProbability {

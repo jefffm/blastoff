@@ -7,8 +7,6 @@ use std::{env, path};
 use tracing::info;
 use tracing::Level;
 
-use bracket_random::prelude::RandomNumberGenerator;
-
 pub mod animation;
 pub mod camera;
 pub mod color;
@@ -26,21 +24,16 @@ pub mod system;
 pub mod util;
 
 use game::consts;
-use resource::{Resources, Viewport};
+use resource::Resources;
 use scene::MainState;
-use util::{ViewportPoint, ViewportRect, ViewportSize, WorldToViewport};
 
 use clap::Parser;
 use rand::RngCore;
 
-use crate::data::Image;
 use crate::game::consts::SCALING_FACTOR;
 use crate::game::consts::SCREEN_HEIGHT_PIXELS;
 use crate::game::consts::SCREEN_WIDTH_PIXELS;
 use crate::game::consts::TITLE_HEADER;
-use crate::util::BitmapFont;
-use crate::util::SpriteSheet;
-use crate::util::SpriteSize;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -91,37 +84,8 @@ fn main() -> GameResult {
     tracing::info!("Adding 'resources' path {:?}", path);
     let cache = assets_manager::AssetCache::new(path)?;
 
-    let font_image = cache
-        .load::<Image>("fonts.rex_16x16")
-        .map_err(|err| GameError::ResourceLoadError(err.to_string()))?
-        .read();
-    let font = BitmapFont::from_grid(&ctx, font_image.to_image(&ctx), &SpriteSize::new(16, 16));
-
-    // TODO: Spritesheet Definitions should be configured via yaml or something
-    let spritesheet_image = cache
-        .load::<Image>("tileset.monochrome-transparent")
-        .map_err(|err| GameError::ResourceLoadError(err.to_string()))?
-        .read();
-    let spritesheet = SpriteSheet::from_grid(
-        &ctx,
-        spritesheet_image.to_image(&ctx),
-        SpriteSize::new(49, 22),
-    );
-
     // Global Resources struct used for resources shared across scenes
-    let resources = Resources {
-        rng: RandomNumberGenerator::seeded(rng_seed),
-        viewport: Viewport::new(
-            ViewportRect::new(
-                ViewportPoint::new(0, 0),
-                ViewportSize::new(consts::VIEWPORT_WIDTH, consts::VIEWPORT_HEIGHT),
-            ),
-            WorldToViewport::default(),
-        ),
-        font,
-        spritesheet,
-        assets: cache,
-    };
+    let resources = Resources::try_new(&ctx, rng_seed, cache)?;
 
     let mut game = MainState::new(resources, &mut ctx);
 
