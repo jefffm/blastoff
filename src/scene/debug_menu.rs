@@ -2,7 +2,7 @@ use ggez::graphics::{Canvas, DrawParam};
 use ggez::input::keyboard::KeyCode;
 use std::fmt;
 
-use crate::data::{Element, PlanetType};
+use crate::data::{Element, PlanetType, SectorProbability};
 use crate::game::consts::{SECTOR_HEIGHT, SECTOR_SIZE, SECTOR_WIDTH};
 use crate::overworld::{OverworldTile, PlanetInfo, SectorInfo};
 use crate::procgen::{seed, Combo, MapTemplate, SectorProcgenLoader, SubMap, WfcGen};
@@ -126,6 +126,7 @@ impl Scene<Resources, Controls> for DebugMenu {
                             OverworldSize::new(100, 100),
                             PlanetType::Barren,
                             Element::Fire,
+                            SectorProbability {},
                         );
 
                         let sector_info = SectorInfo::new(

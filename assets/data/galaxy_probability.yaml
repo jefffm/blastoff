@@ -5,10 +5,10 @@ planet_count:
   bonus: 2
 planet_type:
   items:
-    Water: 1.0
-    Fire: 1.0
-    Plant: 1.0
     Barren: 1.0
+    Lush: 1.0
+    Aqueus: 1.0
+    Mountains: 1.0
 planet_element:
   items:
     Water: 1.0
