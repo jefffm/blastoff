@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     color::{RGBA8Ext, FIRE, PLANT, WATER},
-    data::{Element, PlanetType},
+    data::{Element, PlanetType, SectorProbability},
     game::consts::MAX_PLANET_SPRITE_SIZE,
     procgen::{MapGenerator, SectorProcgenLoader, Spawner},
     sector,
@@ -163,6 +163,7 @@ pub struct PlanetInfo {
     rect: OverworldRect,
     planet_type: PlanetType,
     element: Element,
+    sector_probability: SectorProbability,
 }
 
 impl PlanetInfo {
@@ -171,6 +172,7 @@ impl PlanetInfo {
         size: OverworldSize,
         planet_type: PlanetType,
         element: Element,
+        sector_probability: SectorProbability,
     ) -> Self {
         let rect = OverworldRect::new(OverworldPoint::new(0, 0), size);
         Self {
@@ -179,6 +181,7 @@ impl PlanetInfo {
             rect,
             planet_type,
             element,
+            sector_probability,
         }
     }
 

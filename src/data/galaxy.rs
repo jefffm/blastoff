@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{overworld::PlanetInfo, util::OverworldSize};
 
-use super::{ElementProbability, PlanetTypeProbability};
+use super::{ElementProbability, PlanetTypeProbability, SectorProbability};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GalaxyProbability {
@@ -29,14 +29,17 @@ impl GalaxyProbability {
         let height = rng.roll_dice(3, 6);
         let inner = rng.get_rng();
 
-        // TODO: create a PlanetProbability and give it to PlanetInfo for
-        // generating different sectors(?) or are Planets different from
-        // Galaxies? (since this would be tile-type-based)
+        let planet_type = self.planet_type.next_element(inner);
+        let planet_element = self.planet_element.next_element(inner);
+
+        let sector_probability = SectorProbability::new();
+
         PlanetInfo::new(
             name,
             OverworldSize::new(width, height),
-            self.planet_type.next_element(inner),
-            self.planet_element.next_element(inner),
+            planet_type,
+            planet_element,
+            sector_probability,
         )
     }
 }

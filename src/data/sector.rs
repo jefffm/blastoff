@@ -25,6 +25,12 @@ pub struct SectorProbability {
     // TODO: not sure what is needed in sector probability (items? level distribution?)
 }
 
+impl SectorProbability {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 impl Asset for SectorProbability {
     const EXTENSION: &'static str = "yaml";
     const EXTENSIONS: &'static [&'static str] = &[Self::EXTENSION];
