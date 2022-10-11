@@ -10,6 +10,8 @@ use crate::{
 
 use super::consts::{SCREEN_WIDTH_PIXELS, TILE_SIZE};
 
+// TODO: ui should use a framework like egui
+
 /// UI:
 pub fn draw_ui(
     ctx: &mut ggez::Context,
@@ -45,8 +47,6 @@ pub fn draw_ui(
             None,
         );
     }
-
-    // TODO: create relative coordinate systems for the two ui rects
 
     // // box around top
     // draw_batch.draw_hollow_box(

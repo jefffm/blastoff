@@ -155,15 +155,14 @@ impl fmt::Display for Overworld {
     }
 }
 
-// TODO: PlanetInfo needs a SectorProbability struct
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlanetInfo {
-    name: String,
-    size: OverworldSize,
-    rect: OverworldRect,
-    planet_type: PlanetType,
-    element: Element,
-    sector_probability: SectorProbability,
+    pub name: String,
+    pub size: OverworldSize,
+    pub rect: OverworldRect,
+    pub planet_type: PlanetType,
+    pub element: Element,
+    pub sector_probability: SectorProbability,
 }
 
 impl PlanetInfo {
@@ -198,13 +197,10 @@ impl PlanetInfo {
     }
 
     pub fn default_tile(&self) -> OverworldTile {
-        match self.planet_type {
-            PlanetType::Barren => OverworldTile::Barren,
-            PlanetType::Ice => todo!(),
-            PlanetType::Terran => todo!(),
-            PlanetType::Water => OverworldTile::Water,
-            PlanetType::Plant => OverworldTile::Jungle,
-            PlanetType::Fire => OverworldTile::Lava,
+        match self.element {
+            Element::Water => OverworldTile::Water,
+            Element::Fire => OverworldTile::Lava,
+            Element::Plant => OverworldTile::Jungle,
         }
     }
 

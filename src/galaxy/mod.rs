@@ -53,7 +53,7 @@ impl Galaxy {
     /// The entire galaxy is always populated with all possible points and their
     /// corresponding PlanetInfos
     pub fn iter_planet_infos(&self) -> impl Iterator<Item = &(GalaxyPoint, PlanetInfo)> {
-        // TODO: enforce no duplicates
+        // TODO: enforce no duplicate planets at same coordinates
         self.planet_infos.iter()
     }
 

@@ -5,12 +5,14 @@ use super::{ProbabilityDistribution, SectorTypeProbability};
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, Eq, PartialOrd, Ord)]
 pub enum PlanetType {
+    /// Mostly empty space and not much life
     Barren,
-    Ice,
-    Terran,
-    Water,
-    Plant,
-    Fire,
+    /// Mountains, Forests, Rivers, and Oceans
+    Lush,
+    /// Mostly liquid with some islands
+    Aqueus,
+    /// Mostly impassible mountains with winding paths and caves
+    Mountains,
 }
 
 pub type PlanetTypeProbability = ProbabilityDistribution<PlanetType>;
