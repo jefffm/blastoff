@@ -69,7 +69,6 @@ impl Index<&SpritePoint> for SpriteGrid {
     }
 }
 
-#[derive(Debug)]
 pub struct SpriteSheet {
     batch: graphics::InstanceArray,
     sprite_grid: SpriteGrid,

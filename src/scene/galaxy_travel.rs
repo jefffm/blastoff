@@ -176,7 +176,7 @@ impl Scene<Resources, Controls> for GalaxyTravel {
             if selected_point == point {
                 canvas.draw(
                     &self.selection_rect,
-                    DrawParam::default().dest(planet_pixel_point.into_mint_f32()),
+                    DrawParam::default().dest(planet_pixel_point.as_mint_f32()),
                 )
             }
         }

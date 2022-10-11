@@ -186,7 +186,7 @@ pub trait PointExt<T, U> {
     fn to_index(&self, width: T) -> usize;
     fn from_index(idx: usize, width: T) -> Point2D<T, U>;
     fn get_vector(self, other: Self) -> Vector2D<T, U>;
-    fn into_mint_f32(&self) -> Point2<f32>;
+    fn as_mint_f32(&self) -> Point2<f32>;
 }
 
 impl<U> PointExt<i32, U> for Point2D<i32, U> {
@@ -206,7 +206,7 @@ impl<U> PointExt<i32, U> for Point2D<i32, U> {
         other - self
     }
 
-    fn into_mint_f32(&self) -> Point2<f32> {
+    fn as_mint_f32(&self) -> Point2<f32> {
         Point2::<f32> {
             x: self.x as f32,
             y: self.y as f32,
@@ -231,7 +231,7 @@ impl<U> PointExt<f32, U> for Point2D<f32, U> {
         other - self
     }
 
-    fn into_mint_f32(&self) -> Point2<f32> {
+    fn as_mint_f32(&self) -> Point2<f32> {
         Point2::<f32> {
             x: self.x,
             y: self.y,

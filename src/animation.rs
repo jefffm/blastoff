@@ -13,8 +13,8 @@ pub fn move_sequence(
     ease_enum: &EasingEnum,
     duration: f32,
 ) -> AnimationSequence<Point2<f32>> {
-    let start_pos: Point2<f32> = start_point.into_mint_f32();
-    let end_pos: Point2<f32> = end_point.into_mint_f32();
+    let start_pos: Point2<f32> = start_point.as_mint_f32();
+    let end_pos: Point2<f32> = end_point.as_mint_f32();
 
     if let EasingEnum::EaseInOut3Point = ease_enum {
         let mid_pos = ease(Linear, start_pos, end_pos, 0.33);

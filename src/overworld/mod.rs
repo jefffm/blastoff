@@ -124,7 +124,7 @@ impl Overworld {
         // Create a new Sector and spawn to a fresh ECS world
         let mut world = hecs::World::new();
 
-        let map = loader.load(&sector_info, &mut world);
+        let map = loader.load(sector_info, &mut world);
 
         // Set the sector to the given point
         self.set_sector(point, SectorData { map, world });
