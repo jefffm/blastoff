@@ -180,7 +180,7 @@ impl Scene<Resources, Controls> for OverworldMap {
         );
 
         for overworld_point in self.viewport.visible_points() {
-            if let Some(tile) = (*self.planet).borrow().get_tile(&overworld_point) {
+            if let Some(tile) = (*self.planet).borrow().get_sector_info(&overworld_point) {
                 tile.render(
                     resources,
                     &self.overworld_to_pixel(overworld_point.to_f32()),

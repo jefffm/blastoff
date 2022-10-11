@@ -1,4 +1,7 @@
+mod sector_info;
+pub use sector_info::*;
 mod tile;
+
 use ggez::graphics::DrawParam;
 use rgb::RGBA8;
 pub use tile::*;
@@ -10,15 +13,15 @@ use serde::{Deserialize, Serialize};
 use crate::{
     color::{RGBA8Ext, FIRE, PLANT, WATER},
     data::{Element, PlanetType},
-    game::consts::{MAX_PLANET_SPRITE_SIZE, SECTOR_HEIGHT, SECTOR_WIDTH},
+    game::consts::MAX_PLANET_SPRITE_SIZE,
     procgen::{MapGenerator, SectorProcgenLoader, Spawner},
     sector,
-    util::{OverworldPoint, OverworldRect, OverworldSize, Sprite, WorldSize, PLANET},
+    util::{OverworldPoint, OverworldRect, OverworldSize, Sprite, PLANET},
 };
 
 // TODO: World needs to be serializeable in order to implement save/load
 pub type OverworldSectors = HashMap<OverworldPoint, Rc<RefCell<SectorData>>>;
-pub type OverworldMap = HashMap<OverworldPoint, OverworldTile>;
+pub type OverworldMap = HashMap<OverworldPoint, SectorInfo>;
 
 pub struct SectorData {
     pub map: sector::Map,
@@ -63,6 +66,7 @@ impl Overworld {
         &self.info
     }
 
+    /// Return an Overworld point clamped to the Overworld's rect
     pub fn clamp(&self, point: OverworldPoint) -> OverworldPoint {
         // TODO: move clamping logic to a RectExt trait clamp method
         let clamped_x = point
@@ -81,17 +85,17 @@ impl Overworld {
         self.info.center()
     }
 
-    pub fn get_tile(&self, point: &OverworldPoint) -> Option<&OverworldTile> {
+    pub fn get_sector_info(&self, point: &OverworldPoint) -> Option<&SectorInfo> {
         if self.info.rect.contains(*point) {
-            Some(self.map.get(point).unwrap_or(&self.default_map_tile))
+            self.map.get(point)
         } else {
             None
         }
     }
 
     /// sets *JUST* the tile
-    pub fn set_tile(&mut self, point: OverworldPoint, tile: OverworldTile) {
-        self.map.insert(point, tile);
+    pub fn set_sector_info(&mut self, point: OverworldPoint, sector_info: SectorInfo) {
+        self.map.insert(point, sector_info);
     }
 
     /// Try to get the sector at a given point. Returns None if it hasn't been created yet (and see [`Self::create_sector'])
@@ -112,11 +116,15 @@ impl Overworld {
         loader: &mut SectorProcgenLoader<'a, T>,
     ) -> Rc<RefCell<SectorData>> {
         // TODO: it's confusing how Overworld and procgen/overworld/ interact. Consolidate?
+
+        let sector_info = self
+            .get_sector_info(point)
+            .expect("SectorInfo should exist for point");
+
         // Create a new Sector and spawn to a fresh ECS world
         let mut world = hecs::World::new();
 
-        // TODO: Overworld should create a SectorInfo for each world before creation
-        let map = loader.load(WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT), &mut world);
+        let map = loader.load(&sector_info, &mut world);
 
         // Set the sector to the given point
         self.set_sector(point, SectorData { map, world });
@@ -129,7 +137,7 @@ impl Overworld {
         self.info.color()
     }
 
-    pub fn iter_tiles(&self) -> impl Iterator<Item = (&OverworldPoint, &OverworldTile)> {
+    pub fn iter_sector_infos(&self) -> impl Iterator<Item = (&OverworldPoint, &SectorInfo)> {
         self.map.iter()
     }
 

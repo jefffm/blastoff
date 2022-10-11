@@ -2,6 +2,7 @@ use bracket_random::prelude::RandomNumberGenerator;
 
 use crate::camera::Glyph;
 use crate::color::{Palette, COMMON, FIRE, PLANT, WATER};
+use crate::overworld::SectorInfo;
 use crate::procgen::Spawner;
 use crate::resource::Resources;
 use crate::sector::{FloorKind, Map, Tile, WallKind};
@@ -151,7 +152,7 @@ fn draw_corridor(map: &mut Map, start: &WorldPoint, end: &WorldPoint) {
 impl MapGenerator for Bsp {
     fn generate(
         &mut self,
-        _size: WorldSize,
+        sector_info: &SectorInfo,
         resources: &mut Resources,
         mapgen_history: &mut Vec<sector::Map>,
     ) -> Map {

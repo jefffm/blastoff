@@ -7,12 +7,12 @@ pub use wfcgen::*;
 mod combo;
 pub use combo::*;
 
-use crate::{resource::Resources, sector::Map, util::WorldSize};
+use crate::{overworld::SectorInfo, resource::Resources, sector::Map};
 
 pub trait MapGenerator {
     fn generate(
         &mut self,
-        size: WorldSize, // TODO: take a WorldInfo (or SectorInfo) instead of just a Size
+        sector_info: &SectorInfo,
         resources: &mut Resources,
         mapgen_history: &mut Vec<Map>,
     ) -> Map;

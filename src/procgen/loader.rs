@@ -2,9 +2,9 @@ use hecs::World;
 
 use crate::overworld::Overworld;
 use crate::overworld::PlanetInfo;
+use crate::overworld::SectorInfo;
 use crate::resource::Resources;
 use crate::sector;
-use crate::util::WorldSize;
 
 use super::GalaxyGenerator;
 use super::MapGenerator;
@@ -37,10 +37,10 @@ where
     }
 
     /// Generates the map and returns the Spawner
-    pub fn load(&mut self, size: WorldSize, world: &mut World) -> sector::Map {
+    pub fn load(&mut self, sector_info: &SectorInfo, world: &mut World) -> sector::Map {
         let map = self
             .inner
-            .generate(size, self.resources, self.mapgen_history);
+            .generate(sector_info, self.resources, self.mapgen_history);
 
         self.inner.spawn(&map, world, self.resources);
 

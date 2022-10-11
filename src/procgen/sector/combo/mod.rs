@@ -4,6 +4,7 @@ use crate::{
     camera::Glyph,
     color::{Palette, COMMON},
     component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed},
+    overworld::SectorInfo,
     procgen::Spawner,
     resource::Resources,
     sector::{self, Map, Tile},
@@ -27,8 +28,17 @@ impl SubMap {
             dest_point,
         }
     }
-    fn generate(&mut self, resources: &mut Resources, mapgen_history: &mut Vec<Map>) -> Map {
-        self.mapgen.generate(self.size, resources, mapgen_history)
+
+    fn generate(
+        &mut self,
+        resources: &mut Resources,
+        mapgen_history: &mut Vec<Map>,
+        mut sector_info: SectorInfo,
+    ) -> Map {
+        // TODO: Submap vs. Map generation. Submap needs a size, total map just needs SectorInfo
+        sector_info.size = self.size;
+        self.mapgen
+            .generate(&sector_info, resources, mapgen_history)
     }
 }
 
@@ -64,18 +74,22 @@ impl Combo {
 impl MapGenerator for Combo {
     fn generate(
         &mut self,
-        size: WorldSize,
         // TODO: add default_tile argument to WorldInfo/SectorInfo
+        sector_info: &SectorInfo,
         resources: &mut Resources,
         mapgen_history: &mut Vec<sector::Map>,
     ) -> Map {
-        let mut map = Map::init(String::from("meta map"), size, self.template.default_tile);
+        let mut map = Map::init(
+            String::from("meta map"),
+            sector_info.size,
+            self.template.default_tile,
+        );
 
         mapgen_history.push(map.clone());
 
         // Composite submaps in-order onto the Combo map
         for gen in &mut self.template.submaps {
-            let submap = gen.generate(resources, mapgen_history);
+            let submap = gen.generate(resources, mapgen_history, sector_info.clone());
 
             // Create a transform to translate submap space into Combo map space
             let xform = Transform2D::<i32, WorldSpace, WorldSpace>::from_points(

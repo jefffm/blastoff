@@ -7,6 +7,7 @@ use crate::{
     util::PixelPoint,
 };
 
+#[derive(Debug, Clone, Copy)]
 pub enum OverworldTile {
     City,
     Barren,

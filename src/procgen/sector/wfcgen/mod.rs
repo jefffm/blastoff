@@ -19,10 +19,11 @@ use coord_2d::{Coord, Size};
 use crate::camera::Glyph;
 use crate::color::{Palette, COMMON};
 use crate::component::{Actor, ActorKind, Camera, Player, Position, Renderable, Viewshed};
+use crate::overworld::SectorInfo;
 use crate::procgen::Spawner;
 use crate::resource::Resources;
 use crate::sector::{Map, Tile};
-use crate::util::{WorldSize, PLAYER};
+use crate::util::PLAYER;
 
 use super::MapGenerator;
 
@@ -102,11 +103,14 @@ impl WfcGen {
 impl MapGenerator for WfcGen {
     fn generate(
         &mut self,
-        size: WorldSize,
+        sector_info: &SectorInfo,
         resources: &mut Resources,
         mapgen_history: &mut Vec<Map>,
     ) -> Map {
-        let output_size = Size::new(size.width as u32, size.height as u32);
+        let output_size = Size::new(
+            sector_info.size.width as u32,
+            sector_info.size.height as u32,
+        );
 
         let pattern = self.seed.tile_pattern();
         let _forbid = ForceBorderForbid::new(&pattern, self.seed.pattern_size);

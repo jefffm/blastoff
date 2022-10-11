@@ -2,10 +2,12 @@ use ggez::graphics::{Canvas, DrawParam};
 use ggez::input::keyboard::KeyCode;
 use std::fmt;
 
+use crate::data::{Element, PlanetType};
 use crate::game::consts::{SECTOR_HEIGHT, SECTOR_SIZE, SECTOR_WIDTH};
+use crate::overworld::{OverworldTile, PlanetInfo, SectorInfo};
 use crate::procgen::{seed, Combo, MapTemplate, SectorProcgenLoader, SubMap, WfcGen};
 use crate::sector::{FloorKind, Tile};
-use crate::util::{WorldPoint, WorldSize};
+use crate::util::{OverworldSize, WorldPoint, WorldSize};
 use crate::{
     color::{RGBA8Ext, COMMON},
     game::consts::{PIXEL_RECT, SCREEN_RECT},
@@ -118,6 +120,20 @@ impl Scene<Resources, Controls> for DebugMenu {
             } => {
                 let result = match selected {
                     DebugMenuSelection::SectorGeneration => {
+                        // TODO: map debug needs a way to test overworlds and planets too
+                        let planet_info = PlanetInfo::new(
+                            "Test Planet".to_owned(),
+                            OverworldSize::new(100, 100),
+                            PlanetType::Barren,
+                            Element::Fire,
+                        );
+
+                        let sector_info = SectorInfo::new(
+                            planet_info,
+                            OverworldTile::City,
+                            WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT),
+                        );
+
                         // TODO: this logic needs to move somewhere else (like how we had it in LoadingScreen)
                         let mapgen = Combo::new(MapTemplate::new(
                             SECTOR_SIZE,
@@ -146,7 +162,7 @@ impl Scene<Resources, Controls> for DebugMenu {
                         let mut world = hecs::World::new();
                         let _sector = {
                             // Create a new Sector and spawn to a fresh ECS world
-                            loader.load(WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT), &mut world)
+                            loader.load(&sector_info, &mut world)
                         };
 
                         tracing::info!("Pushing MapGeneration to the Scene stack");
