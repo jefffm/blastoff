@@ -1,7 +1,3 @@
-//! Yoinked from the aging ggez-goodies repo
-
-use ggez::{self, graphics};
-
 /// A command to change to a new scene, either by pushign a new one,
 /// popping one or replacing the current scene (pop and then push).
 pub enum SceneSwitch<C, Ev> {
@@ -17,13 +13,8 @@ pub enum SceneSwitch<C, Ev> {
 /// a common context type `C`, and an input event type `Ev`.
 pub trait Scene<C, Ev> {
     fn input(&mut self, resources: &mut C, controls: &mut Ev, started: bool);
-    fn update(&mut self, resources: &mut C, ctx: &mut ggez::Context) -> SceneSwitch<C, Ev>;
-    fn draw(
-        &mut self,
-        resources: &mut C,
-        ctx: &mut ggez::Context,
-        canvas: &mut graphics::Canvas,
-    ) -> ggez::GameResult<()>;
+    fn update(&mut self, resources: &mut C) -> SceneSwitch<C, Ev>;
+    fn draw(&mut self, resources: &mut C) -> anyhow::Result<()>;
     /// This returns whether or not to draw the next scene down on the
     /// stack as well; this is useful for layers or GUI stuff that
     /// only partially covers the screen.
@@ -122,13 +113,13 @@ impl<C, Ev> SceneStack<C, Ev> {
     // These functions must be on the SceneStack because otherwise
     // if you try to get the current scene and the world to call
     // update() on the current scene it causes a double-borrow.  :/
-    pub fn update(&mut self, ctx: &mut ggez::Context) {
+    pub fn update(&mut self) {
         let next_scene = {
             let current_scene = &mut **self
                 .scenes
                 .last_mut()
                 .expect("Tried to update empty scene stack");
-            current_scene.update(&mut self.resources, ctx)
+            current_scene.update(&mut self.resources)
         };
         self.switch(next_scene);
     }

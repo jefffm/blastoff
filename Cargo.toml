@@ -25,7 +25,6 @@ line_drawing = "1.0.0"
 png = "0.17"
 morton-encoding = "2.0"
 image = "0.24"
-ggez = { git = "https://github.com/ggez/ggez", branch = "master" }
 wfc = "0.10"
 grid_2d = "0.15"
 coord_2d = "0.3"
@@ -36,3 +35,4 @@ rmp-serde = "1.1"
 assets_manager = { version = "0.8", features = ["yaml", "image"] }
 assets_manager_macros = "0.2"
 rand_distr = "0.4"
+macroquad = "0.3"

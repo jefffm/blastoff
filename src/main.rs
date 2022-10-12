@@ -1,8 +1,3 @@
-use ggez::conf;
-use ggez::event;
-
-use ggez::GameError;
-use ggez::{ContextBuilder, GameResult};
 use std::{env, path};
 use tracing::info;
 use tracing::Level;
@@ -49,7 +44,8 @@ struct Cli {
     seed: Option<u64>,
 }
 
-fn main() -> GameResult {
+#[macroquad::main("blastoff")]
+async fn main() {
     let cli = Cli::parse();
 
     let level = match cli.verbose {
