@@ -1,10 +1,8 @@
-use ggez::Context;
-
 use crate::component::{BlocksTile, Door, Position};
 use crate::overworld::SectorData;
 use crate::resource::Resources;
 
-pub fn map_indexing_system(_resources: &mut Resources, sector: &mut SectorData, _ctx: &Context) {
+pub fn map_indexing_system(_resources: &mut Resources, sector: &mut SectorData) {
     sector.map.reset_blocked();
     sector.map.reset_content();
 

@@ -1,6 +1,5 @@
 mod wall;
 
-use ggez::graphics::{DrawParam};
 use rgb::RGBA8;
 pub use wall::*;
 
@@ -10,7 +9,7 @@ pub use floor::*;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    color::{RGBA8Ext, COMMON, EMPTY},
+    color::{COMMON, EMPTY},
     resource::Resources,
     util::PixelPoint,
 };
@@ -113,14 +112,14 @@ impl Tile {
         match visibility_kind {
             VisibilityKind::Torch { brightness: _ } => {
                 // TODO: use torch brightness to modify rendering brightness
-                resources.font.push_char(self.glyph(), &pixel_point, None);
+                // resources.font.push_char(self.glyph(), &pixel_point, None);
             }
             VisibilityKind::Remembered => {
-                resources.font.push_char(
-                    self.glyph(),
-                    &pixel_point,
-                    Some(DrawParam::new().color(COMMON.two.to_ggez_color())),
-                );
+                // resources.font.push_char(
+                //     self.glyph(),
+                //     &pixel_point,
+                //     Some(DrawParam::new().color(COMMON.two.to_ggez_color())),
+                // );
             }
             VisibilityKind::DiscoBall { value: _ } => {
                 // draw_batch.set(

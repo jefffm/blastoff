@@ -1,9 +1,8 @@
-use ggez::Context;
 use hecs::Entity;
 
 use crate::{overworld::SectorData, resource::Resources};
 
-pub type SystemFn = fn(&mut Resources, &mut SectorData, &Context);
+pub type SystemFn = fn(&mut Resources, &mut SectorData);
 
 /// This is used as a component to signify ownership
 pub struct Owner(pub Entity);
@@ -56,9 +55,9 @@ impl Scheduler {
         SchedulerBuilder::default()
     }
 
-    pub fn execute(&mut self, resources: &mut Resources, sector: &mut SectorData, ctx: &Context) {
+    pub fn execute(&mut self, resources: &mut Resources, sector: &mut SectorData) {
         for f in &mut self.steps {
-            f(resources, sector, ctx);
+            f(resources, sector);
         }
     }
 }

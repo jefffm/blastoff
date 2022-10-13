@@ -1,4 +1,3 @@
-use ggez::Context;
 use hecs::{Entity, World};
 
 use crate::{
@@ -10,7 +9,7 @@ use crate::{
 };
 
 /// Check Behavior for all entities and resolve any behaviors that can change
-pub fn behavior_system(_resources: &mut Resources, sector: &mut SectorData, _ctx: &Context) {
+pub fn behavior_system(_resources: &mut Resources, sector: &mut SectorData) {
     let mut updates: Vec<(Entity, BehaviorKind)> = vec![];
     for (entity, (_actor, behavior, viewshed)) in sector
         .world
