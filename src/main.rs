@@ -2,20 +2,20 @@ use std::{env, path};
 use tracing::info;
 use tracing::Level;
 
-pub mod scene;
-// pub mod ation;
-// pub mod camera;
+pub mod animation;
+pub mod camera;
 pub mod color;
-// pub mod component;
-// pub mod data;
-// pub mod galaxy;
+pub mod component;
+pub mod data;
+pub mod galaxy;
 pub mod game;
-// pub mod input;
-// pub mod overworld;
-// pub mod procgen;
+pub mod input;
+pub mod overworld;
+pub mod procgen;
 pub mod resource;
-// pub mod sector;
-// pub mod system;
+pub mod scene;
+pub mod sector;
+pub mod system;
 pub mod util;
 
 use clap::Parser;
@@ -82,7 +82,7 @@ async fn main() -> anyhow::Result<()> {
     let cache = assets_manager::AssetCache::new(path)?;
 
     // Global Resources struct used for resources shared across scenes
-    let resources = Resources::try_new(rng_seed, cache)?;
+    let resources = Resources::try_new(rng_seed, cache).await?;
 
     let mut game = MainState::new(resources);
 
@@ -97,15 +97,19 @@ async fn main() -> anyhow::Result<()> {
 
     let canvas = render_target(SCREEN_WIDTH_PIXELS as u32, SCREEN_HEIGHT_PIXELS as u32);
     canvas.texture.set_filter(FilterMode::Nearest);
+
     loop {
         // Render to the Canvas
         set_camera(&Camera2D {
             render_target: Some(canvas),
             zoom: vec2(
-                (SCREEN_WIDTH_PIXELS).recip() * 2.0,
-                (SCREEN_HEIGHT_PIXELS).recip() * 2.0,
+                (SCREEN_WIDTH_PIXELS as f32).recip() * 2.0,
+                (SCREEN_HEIGHT_PIXELS as f32).recip() * 2.0,
             ),
-            target: vec2(SCREEN_WIDTH_PIXELS / 2.0, SCREEN_WIDTH_PIXELS / 2.0),
+            target: vec2(
+                SCREEN_WIDTH_PIXELS as f32 / 2.0,
+                SCREEN_WIDTH_PIXELS as f32 / 2.0,
+            ),
             ..Default::default()
         });
         clear_background(WHITE);
@@ -121,6 +125,4 @@ async fn main() -> anyhow::Result<()> {
 
         next_frame().await
     }
-
-    Ok(())
 }

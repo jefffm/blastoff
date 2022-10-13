@@ -14,7 +14,7 @@ pub enum SceneSwitch<C, Ev> {
 /// Defines the callbacks the scene uses:
 /// a common context type `C`, and an input event type `Ev`.
 pub trait Scene<C, Ev> {
-    fn input(&mut self, resources: &mut C, controls: &mut Ev, started: bool);
+    fn poll_input(&mut self, resources: &mut C) -> anyhow::Result<()>;
     fn update(&mut self, resources: &mut C) -> SceneSwitch<C, Ev>;
     fn draw(&mut self, resources: &mut C) -> anyhow::Result<()>;
     /// This returns whether or not to draw the next scene down on the
@@ -119,7 +119,7 @@ impl<C, Ev> SceneStack<C, Ev> {
             .last_mut()
             .ok_or_else(|| anyhow!("Tried to poll input for empty scene stack"))?;
 
-        current_scene.poll_input()?
+        current_scene.poll_input(&mut self.resources)
     }
 
     // These functions must be on the SceneStack because otherwise
@@ -138,14 +138,14 @@ impl<C, Ev> SceneStack<C, Ev> {
 
     /// Draw the current scene.
     pub fn draw(&mut self) -> anyhow::Result<()> {
-        SceneStack::draw_scenes(&mut self.scenes, &mut self.resources)?
+        SceneStack::draw_scenes(&mut self.scenes, &mut self.resources)
     }
 
     /// We walk down the scene stack until we find a scene where we aren't
     /// supposed to draw the previous one, then draw them from the bottom up.
     ///
     /// This allows for layering GUI's and such.
-    fn draw_scenes(scenes: &mut [Box<dyn Scene<C, Ev>>], resources: &mut C) {
+    fn draw_scenes(scenes: &mut [Box<dyn Scene<C, Ev>>], resources: &mut C) -> anyhow::Result<()> {
         assert!(!scenes.is_empty());
         if let Some((current, rest)) = scenes.split_last_mut() {
             if current.draw_previous() {

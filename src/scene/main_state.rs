@@ -1,8 +1,4 @@
-use macroquad::prelude::*;
-
-use crate::color::{RGBA8Ext, EMPTY};
-
-use crate::input::Controls;
+use crate::color::EMPTY;
 
 use crate::resource::Resources;
 
@@ -13,6 +9,7 @@ use crate::game::consts;
 // use super::{DebugMenu, MainMenu};
 use super::MainMenu;
 
+// TODO: decide what to do with this Controls thing. This should be more like an Event in the global game state machine. Is it necessary still?
 pub struct MainState {
     scene_stack: SceneStack<Resources, Controls>,
 }
@@ -33,7 +30,7 @@ impl MainState {
         self.scene_stack.push(Box::new(MainMenu::default()))
     }
 
-    pub fn poll_input(&mut self) {
+    pub fn poll_input(&mut self) -> anyhow::Result<()> {
         self.scene_stack.poll_input();
     }
 

@@ -1,4 +1,3 @@
-use ggez::graphics;
 use keyframe::{functions::*, EasingFunction};
 use keyframe_derive::CanTween;
 
@@ -30,31 +29,31 @@ pub fn easing_function(ease_enum: &EasingEnum) -> Box<dyn EasingFunction + Send 
     }
 }
 
-#[derive(CanTween, Clone, Copy)]
-/// necessary because we can't implement CanTween for graphics::Rect directly, as it's a foreign type
-pub struct TweenableRect {
-    x: f32,
-    y: f32,
-    w: f32,
-    h: f32,
-}
+// #[derive(CanTween, Clone, Copy)]
+// /// necessary because we can't implement CanTween for graphics::Rect directly, as it's a foreign type
+// pub struct TweenableRect {
+//     x: f32,
+//     y: f32,
+//     w: f32,
+//     h: f32,
+// }
 
-impl TweenableRect {
-    fn new(x: f32, y: f32, w: f32, h: f32) -> Self {
-        TweenableRect { x, y, w, h }
-    }
-}
+// impl TweenableRect {
+//     fn new(x: f32, y: f32, w: f32, h: f32) -> Self {
+//         TweenableRect { x, y, w, h }
+//     }
+// }
 
-impl From<TweenableRect> for graphics::Rect {
-    fn from(t_rect: TweenableRect) -> Self {
-        graphics::Rect {
-            x: t_rect.x,
-            y: t_rect.y,
-            w: t_rect.w,
-            h: t_rect.h,
-        }
-    }
-}
+// impl From<TweenableRect> for graphics::Rect {
+//     fn from(t_rect: TweenableRect) -> Self {
+//         graphics::Rect {
+//             x: t_rect.x,
+//             y: t_rect.y,
+//             w: t_rect.w,
+//             h: t_rect.h,
+//         }
+//     }
+// }
 
 /// A fancy easing function, tweening something into one of `frames` many discrete states.
 /// The `pre_easing` is applied first, thereby making other `EasingFunction`s usable in the realm of frame-by-frame animation

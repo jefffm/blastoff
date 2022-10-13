@@ -1,8 +1,9 @@
-use ggez::mint::Point2;
 use keyframe::{
     ease,
     functions::{EaseInOut, Linear},
-    keyframes, AnimationSequence,
+    keyframes,
+    mint::Point2,
+    AnimationSequence,
 };
 
 use crate::util::{easing_function, EasingEnum, PointExt, WorldFloatPoint};

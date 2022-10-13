@@ -1,9 +1,6 @@
 mod spawn;
 pub use spawn::*;
 
-mod image;
-pub use self::image::*;
-
 mod galaxy;
 pub use galaxy::*;
 
@@ -21,3 +18,6 @@ pub use sector::*;
 
 mod markov_seed;
 pub use markov_seed::*;
+
+mod tileset;
+pub use tileset::*;

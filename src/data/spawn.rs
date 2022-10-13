@@ -7,7 +7,7 @@ use crate::{
     component::{
         Actor as ActorComponent, ActorKind, InitialBehavior, Player, Position, Renderable, Viewshed,
     },
-    util::{WorldPoint, PLAYER},
+    util::WorldPoint,
 };
 
 #[derive(Debug, PartialEq, Deserialize)]

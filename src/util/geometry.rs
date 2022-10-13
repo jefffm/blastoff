@@ -10,7 +10,7 @@
 use std::{convert::TryInto, fmt::Debug};
 
 use euclid::{Point2D, Rect, Size2D, Transform2D, UnknownUnit, Vector2D};
-use ggez::mint::Point2;
+use keyframe::mint::Point2;
 use serde::{Deserialize, Serialize};
 
 /// SpriteSpace is coordinates to refer to different sprites in a spritesheet of equal tile sizes
