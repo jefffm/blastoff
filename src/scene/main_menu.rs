@@ -4,7 +4,6 @@ use macroquad::prelude::*;
 
 use crate::{
     game::consts::{PIXEL_RECT, TILE_SIZE, TITLE_HEADER},
-    input::Controls,
     resource::Resources,
     util::{Scene, SceneSwitch},
 };
@@ -50,8 +49,8 @@ impl Default for MainMenu {
         }
     }
 }
-impl Scene<Resources, Controls> for MainMenu {
-    fn input(&mut self, resources: &mut Resources) {
+impl Scene<Resources> for MainMenu {
+    fn poll_input(&mut self, resources: &mut Resources) -> anyhow::Result<()> {
         let selection = self.state.selection();
 
         let can_continue = false; // TODO: implement save/continue
@@ -77,7 +76,7 @@ impl Scene<Resources, Controls> for MainMenu {
             MenuResult::Unconfirmed {
                 selection: entries[(idx + 1) % entries.len()],
             }
-        } else if is_key_pressed(KeyCode::Return) {
+        } else if is_key_pressed(KeyCode::Enter) {
             MenuResult::Confirmed {
                 selection: *selection,
             }
@@ -86,9 +85,11 @@ impl Scene<Resources, Controls> for MainMenu {
                 selection: *selection,
             }
         };
+
+        Ok(())
     }
 
-    fn update(&mut self, resources: &mut Resources) -> SceneSwitch<Resources, Controls> {
+    fn update(&mut self, resources: &mut Resources) -> SceneSwitch<Resources> {
         match self.state {
             MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
             MenuResult::Confirmed {
@@ -113,20 +114,19 @@ impl Scene<Resources, Controls> for MainMenu {
 
         draw_text(
             TITLE_HEADER,
-            PIXEL_RECT.center().x,
-            PIXEL_RECT.center().y,
-            TILE_SIZE as f32,
+            PIXEL_RECT.center().x as f32,
+            PIXEL_RECT.center().y as f32,
+            TILE_SIZE.width as f32,
             WHITE,
         );
 
         let entries = selection.entries(can_continue);
         for (i, entry) in entries.iter().enumerate() {
-            let text_pos = resources.font.char_size.height * (i as i32 + 2); // 2-line gap because title
             draw_text(
                 &selection.to_string(),
-                text_pos.x,
-                text_pos.y,
-                TILE_SIZE as f32,
+                TILE_SIZE.width as f32 * 1.,
+                TILE_SIZE.width as f32 * i as f32 + 2., // 2-line gap because title
+                TILE_SIZE.width as f32,
                 WHITE,
             );
         }
