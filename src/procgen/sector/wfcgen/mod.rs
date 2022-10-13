@@ -23,7 +23,6 @@ use crate::overworld::SectorInfo;
 use crate::procgen::Spawner;
 use crate::resource::Resources;
 use crate::sector::{Map, Tile};
-use crate::util::PLAYER;
 
 use super::MapGenerator;
 
@@ -150,12 +149,12 @@ impl Spawner for WfcGen {
                 // Add the player
                 world.spawn((
                     Position::new(point),
-                    Renderable::new(
-                        Glyph::new('@', COMMON.four, Palette::empty()),
-                        PLAYER,
-                        5,
-                        None,
-                    ),
+                    // Renderable::new(
+                    //     Glyph::new('@', COMMON.four, Palette::empty()),
+                    //     PLAYER,
+                    //     5,
+                    //     None,
+                    // ),
                     Viewshed::default().with_init().with_range(100),
                     Player {},
                     Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),

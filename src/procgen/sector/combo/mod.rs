@@ -8,7 +8,7 @@ use crate::{
     procgen::Spawner,
     resource::Resources,
     sector::{self, Map, Tile},
-    util::{TransformExt, WorldPoint, WorldSize, WorldSpace, PLAYER},
+    util::{TransformExt, WorldPoint, WorldSize, WorldSpace},
 };
 
 use super::MapGenerator;
@@ -122,12 +122,12 @@ impl Spawner for Combo {
                 // Add the player
                 world.spawn((
                     Position::new(point),
-                    Renderable::new(
-                        Glyph::new('@', COMMON.four, Palette::empty()),
-                        PLAYER,
-                        5,
-                        None,
-                    ),
+                    // Renderable::new(
+                    //     Glyph::new('@', COMMON.four, Palette::empty()),
+                    //     PLAYER,
+                    //     5,
+                    //     None,
+                    // ),
                     Viewshed::default().with_init().with_range(100),
                     Player {},
                     Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),

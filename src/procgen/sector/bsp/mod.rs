@@ -6,9 +6,7 @@ use crate::overworld::SectorInfo;
 use crate::procgen::Spawner;
 use crate::resource::Resources;
 use crate::sector::{FloorKind, Map, Tile, WallKind};
-use crate::util::{
-    WorldPoint, WorldRect, WorldSize, WorldVector, ANIMAL1, ANIMAL2, ANIMAL3, PLAYER,
-};
+use crate::util::{WorldPoint, WorldRect, WorldSize, WorldVector};
 use crate::{component::*, sector};
 
 use super::MapGenerator;
@@ -244,12 +242,12 @@ impl Spawner for Bsp {
         // Add the player
         world.spawn((
             Position::new(center),
-            Renderable::new(
-                Glyph::new('@', COMMON.four, Palette::empty()),
-                PLAYER,
-                5,
-                None,
-            ),
+            // Renderable::new(
+            //     Glyph::new('@', COMMON.four, Palette::empty()),
+            //     PLAYER,
+            //     5,
+            //     None,
+            // ),
             viewshed,
             Player {},
             Actor::new(0, 100, 100, 20, 0, ActorKind::Player(None)),
@@ -270,12 +268,12 @@ impl Spawner for Bsp {
                         monster_viewshed.set_dirty();
                         world.spawn((
                             Position::new(self.rooms[room_idx].center()),
-                            Renderable::new(
-                                Glyph::new('$', FIRE.four, Palette::empty()),
-                                ANIMAL1,
-                                2,
-                                None,
-                            ),
+                            // Renderable::new(
+                            //     Glyph::new('$', FIRE.four, Palette::empty()),
+                            //     ANIMAL1,
+                            //     2,
+                            //     None,
+                            // ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
                             Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
@@ -293,12 +291,12 @@ impl Spawner for Bsp {
                                 // Add a (????) every once in a while for fireworld
                                 world.spawn((
                                     Position::new(point),
-                                    Renderable::new(
-                                        Glyph::new('^', FIRE.four, COMMON.two),
-                                        ANIMAL1,
-                                        1,
-                                        None,
-                                    ),
+                                    // Renderable::new(
+                                    //     Glyph::new('^', FIRE.four, COMMON.two),
+                                    //     ANIMAL1,
+                                    //     1,
+                                    //     None,
+                                    // ),
                                 ));
                             }
                         }
@@ -309,12 +307,12 @@ impl Spawner for Bsp {
                         monster_viewshed.set_dirty();
                         world.spawn((
                             Position::new(self.rooms[room_idx].center()),
-                            Renderable::new(
-                                Glyph::new('&', WATER.four, Palette::empty()),
-                                ANIMAL2,
-                                2,
-                                None,
-                            ),
+                            // Renderable::new(
+                            //     Glyph::new('&', WATER.four, Palette::empty()),
+                            //     ANIMAL2,
+                            //     2,
+                            //     None,
+                            // ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
                             Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
@@ -332,12 +330,12 @@ impl Spawner for Bsp {
                                 // Add a puddle every once in a while for water
                                 world.spawn((
                                     Position::new(point),
-                                    Renderable::new(
-                                        Glyph::new('~', WATER.one, WATER.two),
-                                        ANIMAL3,
-                                        1,
-                                        None,
-                                    ),
+                                    // Renderable::new(
+                                    //     Glyph::new('~', WATER.one, WATER.two),
+                                    //     ANIMAL3,
+                                    //     1,
+                                    //     None,
+                                    // ),
                                 ));
                             }
                         }
@@ -348,12 +346,12 @@ impl Spawner for Bsp {
                         monster_viewshed.set_dirty();
                         world.spawn((
                             Position::new(self.rooms[room_idx].center()),
-                            Renderable::new(
-                                Glyph::new('%', PLANT.four, Palette::empty()),
-                                ANIMAL3,
-                                2,
-                                None,
-                            ),
+                            // Renderable::new(
+                            //     Glyph::new('%', PLANT.four, Palette::empty()),
+                            //     ANIMAL3,
+                            //     2,
+                            //     None,
+                            // ),
                             monster_viewshed,
                             Actor::new(0, 100, 100, 25, 0, ActorKind::Computer(None)),
                             Behavior::new(BehaviorKind::Initial(InitialBehavior::FollowNearest)),
@@ -371,12 +369,12 @@ impl Spawner for Bsp {
                                 // Add a puddle every once in a while for water
                                 world.spawn((
                                     Position::new(point),
-                                    Renderable::new(
-                                        Glyph::new('{', PLANT.three, PLANT.one),
-                                        ANIMAL2,
-                                        1,
-                                        None,
-                                    ),
+                                    // Renderable::new(
+                                    //     Glyph::new('{', PLANT.three, PLANT.one),
+                                    //     ANIMAL2,
+                                    //     1,
+                                    //     None,
+                                    // ),
                                 ));
                             }
                         }
