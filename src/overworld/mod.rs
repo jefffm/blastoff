@@ -2,7 +2,6 @@ mod sector_info;
 pub use sector_info::*;
 mod tile;
 
-use ggez::graphics::DrawParam;
 use rgb::RGBA8;
 pub use tile::*;
 
@@ -11,12 +10,12 @@ use std::{cell::RefCell, collections::HashMap, fmt, rc::Rc};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    color::{RGBA8Ext, FIRE, PLANT, WATER},
+    color::{FIRE, PLANT, WATER},
     data::{Element, PlanetType, SectorProbability},
     game::consts::MAX_PLANET_SPRITE_SIZE,
     procgen::{MapGenerator, SectorProcgenLoader, Spawner},
     sector,
-    util::{OverworldPoint, OverworldRect, OverworldSize, Sprite, PLANET},
+    util::{OverworldPoint, OverworldRect, OverworldSize},
 };
 
 // TODO: World needs to be serializeable in order to implement save/load
@@ -204,26 +203,28 @@ impl PlanetInfo {
         }
     }
 
-    pub fn sprite(&self) -> Sprite {
-        // Determine the sprite scale by deriving a square size from the
-        // planet's area (planets can technically be rectangles).
-        // x normalized = (x – x minimum) / (x maximum – x minimum)
-        let area = self.size.area() as f32;
-        let x = area.sqrt();
+    pub fn sprite(&self) -> u32 {
+        // TODO: planet returns a sprite object of some sort
+        todo!()
+        // // Determine the sprite scale by deriving a square size from the
+        // // planet's area (planets can technically be rectangles).
+        // // x normalized = (x – x minimum) / (x maximum – x minimum)
+        // let area = self.size.area() as f32;
+        // let x = area.sqrt();
 
-        // TODO: remove magic numbers from planet sprite
-        let x_min: f32 = 1.;
-        let x_max: f32 = 18. * 18.;
-        let scale = (x - x_min) / (x_max - x_min);
+        // // TODO: remove magic numbers from planet sprite
+        // let x_min: f32 = 1.;
+        // let x_max: f32 = 18. * 18.;
+        // let scale = (x - x_min) / (x_max - x_min);
 
-        PLANET.with_params(
-            DrawParam::default()
-                .scale([
-                    MAX_PLANET_SPRITE_SIZE * scale,
-                    MAX_PLANET_SPRITE_SIZE * scale,
-                ])
-                .color(self.color().to_ggez_color()),
-        )
+        // PLANET.with_params(
+        //     DrawParam::default()
+        //         .scale([
+        //             MAX_PLANET_SPRITE_SIZE * scale,
+        //             MAX_PLANET_SPRITE_SIZE * scale,
+        //         ])
+        //         .color(self.color().to_ggez_color()),
+        // )
     }
 }
 

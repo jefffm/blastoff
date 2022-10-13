@@ -1,7 +1,6 @@
 use std::collections::VecDeque;
 
-use ggez::mint::Point2;
-use keyframe::AnimationSequence;
+use keyframe::{mint::Point2, AnimationSequence};
 
 use crate::{
     animation,

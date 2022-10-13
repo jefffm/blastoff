@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
-use ggez::graphics::{Canvas, DrawParam};
 use hecs::{Entity, World};
 
-use crate::color::RGBA8Ext;
 use crate::component::{Position, Renderable};
 use crate::game::consts::{get_screen_to_pixel_transform_float, USE_SPRITES};
 use crate::game::draw_ui;
@@ -11,7 +9,6 @@ use crate::resource::Resources;
 use crate::sector::{Map, Tile, VisibilityKind};
 use crate::util::{
     PixelPoint, TransformExt, ViewportFloatToScreen, ViewportToScreen, WorldFloatPoint, WorldPoint,
-    PLAYER,
 };
 
 enum RenderCell {
@@ -40,15 +37,15 @@ impl Screen {
         let pixel_point = self.worldfloat_to_pixel(resources, worldfloat_point);
 
         if USE_SPRITES {
-            let sprite = PLAYER;
-            resources.spritesheet.push_sprite(sprite, pixel_point);
+            // let sprite = PLAYER;
+            // resources.spritesheet.push_sprite(sprite, pixel_point);
         } else {
             let glyph = renderable.glyph;
-            resources.font.push_char(
-                glyph.glyph,
-                &pixel_point,
-                Some(DrawParam::new().color(glyph.fg.to_ggez_color())),
-            );
+            // resources.font.push_char(
+            //     glyph.glyph,
+            //     &pixel_point,
+            //     Some(DrawParam::new().color(glyph.fg.to_ggez_color())),
+            // );
         }
     }
 
@@ -66,14 +63,7 @@ impl Screen {
             .to_i32()
     }
 
-    pub fn draw_game(
-        &self,
-        ctx: &mut ggez::Context,
-        canvas: &mut Canvas,
-        world: &World,
-        resources: &mut Resources,
-        map: &Map,
-    ) {
+    pub fn draw_game(&self, world: &World, resources: &mut Resources, map: &Map) {
         // TODO: Floating Point Viewport Translation
         // Rather than translating points in Viewport, instead we should translate the viewport rect
         // using the floating point transform in Viewport.
@@ -145,6 +135,6 @@ impl Screen {
         }
 
         // Draw the UI overlay last
-        draw_ui(ctx, canvas, world, resources, map);
+        draw_ui(world, resources, map);
     }
 }

@@ -1,8 +1,7 @@
-use ggez::graphics::DrawParam;
 use rgb::RGBA8;
 
 use crate::{
-    color::{RGBA8Ext, COMMON, FIRE, PLANT, WATER},
+    color::{COMMON, FIRE, PLANT, WATER},
     resource::Resources,
     util::PixelPoint,
 };
@@ -38,10 +37,6 @@ impl OverworldTile {
     }
 
     pub fn render(&self, resources: &mut Resources, point: &PixelPoint) {
-        resources.font.push_char(
-            self.glyph(),
-            point,
-            Some(DrawParam::default().color(self.fg().to_ggez_color())),
-        );
+        // TODO: render overworld tiles
     }
 }

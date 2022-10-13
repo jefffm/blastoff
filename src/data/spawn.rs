@@ -41,7 +41,7 @@ impl Spawnable for Actor {
         let position = Position::new(point);
         let renderable = Renderable {
             glyph: Glyph::new(self.glyph, self.fg, self.bg),
-            sprite: PLAYER, // TODO parse sprites from yaml datafiles somehow
+            sprite: 0, // TODO parse sprites from yaml datafiles somehow
             render_order: self.zorder,
             sequence: None,
         };

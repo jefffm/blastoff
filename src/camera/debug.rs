@@ -7,7 +7,6 @@ use crate::{
 
 // Create default transforms and render the map as absolute coordinates
 pub fn render_debug_map(
-    _ctx: &mut ggez::Context,
     viewport: &mut Viewport<WorldSpace>,
     screen_transform: &ViewportFloatToScreen,
     resources: &mut Resources,

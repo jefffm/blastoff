@@ -1,12 +1,11 @@
-use ggez::mint::Point2;
-use keyframe::AnimationSequence;
+use keyframe::{mint::Point2, AnimationSequence};
 
-use crate::{camera::Glyph, util::Sprite};
+use crate::camera::Glyph;
 
 #[derive(Clone)]
 pub struct Renderable {
     pub glyph: Glyph,
-    pub sprite: Sprite,
+    pub sprite: u32,
     pub render_order: u32,
     pub sequence: Option<AnimationSequence<Point2<f32>>>,
 }
@@ -14,7 +13,7 @@ pub struct Renderable {
 impl Renderable {
     pub fn new(
         glyph: Glyph,
-        sprite: Sprite,
+        sprite: u32,
         render_order: u32,
         sequence: Option<AnimationSequence<Point2<f32>>>,
     ) -> Self {
