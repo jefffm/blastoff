@@ -37,8 +37,8 @@ pub fn get_screen_to_pixel_transform_float() -> ScreenFloatToPixel {
 }
 
 // TODO: derive the viewport height instead
-pub const VIEWPORT_WIDTH: i32 = 60;
-pub const VIEWPORT_HEIGHT: i32 = 50;
+pub const VIEWPORT_WIDTH: i32 = 50;
+pub const VIEWPORT_HEIGHT: i32 = 40;
 
 // Where on the screen is the viewport's origin?
 pub const VIEWPORT_SCREEN_POINT: ScreenPoint = ScreenPoint::new(2, 2);

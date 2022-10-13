@@ -1,3 +1,5 @@
+use anyhow::anyhow;
+
 /// A command to change to a new scene, either by pushign a new one,
 /// popping one or replacing the current scene (pop and then push).
 pub enum SceneSwitch<C, Ev> {
@@ -51,7 +53,7 @@ pub struct SceneStack<C, Ev> {
 }
 
 impl<C, Ev> SceneStack<C, Ev> {
-    pub fn new(_ctx: &mut ggez::Context, global_state: C) -> Self {
+    pub fn new(global_state: C) -> Self {
         Self {
             resources: global_state,
             scenes: Vec::new(),
@@ -110,6 +112,16 @@ impl<C, Ev> SceneStack<C, Ev> {
         }
     }
 
+    /// Feeds the given input event to the current scene.
+    pub fn poll_input(&mut self) -> anyhow::Result<()> {
+        let current_scene = &mut **self
+            .scenes
+            .last_mut()
+            .ok_or_else(|| anyhow!("Tried to poll input for empty scene stack"))?;
+
+        current_scene.poll_input()?
+    }
+
     // These functions must be on the SceneStack because otherwise
     // if you try to get the current scene and the world to call
     // update() on the current scene it causes a double-borrow.  :/
@@ -124,39 +136,25 @@ impl<C, Ev> SceneStack<C, Ev> {
         self.switch(next_scene);
     }
 
+    /// Draw the current scene.
+    pub fn draw(&mut self) -> anyhow::Result<()> {
+        SceneStack::draw_scenes(&mut self.scenes, &mut self.resources)?
+    }
+
     /// We walk down the scene stack until we find a scene where we aren't
     /// supposed to draw the previous one, then draw them from the bottom up.
     ///
     /// This allows for layering GUI's and such.
-    fn draw_scenes(
-        scenes: &mut [Box<dyn Scene<C, Ev>>],
-        resources: &mut C,
-        ctx: &mut ggez::Context,
-        canvas: &mut graphics::Canvas,
-    ) {
+    fn draw_scenes(scenes: &mut [Box<dyn Scene<C, Ev>>], resources: &mut C) {
         assert!(!scenes.is_empty());
         if let Some((current, rest)) = scenes.split_last_mut() {
             if current.draw_previous() {
-                SceneStack::draw_scenes(rest, resources, ctx, canvas);
+                SceneStack::draw_scenes(rest, resources);
             }
-            current
-                .draw(resources, ctx, canvas)
-                .expect("I would hope drawing a scene never fails!");
+            current.draw(resources)?;
         }
-    }
 
-    /// Draw the current scene.
-    pub fn draw(&mut self, ctx: &mut ggez::Context, canvas: &mut graphics::Canvas) {
-        SceneStack::draw_scenes(&mut self.scenes, &mut self.resources, ctx, canvas)
-    }
-
-    /// Feeds the given input event to the current scene.
-    pub fn input(&mut self, controls: &mut Ev, started: bool) {
-        let current_scene = &mut **self
-            .scenes
-            .last_mut()
-            .expect("Tried to do input for empty scene stack");
-        current_scene.input(&mut self.resources, controls, started);
+        Ok(())
     }
 }
 

@@ -23,11 +23,7 @@ pub struct Resources {
 }
 
 impl Resources {
-    pub fn try_new(
-        ctx: &impl Has<GraphicsContext>,
-        rng_seed: u64,
-        assets: AssetCache,
-    ) -> Result<Self, GameError> {
+    pub fn try_new(rng_seed: u64, assets: AssetCache) -> Result<Self, GameError> {
         let rng = RandomNumberGenerator::seeded(rng_seed);
         let viewport = Viewport::new(
             ViewportRect::new(

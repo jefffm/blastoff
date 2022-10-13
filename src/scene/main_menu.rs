@@ -1,16 +1,15 @@
-use ggez::graphics::{Canvas, DrawParam};
-use ggez::input::keyboard::KeyCode;
 use std::fmt;
 
+use macroquad::prelude::*;
+
 use crate::{
-    color::{RGBA8Ext, COMMON},
-    game::consts::{PIXEL_RECT, SCREEN_RECT, TITLE_HEADER},
+    game::consts::{PIXEL_RECT, TILE_SIZE, TITLE_HEADER},
     input::Controls,
     resource::Resources,
-    util::{PixelPoint, Scene, SceneSwitch},
+    util::{Scene, SceneSwitch},
 };
 
-use super::{GalaxyTravel, MenuResult};
+use super::MenuResult;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MainMenuSelection {
@@ -31,26 +30,6 @@ impl fmt::Display for MainMenuSelection {
 }
 
 impl MainMenuSelection {
-    fn print(
-        &self,
-        canvas: &mut Canvas,
-        resources: &mut Resources,
-        y: i32,
-        selection: &MainMenuSelection,
-    ) {
-        let fg = if selection == self {
-            COMMON.five
-        } else {
-            COMMON.three
-        };
-        resources.font.draw_each_char(
-            canvas,
-            &self.to_string(),
-            &PixelPoint::new(SCREEN_RECT.center().x, y),
-            Some(DrawParam::default().color(fg.to_ggez_color())),
-        );
-    }
-
     pub fn entries(&self, can_continue: bool) -> Vec<Self> {
         if can_continue {
             vec![Self::Continue, Self::NewGame, Self::Quit]
@@ -72,60 +51,53 @@ impl Default for MainMenu {
     }
 }
 impl Scene<Resources, Controls> for MainMenu {
-    fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
+    fn input(&mut self, resources: &mut Resources) {
         let selection = self.state.selection();
 
         let can_continue = false; // TODO: implement save/continue
         let entries = selection.entries(can_continue);
 
-        self.state = match controls.read() {
-            None => MenuResult::Unconfirmed {
+        self.state = if is_key_pressed(KeyCode::Escape) {
+            MenuResult::Unconfirmed {
+                selection: MainMenuSelection::Quit,
+            }
+        } else if is_key_pressed(KeyCode::Up) {
+            let idx = entries
+                .iter()
+                .position(|&x| x == *selection)
+                .expect("MainMenuSelection");
+            MenuResult::Unconfirmed {
+                selection: entries[(idx + entries.len() - 1) % entries.len()],
+            }
+        } else if is_key_pressed(KeyCode::Down) {
+            let idx = entries
+                .iter()
+                .position(|&x| x == *selection)
+                .expect("MainMenuSelection");
+            MenuResult::Unconfirmed {
+                selection: entries[(idx + 1) % entries.len()],
+            }
+        } else if is_key_pressed(KeyCode::Return) {
+            MenuResult::Confirmed {
                 selection: *selection,
-            },
-            Some(key) => match key {
-                KeyCode::Escape => MenuResult::Unconfirmed {
-                    selection: MainMenuSelection::Quit,
-                },
-                KeyCode::Up => {
-                    let idx = entries
-                        .iter()
-                        .position(|&x| x == *selection)
-                        .expect("MainMenuSelection");
-                    MenuResult::Unconfirmed {
-                        selection: entries[(idx + entries.len() - 1) % entries.len()],
-                    }
-                }
-                KeyCode::Down => {
-                    let idx = entries
-                        .iter()
-                        .position(|&x| x == *selection)
-                        .expect("MainMenuSelection");
-                    MenuResult::Unconfirmed {
-                        selection: entries[(idx + 1) % entries.len()],
-                    }
-                }
-                KeyCode::Return => MenuResult::Confirmed {
-                    selection: *selection,
-                },
-                _ => MenuResult::Unconfirmed {
-                    selection: *selection,
-                },
-            },
+            }
+        } else {
+            MenuResult::Unconfirmed {
+                selection: *selection,
+            }
         };
     }
 
-    fn update(
-        &mut self,
-        resources: &mut Resources,
-        ctx: &mut ggez::Context,
-    ) -> SceneSwitch<Resources, Controls> {
+    fn update(&mut self, resources: &mut Resources) -> SceneSwitch<Resources, Controls> {
         match self.state {
             MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
             MenuResult::Confirmed {
                 selection: selected,
             } => match selected {
                 MainMenuSelection::NewGame => {
-                    SceneSwitch::Push(Box::new(GalaxyTravel::create(ctx, resources)))
+                    // TODO: make next scene work again
+                    // SceneSwitch::Push(Box::new(GalaxyTravel::create(resources)))
+                    SceneSwitch::None
                 }
                 MainMenuSelection::Continue => SceneSwitch::None, // TODO: implement save/load/continue
                 MainMenuSelection::Quit => {
@@ -135,28 +107,27 @@ impl Scene<Resources, Controls> for MainMenu {
         }
     }
 
-    fn draw(
-        &mut self,
-        resources: &mut Resources,
-        _ctx: &mut ggez::Context,
-        canvas: &mut Canvas,
-    ) -> ggez::GameResult<()> {
+    fn draw(&mut self, resources: &mut Resources) -> anyhow::Result<()> {
         let selection = self.state.selection();
         let can_continue: bool = false;
-        resources.font.draw_each_char(
-            canvas,
+
+        draw_text(
             TITLE_HEADER,
-            &PixelPoint::new(PIXEL_RECT.center().x, 0),
-            None,
+            PIXEL_RECT.center().x,
+            PIXEL_RECT.center().y,
+            TILE_SIZE as f32,
+            WHITE,
         );
 
         let entries = selection.entries(can_continue);
         for (i, entry) in entries.iter().enumerate() {
-            entry.print(
-                canvas,
-                resources,
-                resources.font.char_size.height * (i as i32 + 2), // 2-line gap because title
-                selection,
+            let text_pos = resources.font.char_size.height * (i as i32 + 2); // 2-line gap because title
+            draw_text(
+                &selection.to_string(),
+                text_pos.x,
+                text_pos.y,
+                TILE_SIZE as f32,
+                WHITE,
             );
         }
 

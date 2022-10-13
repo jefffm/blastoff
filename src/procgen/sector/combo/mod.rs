@@ -99,15 +99,10 @@ impl MapGenerator for Combo {
 
             // Iterate over the submap, translate to the Combo map's
             // coordinates, and overwrite the tile if it fits.
-            const MAP_DEBUG_TILES_PER_FRAME: usize = 100;
             for (i, (subpoint, subtile)) in submap.iter_tiles().enumerate() {
                 let map_point = xform.transform_point(subpoint);
                 if map.contains(map_point) {
                     map[&map_point] = *subtile;
-                }
-
-                if i % MAP_DEBUG_TILES_PER_FRAME == 0 {
-                    mapgen_history.push(map.clone())
                 }
             }
 

@@ -134,7 +134,7 @@ impl SectorGeneration {
 
         let screen_transform = ViewportFloatToScreen::from_points(
             ViewportFloatPoint::new(0., 0.),
-            ScreenFloatPoint::new(2., 2.),
+            ScreenFloatPoint::new(1., 2.),
         );
 
         let hist_length = history.len();

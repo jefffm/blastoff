@@ -1,6 +1,4 @@
-use ggez::event::EventHandler;
-use ggez::graphics::BlendMode;
-use ggez::{graphics, timer, Context, GameError};
+use macroquad::prelude::*;
 
 use crate::color::{RGBA8Ext, EMPTY};
 
@@ -13,26 +11,16 @@ use crate::util::SceneStack;
 use crate::game::consts;
 
 // use super::{DebugMenu, MainMenu};
-use super::{DebugMenu, MainMenu};
+use super::MainMenu;
 
 pub struct MainState {
-    controls: Controls,
-    canvas_image: graphics::ScreenImage,
     scene_stack: SceneStack<Resources, Controls>,
 }
 
 impl MainState {
-    pub fn new(resources: Resources, ctx: &mut Context) -> Self {
+    pub fn new(resources: Resources) -> Self {
         Self {
-            controls: Controls::default(),
-            canvas_image: graphics::ScreenImage::new(
-                ctx,
-                None,
-                1. / consts::SCALING_FACTOR,
-                1. / consts::SCALING_FACTOR,
-                1,
-            ),
-            scene_stack: SceneStack::new(ctx, resources),
+            scene_stack: SceneStack::new(resources),
         }
     }
 
@@ -41,81 +29,24 @@ impl MainState {
     }
 
     pub fn init_debug(&mut self) {
-        self.scene_stack.push(Box::new(DebugMenu::default()))
+        // self.scene_stack.push(Box::new(DebugMenu::default()))
+        self.scene_stack.push(Box::new(MainMenu::default()))
     }
-}
 
-impl EventHandler for MainState {
-    fn key_down_event(
-        &mut self,
-        _ctx: &mut ggez::Context,
-        input: ggez::input::keyboard::KeyInput,
-        _repeated: bool,
-    ) -> Result<(), GameError> {
-        self.controls.key_down(input);
-        self.scene_stack.input(&mut self.controls, true);
+    pub fn poll_input(&mut self) {
+        self.scene_stack.poll_input();
+    }
+
+    pub fn update(&mut self) -> anyhow::Result<()> {
+        self.scene_stack.update()?;
 
         Ok(())
     }
 
-    fn key_up_event(
-        &mut self,
-        _ctx: &mut ggez::Context,
-        input: ggez::input::keyboard::KeyInput,
-    ) -> Result<(), GameError> {
-        self.controls.key_up(input);
-        self.scene_stack.input(&mut self.controls, true);
-
-        Ok(())
-    }
-
-    fn update(&mut self, ctx: &mut ggez::Context) -> Result<(), GameError> {
-        while ctx.time.check_update_time(consts::UPDATE_FPS) {
-            self.scene_stack.update(ctx);
-        }
-
-        Ok(())
-    }
-
-    fn draw(&mut self, ctx: &mut ggez::Context) -> Result<(), GameError> {
-        let mut canvas =
-            graphics::Canvas::from_screen_image(ctx, &mut self.canvas_image, EMPTY.to_ggez_color());
-        canvas.set_sampler(graphics::Sampler::nearest_clamp());
-        canvas.set_blend_mode(BlendMode::REPLACE);
-
-        self.scene_stack.resources.font.clear();
-        self.scene_stack.resources.spritesheet.clear();
-
+    pub fn draw(&mut self) -> anyhow::Result<()> {
         // Draw the scene
-        self.scene_stack.draw(ctx, &mut canvas);
+        self.scene_stack.draw()?;
 
-        // Write out the InstanceArrays for BitmapFonts and SpriteSheets
-        canvas.draw(
-            &self.scene_stack.resources.font,
-            graphics::DrawParam::new().dest([0., 0.]),
-        );
-        canvas.draw(
-            &self.scene_stack.resources.spritesheet,
-            graphics::DrawParam::new().dest([0., 0.]),
-        );
-
-        canvas.finish(ctx)?;
-
-        let mut outer_canvas = graphics::Canvas::from_frame(ctx, EMPTY.to_ggez_color());
-        outer_canvas.set_sampler(graphics::Sampler::nearest_clamp());
-
-        let image = self.canvas_image.image(ctx);
-
-        outer_canvas.draw(
-            &image,
-            graphics::DrawParam::new()
-                .dest([0., 0.])
-                .scale([consts::SCALING_FACTOR, consts::SCALING_FACTOR]),
-        );
-
-        outer_canvas.finish(ctx)?;
-
-        timer::yield_now();
         Ok(())
     }
 }
