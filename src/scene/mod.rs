@@ -16,8 +16,8 @@ pub use main_menu::*;
 // mod sector;
 // pub use sector::*;
 
-// mod galaxy_travel;
-// pub use galaxy_travel::*;
+mod galaxy_travel;
+pub use galaxy_travel::*;
 
 // mod cutscene_new_planet;
 // pub use cutscene_new_planet::*;

@@ -1,49 +1,33 @@
 //! The Galaxy scene allows players to select a planet to travel to, and then initialize an Overworld Scene to push to the Scene Stack.
 
-use ggez::{
-    context::Has,
-    graphics::{self, DrawParam},
-    input::keyboard::KeyCode,
-};
+use macroquad::{miniquad::TextureParams, prelude::*};
 
 use crate::{
-    color::{RGBA8Ext, FIRE},
+    color::FIRE,
     galaxy::Galaxy,
-    game::consts::{MAX_PLANET_SPRITE_SIZE, TILE_SIZE},
-    input::Controls,
+    game::consts::{FONT_SIZE_PIXELS, MAX_PLANET_SPRITE_SIZE, TILE_SIZE},
     overworld::PlanetInfo,
     procgen::{GalaxyGenerator, OverworldProcgenLoader, StaticGalaxy, StaticPlanet},
     resource::Resources,
     util::{GalaxyPoint, PixelPoint, PointExt, Scene, SceneSwitch},
 };
 
-use super::{MenuResult, OverworldMap};
+// use super::{MenuResult, OverworldMap};
+use super::MenuResult;
 
 /// The GalaxyTravel Scene allows players to select a planet for landing
 pub struct GalaxyTravel {
     galaxy: Galaxy,
     state: MenuResult<GalaxyPoint>,
-    selection_rect: graphics::Mesh,
 }
 
 impl GalaxyTravel {
-    pub fn new(
-        galaxy: Galaxy,
-        state: MenuResult<GalaxyPoint>,
-        selection_rect: graphics::Mesh,
-    ) -> Self {
-        Self {
-            galaxy,
-            state,
-            selection_rect,
-        }
+    pub fn new(galaxy: Galaxy, state: MenuResult<GalaxyPoint>) -> Self {
+        Self { galaxy, state }
     }
 
     /// Use Resources to procgen a Galaxy of planets
-    pub fn create(
-        gfx: &impl Has<graphics::GraphicsContext>,
-        resources: &mut Resources,
-    ) -> GalaxyTravel {
+    pub fn create(resources: &mut Resources) -> GalaxyTravel {
         let mut loader = StaticGalaxy {};
         let galaxy = loader.generate(resources);
 
@@ -56,73 +40,58 @@ impl GalaxyTravel {
                 .expect("any planets exist"),
         };
 
-        let selection_rect = graphics::Mesh::new_rectangle(
-            gfx,
-            graphics::DrawMode::Stroke(graphics::StrokeOptions::DEFAULT),
-            graphics::Rect::new_i32(
-                0,
-                0,
-                MAX_PLANET_SPRITE_SIZE as i32,
-                MAX_PLANET_SPRITE_SIZE as i32,
-            ),
-            FIRE.three.to_ggez_color(),
-        )
-        .expect("clear rect");
-
-        Self::new(galaxy, state, selection_rect)
+        Self::new(galaxy, state)
     }
 }
 
-impl Scene<Resources, Controls> for GalaxyTravel {
-    fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
+impl Scene<Resources> for GalaxyTravel {
+    fn poll_input(&mut self, _resources: &mut Resources) -> anyhow::Result<()> {
         let selection = self.state.selection();
         let planets: Vec<_> = self.galaxy.iter_planet_infos().collect();
 
-        self.state = match controls.read() {
-            None => MenuResult::Unconfirmed {
-                selection: *selection,
-            },
-            Some(key) => match key {
-                KeyCode::Escape => todo!("Return to main menu"),
-                KeyCode::Left => {
-                    let idx = planets
-                        .iter()
-                        .position(|(point, _overworld)| point == selection)
-                        .unwrap();
+        // self.state = match controls.read() {
+        //     None => MenuResult::Unconfirmed {
+        //         selection: *selection,
+        //     },
+        //     Some(key) => match key {
+        //         KeyCode::Escape => todo!("Return to main menu"),
+        //         KeyCode::Left => {
+        //             let idx = planets
+        //                 .iter()
+        //                 .position(|(point, _overworld)| point == selection)
+        //                 .unwrap();
 
-                    let (new_selection, _) = planets[(idx + planets.len() - 1) % planets.len()];
+        //             let (new_selection, _) = planets[(idx + planets.len() - 1) % planets.len()];
 
-                    MenuResult::Unconfirmed {
-                        selection: *new_selection,
-                    }
-                }
-                KeyCode::Right => {
-                    let idx = planets
-                        .iter()
-                        .position(|(point, _overworld)| point == selection)
-                        .unwrap();
+        //             MenuResult::Unconfirmed {
+        //                 selection: *new_selection,
+        //             }
+        //         }
+        //         KeyCode::Right => {
+        //             let idx = planets
+        //                 .iter()
+        //                 .position(|(point, _overworld)| point == selection)
+        //                 .unwrap();
 
-                    let (new_selection, _) = planets[(idx + planets.len() + 1) % planets.len()];
+        //             let (new_selection, _) = planets[(idx + planets.len() + 1) % planets.len()];
 
-                    MenuResult::Unconfirmed {
-                        selection: *new_selection,
-                    }
-                }
-                KeyCode::Return => MenuResult::Confirmed {
-                    selection: *selection,
-                },
-                _ => MenuResult::Unconfirmed {
-                    selection: *selection,
-                },
-            },
-        };
+        //             MenuResult::Unconfirmed {
+        //                 selection: *new_selection,
+        //             }
+        //         }
+        //         KeyCode::Return => MenuResult::Confirmed {
+        //             selection: *selection,
+        //         },
+        //         _ => MenuResult::Unconfirmed {
+        //             selection: *selection,
+        //         },
+        //     },
+        // };
+
+        Ok(())
     }
 
-    fn update(
-        &mut self,
-        resources: &mut Resources,
-        _ctx: &mut ggez::Context,
-    ) -> SceneSwitch<Resources, Controls> {
+    fn update(&mut self, resources: &mut Resources) -> SceneSwitch<Resources> {
         match self.state {
             MenuResult::Unconfirmed { selection: _ } => SceneSwitch::None,
             MenuResult::Confirmed {
@@ -130,24 +99,23 @@ impl Scene<Resources, Controls> for GalaxyTravel {
             } => {
                 if let Some(planet) = self.galaxy.get_planet(&galaxy_point) {
                     // If the planet already exists, don't recreate it!
-                    SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
+                    // SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
+                    // TODO: implement OverworldMap
+                    SceneSwitch::None
                 } else {
                     // Create the planet when selected
                     let overworld_gen = StaticPlanet {};
                     let mut loader = OverworldProcgenLoader::new(overworld_gen, resources);
                     let planet = self.galaxy.create_planet(&galaxy_point, &mut loader);
-                    SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
+                    // SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
+                    // TODO: implement OverworldMap
+                    SceneSwitch::None
                 }
             }
         }
     }
 
-    fn draw(
-        &mut self,
-        resources: &mut Resources,
-        _ctx: &mut ggez::Context,
-        canvas: &mut ggez::graphics::Canvas,
-    ) -> ggez::GameResult<()> {
+    fn draw(&mut self, resources: &mut Resources) -> anyhow::Result<()> {
         let selected_point = self.state.selection();
         let planet_infos: Vec<&(GalaxyPoint, PlanetInfo)> =
             self.galaxy.iter_planet_infos().collect();
@@ -160,24 +128,33 @@ impl Scene<Resources, Controls> for GalaxyTravel {
         // TODO: create carousel size constant
         let visible = carousel.visible(5);
         for (i, (point, planet_info)) in visible.enumerate() {
-            let y = i as i32 * MAX_PLANET_SPRITE_SIZE as i32;
+            let y = i as f32 * MAX_PLANET_SPRITE_SIZE;
 
-            resources.font.push_text(
+            draw_text_ex(
                 &format!("{} at {:?}", planet_info, *point),
-                &PixelPoint::new(2 * MAX_PLANET_SPRITE_SIZE as i32, y),
-                None,
+                2. * MAX_PLANET_SPRITE_SIZE,
+                y,
+                TextParams {
+                    font: resources.assets.font,
+                    font_size: FONT_SIZE_PIXELS,
+                    ..Default::default()
+                },
             );
 
             let planet_pixel_point = PixelPoint::new(1 * TILE_SIZE.width, y);
             resources
                 .spritesheet
                 .push_sprite(planet_info.sprite(), planet_pixel_point);
+            resources
+                .assets
+                .tileset
+                .spr_ex(DrawTextureParams::default(), [TILE_SIZE.width as f32, y]);
 
             if selected_point == point {
-                canvas.draw(
-                    &self.selection_rect,
-                    DrawParam::default().dest(planet_pixel_point.as_mint_f32()),
-                )
+                // canvas.draw(
+                //     &self.selection_rect,
+                //     DrawParam::default().dest(planet_pixel_point.as_mint_f32()),
+                // )
             }
         }
 

@@ -3,12 +3,12 @@ use std::fmt;
 use macroquad::prelude::*;
 
 use crate::{
-    game::consts::{PIXEL_RECT, TILE_SIZE, TITLE_HEADER},
+    game::consts::{FONT_SIZE_PIXELS, HEADER_FONT_SIZE, PIXEL_RECT, TITLE_HEADER},
     resource::Resources,
     util::{Scene, SceneSwitch},
 };
 
-use super::MenuResult;
+use super::{GalaxyTravel, MenuResult};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MainMenuSelection {
@@ -96,9 +96,7 @@ impl Scene<Resources> for MainMenu {
                 selection: selected,
             } => match selected {
                 MainMenuSelection::NewGame => {
-                    // TODO: make next scene work again
-                    // SceneSwitch::Push(Box::new(GalaxyTravel::create(resources)))
-                    SceneSwitch::None
+                    SceneSwitch::Push(Box::new(GalaxyTravel::create(resources)))
                 }
                 MainMenuSelection::Continue => SceneSwitch::None, // TODO: implement save/load/continue
                 MainMenuSelection::Quit => {
@@ -111,8 +109,6 @@ impl Scene<Resources> for MainMenu {
     fn draw(&mut self, resources: &mut Resources) -> anyhow::Result<()> {
         let selection = self.state.selection();
         let can_continue: bool = false;
-        const FONT_SIZE_PIXELS: u16 = 16;
-        const HEADER_FONT_SIZE: u16 = FONT_SIZE_PIXELS * 2;
 
         draw_text_ex(
             TITLE_HEADER,

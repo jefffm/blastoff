@@ -59,3 +59,6 @@ pub const SECTOR_HEIGHT: i32 = 100;
 pub const SECTOR_SIZE: WorldSize = WorldSize::new(SECTOR_WIDTH, SECTOR_HEIGHT);
 
 pub const MAX_PLANET_SPRITE_SIZE: f32 = 64.;
+
+pub const FONT_SIZE_PIXELS: u16 = 16;
+pub const HEADER_FONT_SIZE: u16 = FONT_SIZE_PIXELS * 2;
