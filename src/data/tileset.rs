@@ -63,8 +63,4 @@ impl Tileset {
             },
         );
     }
-
-    pub fn spr_ex(&self, params: DrawTextureParams, dest: Vec2) {
-        draw_texture_ex(self.texture, dest[0], dest[1], WHITE, params);
-    }
 }

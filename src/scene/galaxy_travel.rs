@@ -1,15 +1,14 @@
 //! The Galaxy scene allows players to select a planet to travel to, and then initialize an Overworld Scene to push to the Scene Stack.
 
-use macroquad::{miniquad::TextureParams, prelude::*};
+use macroquad::prelude::*;
 
 use crate::{
-    color::FIRE,
     galaxy::Galaxy,
     game::consts::{FONT_SIZE_PIXELS, MAX_PLANET_SPRITE_SIZE, TILE_SIZE},
     overworld::PlanetInfo,
     procgen::{GalaxyGenerator, OverworldProcgenLoader, StaticGalaxy, StaticPlanet},
     resource::Resources,
-    util::{GalaxyPoint, PixelPoint, PointExt, Scene, SceneSwitch},
+    util::{GalaxyPoint, PixelPoint, Scene, SceneSwitch},
 };
 
 // use super::{MenuResult, OverworldMap};
@@ -39,6 +38,9 @@ impl GalaxyTravel {
                 .next()
                 .expect("any planets exist"),
         };
+
+        let planet_infos: Vec<&(GalaxyPoint, PlanetInfo)> = galaxy.iter_planet_infos().collect();
+        tracing::info!("Created new galaxy with planets: {:?}", planet_infos);
 
         Self::new(galaxy, state)
     }
@@ -141,14 +143,12 @@ impl Scene<Resources> for GalaxyTravel {
                 },
             );
 
-            let planet_pixel_point = PixelPoint::new(1 * TILE_SIZE.width, y);
-            resources
-                .spritesheet
-                .push_sprite(planet_info.sprite(), planet_pixel_point);
+            let planet_pixel_point = PixelPoint::new(1 * TILE_SIZE.width, y as i32);
+
             resources
                 .assets
                 .tileset
-                .spr_ex(DrawTextureParams::default(), [TILE_SIZE.width as f32, y]);
+                .spr(planet_info.sprite(), &planet_pixel_point);
 
             if selected_point == point {
                 // canvas.draw(
@@ -181,13 +181,14 @@ impl<'a, T> Carousel<'a, T> {
     pub fn visible(&self, size: usize) -> impl Iterator<Item = &T> {
         assert!(
             size % 2 != 0,
-            "size should be an odd number (it needs to have a center)"
+            "Size should be an odd number (it needs to have a center)"
         );
 
         assert!(
             size <= self.items.len(),
             "Size should be less than the number of items",
         );
+
         // How many extra items to pad on each side?
         let pad_count = (size - 1) / 2;
 

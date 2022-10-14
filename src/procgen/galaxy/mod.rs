@@ -1,3 +1,5 @@
+use bracket_random::prelude::DiceType;
+
 use crate::{
     data::GalaxyProbability,
     galaxy::{Galaxy, GalaxyInfo},
@@ -15,7 +17,8 @@ pub struct StaticGalaxy {}
 impl GalaxyGenerator for StaticGalaxy {
     fn generate(&mut self, resources: &mut Resources) -> Galaxy {
         let info = generate_galaxy_info(resources);
-        let num_planets = resources.rng.roll_dice(3, 6);
+        // 5-10 planets
+        let num_planets = resources.rng.roll(DiceType::new(1, 6, 4));
 
         let mut planets: Vec<_> = (0..num_planets)
             // First, create all the OverworldInfos
