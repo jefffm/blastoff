@@ -21,3 +21,6 @@ pub use markov_seed::*;
 
 mod tileset;
 pub use tileset::*;
+
+mod bitmap_font;
+pub use bitmap_font::*;

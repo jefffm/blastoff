@@ -2,16 +2,16 @@ use assets_manager::{AssetCache, Compound, Handle};
 use bracket_random::prelude::RandomNumberGenerator;
 
 mod viewport;
-use macroquad::text::load_ttf_font;
+use macroquad::{text::load_ttf_font, texture::load_texture};
 pub use viewport::*;
 
 mod assets;
 pub use assets::*;
 
 use crate::{
-    data::Tileset,
+    data::{BitmapFont, Tileset},
     game::consts,
-    util::{ViewportPoint, ViewportRect, ViewportSize, WorldSpace, WorldToViewport},
+    util::{SpriteSize, ViewportPoint, ViewportRect, ViewportSize, WorldSpace, WorldToViewport},
 };
 
 pub struct Resources {
@@ -38,9 +38,14 @@ impl Resources {
         let tileset = Tileset::try_from_file("tileset/tileset_transparent.tsx").await?;
 
         tracing::info!("Loading Font");
-        let font = load_ttf_font("fonts/AwkwardExt.ttf").await?;
+        let monospace_font_texture = load_texture("fonts/zx_evolution_8x8");
+        let monospace_font =
+            BitmapFont::from_texture(monospace_font_texture, SpriteSize::new(8, 8));
 
-        let assets = Assets { tileset, font };
+        let assets = Assets {
+            tileset,
+            monospace_font,
+        };
 
         Ok(Self {
             rng,

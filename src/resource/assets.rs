@@ -1,8 +1,6 @@
-use macroquad::text::Font;
-
-use crate::data::Tileset;
+use crate::data::{BitmapFont, Tileset};
 
 pub struct Assets {
     pub tileset: Tileset,
-    pub font: Font,
+    pub monospace_font: BitmapFont,
 }

@@ -3,7 +3,7 @@ use std::fmt;
 use macroquad::prelude::*;
 
 use crate::{
-    game::consts::{FONT_SIZE_PIXELS, HEADER_FONT_SIZE, PIXEL_RECT, TITLE_HEADER},
+    game::consts::{FONT_SIZE, HEADER_FONT_SIZE, PIXEL_RECT, TITLE_HEADER},
     resource::Resources,
     util::{Scene, SceneSwitch},
 };
@@ -125,13 +125,15 @@ impl Scene<Resources> for MainMenu {
         for (i, entry) in entries.iter().enumerate() {
             let color = if entry == selection { WHITE } else { GRAY };
 
+            let size = measure_text("testing", Some(resources.assets.font), FONT_SIZE * 2, 0.6);
             draw_text_ex(
-                &entry.to_string(),
+                &format!("Size: {}", size.height),
                 PIXEL_RECT.center().x as f32 / 2.,
-                FONT_SIZE_PIXELS as f32 * (i as f32 + 6.),
+                FONT_SIZE as f32 * (i as f32 + 6.),
                 TextParams {
                     font: resources.assets.font,
-                    font_size: FONT_SIZE_PIXELS,
+                    font_size: FONT_SIZE * 2,
+                    font_scale: 0.6,
                     color,
                     ..Default::default()
                 },

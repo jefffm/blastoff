@@ -5,7 +5,7 @@ use macroquad::prelude::*;
 
 use crate::{
     galaxy::Galaxy,
-    game::consts::{FONT_SIZE_PIXELS, MAX_PLANET_SPRITE_SIZE, TILE_SIZE},
+    game::consts::{FONT_SIZE, MAX_PLANET_SPRITE_SIZE, TILE_SIZE},
     overworld::PlanetInfo,
     procgen::{GalaxyGenerator, OverworldProcgenLoader, StaticGalaxy, StaticPlanet},
     resource::Resources,
@@ -151,7 +151,7 @@ impl Scene<Resources> for GalaxyTravel {
                     y,
                     TextParams {
                         font: resources.assets.font,
-                        font_size: FONT_SIZE_PIXELS,
+                        font_size: FONT_SIZE,
                         ..Default::default()
                     },
                 );
