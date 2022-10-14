@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::anyhow;
 use macroquad::prelude::*;
 
@@ -9,8 +11,8 @@ pub struct Tileset {
 impl Tileset {
     pub async fn try_from_file(path: &str) -> anyhow::Result<Self> {
         let content = load_file(path).await?;
-        // TODO: empty path might break relative paths in tileset loading(?)
-        let tileset = tiled::Loader::new().load_tsx_tileset_from(&*content, "")?;
+        // TODO: Android/WASM compat for tileset path loading. Use the util library?
+        let tileset = tiled::Loader::new().load_tsx_tileset_from(&*content, path)?;
         let tileset_image_path = tileset
             .image
             .to_owned()

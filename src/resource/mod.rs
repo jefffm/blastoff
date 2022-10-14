@@ -34,7 +34,10 @@ impl Resources {
             WorldToViewport::default(),
         );
 
+        tracing::info!("Loading Tileset");
         let tileset = Tileset::try_from_file("tileset/tileset_colored.tsx").await?;
+
+        tracing::info!("Loading Font");
         let font = load_ttf_font("fonts/AwkwardExt.ttf").await?;
 
         let assets = Assets { tileset, font };

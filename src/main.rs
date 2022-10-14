@@ -1,3 +1,4 @@
+use game::consts::RESOURCE_PATH;
 use std::{env, path};
 use tracing::info;
 use tracing::Level;
@@ -78,10 +79,14 @@ async fn main() -> anyhow::Result<()> {
     let manifest_dir = env::var("CARGO_MANIFEST_DIR")?;
 
     let path = path::PathBuf::from(manifest_dir).join(consts::RESOURCE_PATH);
+
+    set_pc_assets_folder(consts::RESOURCE_PATH);
+
     tracing::info!("Adding 'resources' path {:?}", path);
     let cache = assets_manager::AssetCache::new(path)?;
 
     // Global Resources struct used for resources shared across scenes
+    tracing::info!("Creating global Resources instance");
     let resources = Resources::try_new(rng_seed, cache).await?;
 
     let mut game = MainState::new(resources);
