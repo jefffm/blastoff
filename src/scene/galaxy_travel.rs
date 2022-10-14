@@ -1,5 +1,6 @@
 //! The Galaxy scene allows players to select a planet to travel to, and then initialize an Overworld Scene to push to the Scene Stack.
 
+use euclid::Vector2D;
 use macroquad::prelude::*;
 
 use crate::{
@@ -8,7 +9,7 @@ use crate::{
     overworld::PlanetInfo,
     procgen::{GalaxyGenerator, OverworldProcgenLoader, StaticGalaxy, StaticPlanet},
     resource::Resources,
-    util::{GalaxyPoint, PixelPoint, Scene, SceneSwitch},
+    util::{GalaxyPoint, PixelPoint, PixelSpace, Scene, SceneSwitch},
 };
 
 // use super::{MenuResult, OverworldMap};
@@ -51,44 +52,39 @@ impl Scene<Resources> for GalaxyTravel {
         let selection = self.state.selection();
         let planets: Vec<_> = self.galaxy.iter_planet_infos().collect();
 
-        // self.state = match controls.read() {
-        //     None => MenuResult::Unconfirmed {
-        //         selection: *selection,
-        //     },
-        //     Some(key) => match key {
-        //         KeyCode::Escape => todo!("Return to main menu"),
-        //         KeyCode::Left => {
-        //             let idx = planets
-        //                 .iter()
-        //                 .position(|(point, _overworld)| point == selection)
-        //                 .unwrap();
+        self.state = if is_key_pressed(KeyCode::Escape) {
+            todo!("Return to main menu")
+        } else if is_key_pressed(KeyCode::Left) {
+            let idx = planets
+                .iter()
+                .position(|(point, _overworld)| point == selection)
+                .unwrap();
 
-        //             let (new_selection, _) = planets[(idx + planets.len() - 1) % planets.len()];
+            let (new_selection, _) = planets[(idx + planets.len() - 1) % planets.len()];
 
-        //             MenuResult::Unconfirmed {
-        //                 selection: *new_selection,
-        //             }
-        //         }
-        //         KeyCode::Right => {
-        //             let idx = planets
-        //                 .iter()
-        //                 .position(|(point, _overworld)| point == selection)
-        //                 .unwrap();
+            MenuResult::Unconfirmed {
+                selection: *new_selection,
+            }
+        } else if is_key_pressed(KeyCode::Right) {
+            let idx = planets
+                .iter()
+                .position(|(point, _overworld)| point == selection)
+                .unwrap();
 
-        //             let (new_selection, _) = planets[(idx + planets.len() + 1) % planets.len()];
+            let (new_selection, _) = planets[(idx + planets.len() + 1) % planets.len()];
 
-        //             MenuResult::Unconfirmed {
-        //                 selection: *new_selection,
-        //             }
-        //         }
-        //         KeyCode::Return => MenuResult::Confirmed {
-        //             selection: *selection,
-        //         },
-        //         _ => MenuResult::Unconfirmed {
-        //             selection: *selection,
-        //         },
-        //     },
-        // };
+            MenuResult::Unconfirmed {
+                selection: *new_selection,
+            }
+        } else if is_key_pressed(KeyCode::Enter) {
+            MenuResult::Confirmed {
+                selection: *selection,
+            }
+        } else {
+            MenuResult::Unconfirmed {
+                selection: *selection,
+            }
+        };
 
         Ok(())
     }
@@ -132,29 +128,33 @@ impl Scene<Resources> for GalaxyTravel {
         for (i, (point, planet_info)) in visible.enumerate() {
             let y = i as f32 * MAX_PLANET_SPRITE_SIZE;
 
-            draw_text_ex(
-                &format!("{} at {:?}", planet_info, *point),
-                2. * MAX_PLANET_SPRITE_SIZE,
-                y,
-                TextParams {
-                    font: resources.assets.font,
-                    font_size: FONT_SIZE_PIXELS,
-                    ..Default::default()
-                },
-            );
-
             let planet_pixel_point = PixelPoint::new(1 * TILE_SIZE.width, y as i32);
 
+            // TODO: scale and color these like we did before
             resources
                 .assets
                 .tileset
                 .spr(planet_info.sprite(), &planet_pixel_point);
 
             if selected_point == point {
-                // canvas.draw(
-                //     &self.selection_rect,
-                //     DrawParam::default().dest(planet_pixel_point.as_mint_f32()),
-                // )
+                // TODO: this looks ugly
+                resources.assets.tileset.spr_flip_x(
+                    1063,
+                    &(planet_pixel_point
+                        + Vector2D::<i32, PixelSpace>::new(TILE_SIZE.width * 3, 0)),
+                ); // rocket pic
+
+                // TODO: center this on the bottom
+                draw_text_ex(
+                    &format!("{} at {:?}", planet_info, *point),
+                    MAX_PLANET_SPRITE_SIZE,
+                    y,
+                    TextParams {
+                        font: resources.assets.font,
+                        font_size: FONT_SIZE_PIXELS,
+                        ..Default::default()
+                    },
+                );
             }
         }
 
