@@ -9,5 +9,3 @@ pub use scene_stack::*;
 
 mod easing;
 pub use easing::*;
-
-pub struct DrawableWithParam {}

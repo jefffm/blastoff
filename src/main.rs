@@ -1,4 +1,5 @@
 use game::consts::RESOURCE_PATH;
+use game::consts::SCREEN_ASPECT_RATIO;
 use std::{env, path};
 use tracing::info;
 use tracing::Level;
@@ -113,21 +114,52 @@ async fn main() -> anyhow::Result<()> {
             ),
             target: vec2(
                 SCREEN_WIDTH_PIXELS as f32 / 2.0,
-                SCREEN_WIDTH_PIXELS as f32 / 2.0,
+                SCREEN_HEIGHT_PIXELS as f32 / 2.0,
             ),
             ..Default::default()
         });
-        clear_background(WHITE);
-
-        // Done rendering to the canvas; go back to our normal camera
-        // to size the canvas
-        set_default_camera();
         clear_background(BLACK);
 
-        game.poll_input()?;
-        game.update()?;
+        // Draw the game to the canvas
         game.draw()?;
 
+        // Draw the canvas to the window
+        set_default_camera();
+        clear_background(GREEN);
+
+        let (width_deficit, height_deficit) = wh_deficit();
+        draw_texture_ex(
+            canvas.texture,
+            width_deficit / 2.0,
+            height_deficit / 2.0,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(
+                    screen_width() - width_deficit,
+                    screen_height() - height_deficit,
+                )),
+                ..Default::default()
+            },
+        );
+
+        // Do the rest of the game stuff
+        game.poll_input()?;
+        game.update()?;
+
         next_frame().await
+    }
+}
+
+fn wh_deficit() -> (f32, f32) {
+    if (screen_width() / screen_height()) > SCREEN_ASPECT_RATIO {
+        // it's too wide! put bars on the sides!
+        // the height becomes the authority on how wide to draw
+        let expected_width = screen_height() * SCREEN_ASPECT_RATIO;
+        (screen_width() - expected_width, 0.0f32)
+    } else {
+        // it's too tall! put bars on the ends!
+        // the width is the authority
+        let expected_height = screen_width() / SCREEN_ASPECT_RATIO;
+        (0.0f32, screen_height() - expected_height)
     }
 }

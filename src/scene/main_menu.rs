@@ -112,22 +112,31 @@ impl Scene<Resources> for MainMenu {
         let selection = self.state.selection();
         let can_continue: bool = false;
 
-        draw_text(
+        draw_text_ex(
             TITLE_HEADER,
             PIXEL_RECT.center().x as f32,
             PIXEL_RECT.center().y as f32,
-            TILE_SIZE.width as f32,
-            WHITE,
+            TextParams {
+                font: resources.assets.font,
+                font_size: 128,
+                ..Default::default()
+            },
         );
 
         let entries = selection.entries(can_continue);
         for (i, entry) in entries.iter().enumerate() {
-            draw_text(
-                &selection.to_string(),
+            let color = if entry == selection { WHITE } else { GRAY };
+
+            draw_text_ex(
+                &entry.to_string(),
                 TILE_SIZE.width as f32 * 1.,
-                TILE_SIZE.width as f32 * i as f32 + 2., // 2-line gap because title
-                TILE_SIZE.width as f32,
-                WHITE,
+                64. * (i as f32 + 2.), // 2-line gap because title
+                TextParams {
+                    font: resources.assets.font,
+                    font_size: 64,
+                    color,
+                    ..Default::default()
+                },
             );
         }
 

@@ -9,6 +9,8 @@ use crate::util::{
 pub const SCALING_FACTOR: f32 = 2.;
 pub const SCREEN_WIDTH_PIXELS: i32 = 320 * 3;
 pub const SCREEN_HEIGHT_PIXELS: i32 = 180 * 3;
+pub const SCREEN_ASPECT_RATIO: f32 = SCREEN_WIDTH_PIXELS as f32 / SCREEN_HEIGHT_PIXELS as f32;
+
 pub const TILE_SIZE: PixelSize = PixelSize::new(16, 16);
 
 /// euclid Rect isn't const, so this is manually calculated
