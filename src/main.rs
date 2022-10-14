@@ -51,8 +51,8 @@ fn window_conf() -> Conf {
         .to_owned(),
         fullscreen: false,
         sample_count: 16,
-        window_height: SCREEN_HEIGHT_PIXELS,
-        window_width: SCREEN_WIDTH_PIXELS,
+        window_height: SCREEN_HEIGHT_PIXELS * 3,
+        window_width: SCREEN_WIDTH_PIXELS * 3,
         ..Default::default()
     }
 }

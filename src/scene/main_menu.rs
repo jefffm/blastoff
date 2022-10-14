@@ -111,14 +111,16 @@ impl Scene<Resources> for MainMenu {
     fn draw(&mut self, resources: &mut Resources) -> anyhow::Result<()> {
         let selection = self.state.selection();
         let can_continue: bool = false;
+        const FONT_SIZE_PIXELS: u16 = 16;
+        const HEADER_FONT_SIZE: u16 = FONT_SIZE_PIXELS * 2;
 
         draw_text_ex(
             TITLE_HEADER,
-            PIXEL_RECT.center().x as f32,
-            PIXEL_RECT.center().y as f32,
+            PIXEL_RECT.center().x as f32 / 2.,
+            PIXEL_RECT.center().y as f32 / 2.,
             TextParams {
                 font: resources.assets.font,
-                font_size: 128,
+                font_size: HEADER_FONT_SIZE,
                 ..Default::default()
             },
         );
@@ -129,11 +131,11 @@ impl Scene<Resources> for MainMenu {
 
             draw_text_ex(
                 &entry.to_string(),
-                TILE_SIZE.width as f32 * 1.,
-                64. * (i as f32 + 2.), // 2-line gap because title
+                PIXEL_RECT.center().x as f32 / 2.,
+                FONT_SIZE_PIXELS as f32 * (i as f32 + 6.),
                 TextParams {
                     font: resources.assets.font,
-                    font_size: 64,
+                    font_size: FONT_SIZE_PIXELS,
                     color,
                     ..Default::default()
                 },

@@ -6,28 +6,22 @@ use crate::util::{
 };
 
 // 16:9
-pub const SCALING_FACTOR: f32 = 2.;
-pub const SCREEN_WIDTH_PIXELS: i32 = 320 * 3;
-pub const SCREEN_HEIGHT_PIXELS: i32 = 180 * 3;
+pub const SCREEN_WIDTH_PIXELS: i32 = 320;
+pub const SCREEN_HEIGHT_PIXELS: i32 = 180;
 pub const SCREEN_ASPECT_RATIO: f32 = SCREEN_WIDTH_PIXELS as f32 / SCREEN_HEIGHT_PIXELS as f32;
+pub const PIXEL_RECT: PixelRect = PixelRect::new(
+    PixelPoint::new(0, 0),
+    PixelSize::new(SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS),
+);
 
 pub const TILE_SIZE: PixelSize = PixelSize::new(16, 16);
 
 /// euclid Rect isn't const, so this is manually calculated
-pub const SCREEN_HEIGHT: i32 = SCREEN_HEIGHT_PIXELS / TILE_SIZE.height; // (320 * 3) / 16 = 60
-pub const SCREEN_WIDTH: i32 = SCREEN_WIDTH_PIXELS / TILE_SIZE.width; // (180 * 3) / 16 = 33.75 = 33 + 0.75 extra
+pub const SCREEN_HEIGHT: i32 = 20; // 320 / 16 = 20
+pub const SCREEN_WIDTH: i32 = 11; // 180 / 16 = 11.25
 
 pub const SCREEN_SIZE: ScreenSize = ScreenSize::new(SCREEN_WIDTH, SCREEN_HEIGHT);
 pub const SCREEN_RECT: ScreenRect = ScreenRect::new(ScreenPoint::new(0, 0), SCREEN_SIZE);
-
-// Pixel coordinates can be derived from tile coordinates
-pub const PIXEL_RECT: PixelRect = PixelRect::new(
-    PixelPoint::new(0, 0),
-    PixelSize::new(
-        SCREEN_SIZE.width * TILE_SIZE.width,
-        SCREEN_SIZE.height * TILE_SIZE.height,
-    ),
-);
 
 pub fn get_screen_to_pixel_transform() -> ScreenToPixel {
     ScreenToPixel::from_points(SCREEN_RECT.origin, PIXEL_RECT.origin)
@@ -39,12 +33,12 @@ pub fn get_screen_to_pixel_transform_float() -> ScreenFloatToPixel {
 }
 
 // TODO: derive the viewport height instead
-pub const VIEWPORT_WIDTH: i32 = 50;
-pub const VIEWPORT_HEIGHT: i32 = 40;
+pub const VIEWPORT_WIDTH: i32 = SCREEN_WIDTH - 2;
+pub const VIEWPORT_HEIGHT: i32 = SCREEN_HEIGHT - 2;
 
 // Where on the screen is the viewport's origin?
 pub const VIEWPORT_SCREEN_POINT: ScreenPoint = ScreenPoint::new(2, 2);
-pub const TITLE_HEADER: &str = "Roguemon";
+pub const TITLE_HEADER: &str = "BLAST!OFF!";
 pub const UPDATE_FPS: u32 = 60;
 pub const UPDATE_INTERVAL_SECS: f32 = 1.0 / (UPDATE_FPS as f32);
 
