@@ -205,7 +205,7 @@ impl PlanetInfo {
 
     pub fn sprite(&self) -> u32 {
         // TODO: planet returns a sprite object of some sort
-        180 // return the round planet looking thing
+        265 // return the round planet looking thing
 
         // // Determine the sprite scale by deriving a square size from the
         // // planet's area (planets can technically be rectangles).

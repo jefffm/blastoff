@@ -35,7 +35,7 @@ impl Resources {
         );
 
         tracing::info!("Loading Tileset");
-        let tileset = Tileset::try_from_file("tileset/tileset_colored.tsx").await?;
+        let tileset = Tileset::try_from_file("tileset/tileset_transparent.tsx").await?;
 
         tracing::info!("Loading Font");
         let font = load_ttf_font("fonts/AwkwardExt.ttf").await?;
