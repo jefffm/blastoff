@@ -1,17 +1,14 @@
-use std::collections::HashMap;
-
-use euclid::Size2D;
 use macroquad::prelude::*;
 
-use crate::{
-    color::EMPTY,
-    util::{to_cp437, PixelPoint, PixelSize, PixelSpace, SpriteSize},
+use crate::util::{
+    to_cp437, PixelPoint, PixelSize, PointExt, SpritePoint, SpriteSize, SpriteToPixel,
 };
 #[derive(Debug)]
 pub struct BitmapFont {
     texture: Texture2D,
     pub char_size: PixelSize,
     pub sheet_size: SpriteSize,
+    sprite_to_pixel: SpriteToPixel,
 }
 
 // TODO: implement bitmap font drawing. Some inspo: https://github.com/gamma-delta/haxagon/blob/main/src/utils/text/mod.rs
@@ -27,6 +24,7 @@ impl BitmapFont {
             texture,
             char_size,
             sheet_size,
+            sprite_to_pixel: SpriteToPixel::scale(char_size.width, char_size.height),
         }
     }
 
@@ -57,12 +55,13 @@ impl BitmapFont {
     /// Get the Rect corresponding to a given character
     fn get_for_char(&self, c: char) -> Rect {
         let byte = to_cp437(c);
-        let col = byte as f32 % self.sheet_size.width as f32;
-        let row = self.sheet_size.width as f32 / byte as f32;
+
+        let sprite_point = SpritePoint::from_index(byte as usize, self.sheet_size.width);
+        let sprite_pixel_point = self.sprite_to_pixel.transform_point(sprite_point).to_f32();
 
         Rect {
-            x: col,
-            y: row,
+            x: sprite_pixel_point.x,
+            y: sprite_pixel_point.y,
             w: self.char_size.width as f32,
             h: self.char_size.height as f32,
         }
