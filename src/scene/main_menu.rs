@@ -110,10 +110,11 @@ impl Scene<Resources> for MainMenu {
         let selection = self.state.selection();
         let can_continue: bool = false;
 
+        let title_point = PixelPoint::new(PIXEL_RECT.center().x / 2, PIXEL_RECT.center().y / 2);
         resources
             .assets
             .monospace_font
-            .draw(TITLE_HEADER, PIXEL_RECT.center(), None, None);
+            .draw(TITLE_HEADER, title_point, None, None);
 
         let entries = selection.entries(can_continue);
         for (i, entry) in entries.iter().enumerate() {
@@ -121,7 +122,9 @@ impl Scene<Resources> for MainMenu {
 
             let point = PixelPoint::new(
                 (PIXEL_RECT.center().x as f32 / 2.) as i32,
-                resources.assets.monospace_font.char_size.height as i32 * (i as i32 + 6),
+                (resources.assets.monospace_font.char_size.height * i as i32)
+                    + PIXEL_RECT.center().y
+                    + (PIXEL_RECT.center().y / 2),
             );
 
             // TODO: make it possible to pass in color for monospace_font
