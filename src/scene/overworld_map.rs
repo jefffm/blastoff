@@ -89,15 +89,16 @@ impl Scene<Resources> for OverworldMap {
         self.input = match self.state {
             OverworldMapState::NeedsIntroCutscene => None,
             OverworldMapState::Ready => {
-                if is_key_down(KeyCode::Up) {
+                // TODO: how to implement "key held down goes fast"?
+                if is_key_pressed(KeyCode::Up) {
                     Some(OverworldMapInput::MoveN)
-                } else if is_key_down(KeyCode::Down) {
+                } else if is_key_pressed(KeyCode::Down) {
                     Some(OverworldMapInput::MoveS)
-                } else if is_key_down(KeyCode::Left) {
+                } else if is_key_pressed(KeyCode::Left) {
                     Some(OverworldMapInput::MoveW)
-                } else if is_key_down(KeyCode::Right) {
+                } else if is_key_pressed(KeyCode::Right) {
                     Some(OverworldMapInput::MoveE)
-                } else if is_key_down(KeyCode::Space) {
+                } else if is_key_pressed(KeyCode::Space) {
                     Some(OverworldMapInput::Activate)
                 } else {
                     None
@@ -189,6 +190,14 @@ impl Scene<Resources> for OverworldMap {
             .assets
             .tileset
             .spr(469, &self.overworld_to_pixel(self.player_position.to_f32()));
+
+        // Coordinate debugging
+        resources.assets.monospace_font.draw(
+            &format!("{:?}", self.player_position),
+            PixelPoint::new(0, 8),
+            None,
+            None,
+        );
 
         Ok(())
     }

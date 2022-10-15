@@ -26,6 +26,16 @@ impl OverworldTile {
         }
     }
 
+    pub fn sprite(&self) -> u32 {
+        match self {
+            OverworldTile::City => 1032,
+            OverworldTile::Barren => 6,
+            OverworldTile::Water => 253,
+            OverworldTile::Lava => 253,
+            OverworldTile::Jungle => 101,
+        }
+    }
+
     pub fn fg(&self) -> Color {
         match self {
             OverworldTile::City => COMMON.three,
@@ -37,6 +47,19 @@ impl OverworldTile {
     }
 
     pub fn render(&self, resources: &mut Resources, point: &PixelPoint) {
-        // TODO: render overworld tiles
+        // TODO: render ASCII too
+        resources
+            .assets
+            .tileset
+            .draw(self.sprite(), point, Some(self.fg()), None, false)
     }
 }
+
+/*
+
+- egg rolls
+- shrimp and pork rice dish
+- pho chicken
+
+860 284 1196
+*/
