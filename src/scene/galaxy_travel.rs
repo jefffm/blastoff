@@ -125,13 +125,18 @@ impl Scene<Resources> for GalaxyTravel {
         let carousel = Carousel::new(selected_idx, &planet_infos);
         // TODO: create carousel size constant
         let visible = carousel.visible(5);
+
         for (i, (point, planet_info)) in visible.enumerate() {
-            let y = i as f32 * MAX_PLANET_SPRITE_SIZE;
-            let planet_pixel_point = PixelPoint::new(y as i32, 1 * TILE_SIZE.width);
+            let planetsprite_x_pos = i as f32 * MAX_PLANET_SPRITE_SIZE + 16.;
+            let planet_pixel_point =
+                PixelPoint::new(planetsprite_x_pos as i32, 1 * TILE_SIZE.width);
 
             if selected_point == point {
                 // TODO: center this on the bottom
-                let text_origin = PixelPoint::new(MAX_PLANET_SPRITE_SIZE as i32, y as i32);
+                let text_origin = PixelPoint::new(
+                    PIXEL_RECT.center().x / 2,
+                    PIXEL_RECT.center().y + (PIXEL_RECT.center().y / 2),
+                );
                 resources.assets.monospace_font.draw(
                     &format!("{} at {:?}", planet_info, *point),
                     text_origin,
