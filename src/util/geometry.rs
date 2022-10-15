@@ -31,6 +31,7 @@ pub struct PixelSpace;
 pub type PixelPoint = Point2D<i32, PixelSpace>;
 pub type PixelSize = Size2D<i32, PixelSpace>;
 pub type PixelRect = Rect<i32, PixelSpace>;
+pub type PixelVector = Vector2D<i32, PixelSpace>;
 
 pub type PixelToScreen = Transform2D<i32, PixelSpace, ScreenSpace>;
 pub type ScreenToPixel = Transform2D<i32, ScreenSpace, PixelSpace>;

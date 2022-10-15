@@ -74,13 +74,9 @@ impl BitmapFont {
             .into_iter()
             .enumerate()
         {
-            draw_texture_ex(
-                self.texture,
-                point.x as f32 * (i as f32 * self.char_size.width as f32),
-                point.y as f32,
-                WHITE,
-                param,
-            );
+            let dest =
+                PixelPoint::new(point.x + (i as i32 * self.char_size.width), point.y).to_f32();
+            draw_texture_ex(self.texture, dest.x, dest.y, WHITE, param);
         }
     }
 }
