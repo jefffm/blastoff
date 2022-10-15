@@ -19,11 +19,11 @@ pub use main_menu::*;
 mod galaxy_travel;
 pub use galaxy_travel::*;
 
-// mod cutscene_new_planet;
-// pub use cutscene_new_planet::*;
+mod cutscene_new_planet;
+pub use cutscene_new_planet::*;
 
-// mod overworld_map;
-// pub use overworld_map::*;
+mod overworld_map;
+pub use overworld_map::*;
 
 // // TODO: fix loading screen
 // // mod loading_screen;

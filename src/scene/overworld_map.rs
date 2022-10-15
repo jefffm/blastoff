@@ -1,10 +1,9 @@
 use std::{cell::RefCell, rc::Rc};
 
-use ggez::input::keyboard::KeyCode;
+use macroquad::prelude::*;
 
 use crate::{
     game::consts::{get_screen_to_pixel_transform_float, SCREEN_RECT, SECTOR_SIZE},
-    input::Controls,
     overworld::Overworld,
     procgen::{
         seed::{self},
@@ -16,11 +15,11 @@ use crate::{
         OverworldFloatPoint, OverworldPoint, OverworldSpace, OverworldToViewport, OverworldVector,
         PixelPoint, Scene, SceneSwitch, ScreenFloatPoint, TransformExt, ViewportFloatPoint,
         ViewportFloatToScreen, ViewportPoint, ViewportRect, ViewportSize, WorldPoint, WorldSize,
-        PLAYER,
     },
 };
 
-use super::{CutsceneNewPlanet, Sector};
+// use super::{CutsceneNewPlanet, Sector};
+use super::CutsceneNewPlanet;
 
 enum OverworldMapState {
     NeedsIntroCutscene,
@@ -85,29 +84,31 @@ impl OverworldMap {
     }
 }
 
-impl Scene<Resources, Controls> for OverworldMap {
-    fn input(&mut self, _resources: &mut Resources, controls: &mut Controls, _started: bool) {
-        if let Some(key) = controls.read() {
-            self.input = match self.state {
-                OverworldMapState::NeedsIntroCutscene => None,
-                OverworldMapState::Ready => match key {
-                    // KeyCode::Escape => Some(OverworldMapInput::Exit),
-                    KeyCode::Up => Some(OverworldMapInput::MoveN),
-                    KeyCode::Down => Some(OverworldMapInput::MoveS),
-                    KeyCode::Left => Some(OverworldMapInput::MoveW),
-                    KeyCode::Right => Some(OverworldMapInput::MoveE),
-                    KeyCode::Space => Some(OverworldMapInput::Activate),
-                    _ => None,
-                },
+impl Scene<Resources> for OverworldMap {
+    fn poll_input(&mut self, _resources: &mut Resources) -> anyhow::Result<()> {
+        self.input = match self.state {
+            OverworldMapState::NeedsIntroCutscene => None,
+            OverworldMapState::Ready => {
+                if is_key_down(KeyCode::Up) {
+                    Some(OverworldMapInput::MoveN)
+                } else if is_key_down(KeyCode::Down) {
+                    Some(OverworldMapInput::MoveS)
+                } else if is_key_down(KeyCode::Left) {
+                    Some(OverworldMapInput::MoveW)
+                } else if is_key_down(KeyCode::Right) {
+                    Some(OverworldMapInput::MoveE)
+                } else if is_key_down(KeyCode::Space) {
+                    Some(OverworldMapInput::Activate)
+                } else {
+                    None
+                }
             }
-        }
+        };
+
+        Ok(())
     }
 
-    fn update(
-        &mut self,
-        resources: &mut Resources,
-        _ctx: &mut ggez::Context,
-    ) -> SceneSwitch<Resources, Controls> {
+    fn update(&mut self, resources: &mut Resources) -> SceneSwitch<Resources> {
         match self.state {
             OverworldMapState::NeedsIntroCutscene => {
                 // After we return from this scene switch, we're ready
@@ -158,7 +159,7 @@ impl Scene<Resources, Controls> for OverworldMap {
                             };
 
                             // early return
-                            return SceneSwitch::Push(Box::new(Sector::new(sector)));
+                            // return SceneSwitch::Push(Box::new(Sector::new(sector)));
                         }
                     }
                 }
@@ -167,15 +168,11 @@ impl Scene<Resources, Controls> for OverworldMap {
         }
     }
 
-    fn draw(
-        &mut self,
-        resources: &mut Resources,
-        _ctx: &mut ggez::Context,
-        _canvas: &mut ggez::graphics::Canvas,
-    ) -> ggez::GameResult<()> {
-        resources.font.push_text(
+    fn draw(&mut self, resources: &mut Resources) -> anyhow::Result<()> {
+        resources.assets.monospace_font.draw(
             &format!("{}", (*self.planet).borrow()),
-            &PixelPoint::new(0, 0),
+            PixelPoint::new(0, 0),
+            None,
             None,
         );
 
@@ -188,10 +185,10 @@ impl Scene<Resources, Controls> for OverworldMap {
             }
         }
 
-        resources.spritesheet.push_sprite(
-            PLAYER,
-            self.overworld_to_pixel(self.player_position.to_f32()),
-        );
+        resources
+            .assets
+            .tileset
+            .spr(469, &self.overworld_to_pixel(self.player_position.to_f32()));
 
         Ok(())
     }

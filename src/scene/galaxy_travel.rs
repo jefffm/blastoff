@@ -1,6 +1,5 @@
 //! The Galaxy scene allows players to select a planet to travel to, and then initialize an Overworld Scene to push to the Scene Stack.
 
-use euclid::Vector2D;
 use macroquad::prelude::*;
 
 use crate::{
@@ -13,7 +12,7 @@ use crate::{
 };
 
 // use super::{MenuResult, OverworldMap};
-use super::MenuResult;
+use super::{MenuResult, OverworldMap};
 
 /// The GalaxyTravel Scene allows players to select a planet for landing
 pub struct GalaxyTravel {
@@ -97,17 +96,13 @@ impl Scene<Resources> for GalaxyTravel {
             } => {
                 if let Some(planet) = self.galaxy.get_planet(&galaxy_point) {
                     // If the planet already exists, don't recreate it!
-                    // SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
-                    // TODO: implement OverworldMap
-                    SceneSwitch::None
+                    SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
                 } else {
                     // Create the planet when selected
                     let overworld_gen = StaticPlanet {};
                     let mut loader = OverworldProcgenLoader::new(overworld_gen, resources);
                     let planet = self.galaxy.create_planet(&galaxy_point, &mut loader);
-                    // SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
-                    // TODO: implement OverworldMap
-                    SceneSwitch::None
+                    SceneSwitch::Push(Box::new(OverworldMap::new(planet)))
                 }
             }
         }

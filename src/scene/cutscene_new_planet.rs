@@ -3,16 +3,17 @@ use std::{
     rc::Rc,
 };
 
-use ggez::{graphics::DrawParam, mint::Point2};
 use keyframe::{
     ease,
     functions::{EaseInOut, Linear},
-    keyframes, AnimationSequence,
+    keyframes,
+    mint::Point2,
+    AnimationSequence,
 };
+use macroquad::prelude::*;
 
 use crate::{
     game::consts::{TILE_SIZE, UPDATE_INTERVAL_SECS},
-    input::Controls,
     overworld::Overworld,
     resource::Resources,
     util::{easing_function, EasingEnum, PixelPoint, PointExt, Scene, SceneSwitch},
@@ -48,16 +49,13 @@ impl CutsceneNewPlanet {
     }
 }
 
-impl Scene<Resources, Controls> for CutsceneNewPlanet {
-    fn input(&mut self, _resources: &mut Resources, _controls: &mut Controls, _started: bool) {
+impl Scene<Resources> for CutsceneNewPlanet {
+    fn poll_input(&mut self, _resources: &mut Resources) -> anyhow::Result<()> {
         // TODO: implement skip cutscene
+        Ok(())
     }
 
-    fn update(
-        &mut self,
-        _resources: &mut Resources,
-        _ctx: &mut ggez::Context,
-    ) -> SceneSwitch<Resources, Controls> {
+    fn update(&mut self, _resources: &mut Resources) -> SceneSwitch<Resources> {
         if self.timer > CUTSCENE_LENGTH_SECS {
             SceneSwitch::Pop
         } else {
@@ -66,35 +64,28 @@ impl Scene<Resources, Controls> for CutsceneNewPlanet {
         }
     }
 
-    fn draw(
-        &mut self,
-        resources: &mut Resources,
-        ctx: &mut ggez::Context,
-        _canvas: &mut ggez::graphics::Canvas,
-    ) -> ggez::GameResult<()> {
+    fn draw(&mut self, resources: &mut Resources) -> anyhow::Result<()> {
         let pos = self.planet_pos_animation.now_strict().unwrap();
         let scale = self.planet_scale_animation.now_strict().unwrap();
         let planet: Ref<Overworld> = (*self.planet).borrow();
-        resources.spritesheet.push_sprite(
-            planet
-                .info()
-                .sprite()
-                // TODO: this overwrites everything defined about the sprite including color
-                .with_params(DrawParam::default().scale([scale, scale])),
-            PixelPoint::new(pos.x.round() as i32, pos.y.round() as i32),
+        planet.info().draw(
+            &PixelPoint::new(pos.x.round() as i32, pos.y.round() as i32),
+            &resources.assets.tileset,
+            Some(scale),
         );
 
         // Draw text on top
-        resources.font.push_text(
+        resources.assets.monospace_font.draw(
             &format!("You travel to {}", (*self.planet).borrow()),
-            &PixelPoint::new(5 * TILE_SIZE.width, 5 * TILE_SIZE.height),
+            PixelPoint::new(5 * TILE_SIZE.width, 5 * TILE_SIZE.height),
+            None,
             None,
         );
 
         self.planet_pos_animation
-            .advance_by(ctx.time.delta().as_secs_f64());
+            .advance_by(get_frame_time() as f64);
         self.planet_scale_animation
-            .advance_by(ctx.time.delta().as_secs_f64());
+            .advance_by(get_frame_time() as f64);
         Ok(())
     }
 
