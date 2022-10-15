@@ -146,10 +146,12 @@ impl Scene<Resources> for GalaxyTravel {
 
                 // TODO: center this on the bottom
                 let text_origin = PixelPoint::new(MAX_PLANET_SPRITE_SIZE as i32, y as i32);
-                resources
-                    .assets
-                    .monospace_font
-                    .draw(&format!("{} at {:?}", planet_info, *point), text_origin);
+                resources.assets.monospace_font.draw(
+                    &format!("{} at {:?}", planet_info, *point),
+                    text_origin,
+                    None,
+                    None,
+                );
             }
         }
 

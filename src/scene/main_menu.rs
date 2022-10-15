@@ -113,7 +113,7 @@ impl Scene<Resources> for MainMenu {
         resources
             .assets
             .monospace_font
-            .draw(TITLE_HEADER, PIXEL_RECT.center());
+            .draw(TITLE_HEADER, PIXEL_RECT.center(), None, None);
 
         let entries = selection.entries(can_continue);
         for (i, entry) in entries.iter().enumerate() {
@@ -128,7 +128,7 @@ impl Scene<Resources> for MainMenu {
             resources
                 .assets
                 .monospace_font
-                .draw(&entry.to_string(), point);
+                .draw(&entry.to_string(), point, Some(color), None);
         }
 
         Ok(())

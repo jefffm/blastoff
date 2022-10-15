@@ -68,15 +68,21 @@ impl BitmapFont {
     }
 
     /// Draw a string of chars starting at a top-left corner point
-    pub fn draw(&self, text: &str, point: PixelPoint) {
+    pub fn draw(
+        &self,
+        text: &str,
+        point: PixelPoint,
+        color: Option<Color>,
+        param: Option<DrawTextureParams>,
+    ) {
         for (i, param) in self
-            .string_to_draw_params(text, None)
+            .string_to_draw_params(text, param)
             .into_iter()
             .enumerate()
         {
             let dest =
                 PixelPoint::new(point.x + (i as i32 * self.char_size.width), point.y).to_f32();
-            draw_texture_ex(self.texture, dest.x, dest.y, WHITE, param);
+            draw_texture_ex(self.texture, dest.x, dest.y, color.unwrap_or(WHITE), param);
         }
     }
 }
