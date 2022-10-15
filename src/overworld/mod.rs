@@ -1,4 +1,5 @@
 mod sector_info;
+use macroquad::prelude::Color;
 pub use sector_info::*;
 mod tile;
 
@@ -11,11 +12,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     color::{FIRE, PLANT, WATER},
-    data::{Element, PlanetType, SectorProbability},
+    data::{Element, PlanetType, SectorProbability, Tileset},
     game::consts::MAX_PLANET_SPRITE_SIZE,
     procgen::{MapGenerator, SectorProcgenLoader, Spawner},
     sector,
-    util::{OverworldPoint, OverworldRect, OverworldSize},
+    util::{OverworldPoint, OverworldRect, OverworldSize, PixelPoint},
 };
 
 // TODO: World needs to be serializeable in order to implement save/load
@@ -132,7 +133,7 @@ impl Overworld {
         self.get_sector(point).unwrap()
     }
 
-    pub fn color(&self) -> RGBA8 {
+    pub fn color(&self) -> Color {
         self.info.color()
     }
 
@@ -187,7 +188,7 @@ impl PlanetInfo {
         self.rect.center()
     }
 
-    pub fn color(&self) -> RGBA8 {
+    pub fn color(&self) -> Color {
         match self.element {
             Element::Water => WATER.five,
             Element::Fire => FIRE.five,
@@ -203,20 +204,25 @@ impl PlanetInfo {
         }
     }
 
-    pub fn sprite(&self) -> u32 {
-        // TODO: planet returns a sprite object of some sort
-        265 // return the round planet looking thing
+    pub fn draw(&self, point: &PixelPoint, tileset: &Tileset) {
+        // Determine the sprite scale by deriving a square size from the
+        // planet's area (planets can technically be rectangles).
+        // x normalized = (x – x minimum) / (x maximum – x minimum)
+        let area = self.size.area() as f32;
+        let x = area.sqrt();
 
-        // // Determine the sprite scale by deriving a square size from the
-        // // planet's area (planets can technically be rectangles).
-        // // x normalized = (x – x minimum) / (x maximum – x minimum)
-        // let area = self.size.area() as f32;
-        // let x = area.sqrt();
+        // TODO: remove magic numbers from planet sprite
+        let x_min: f32 = 1.;
+        let scale = (x - x_min) / (MAX_PLANET_SPRITE_SIZE - x_min);
+        let size = (MAX_PLANET_SPRITE_SIZE * scale).round() as u8;
 
-        // // TODO: remove magic numbers from planet sprite
-        // let x_min: f32 = 1.;
-        // let x_max: f32 = 18. * 18.;
-        // let scale = (x - x_min) / (x_max - x_min);
+        tileset.draw(
+            265, // use the round planet looking thing
+            point,
+            Some(self.color()),
+            Some(size),
+            false,
+        );
 
         // PLANET.with_params(
         //     DrawParam::default()

@@ -1,18 +1,13 @@
 mod wall;
-
-use rgb::RGBA8;
 pub use wall::*;
 
 mod floor;
 pub use floor::*;
 
+use macroquad::prelude::Color;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    color::{COMMON, EMPTY},
-    resource::Resources,
-    util::PixelPoint,
-};
+use crate::{color::EMPTY, resource::Resources, util::PixelPoint};
 pub enum VisibilityKind {
     Torch { brightness: u32 },
     DiscoBall { value: u32 },
@@ -92,14 +87,14 @@ impl Tile {
         }
     }
 
-    pub fn fg(&self) -> RGBA8 {
+    pub fn fg(&self) -> Color {
         match self {
             Self::Floor(floor) => floor.fg(),
             Self::Wall(wall) => wall.fg(),
         }
     }
 
-    pub fn bg(&self) -> RGBA8 {
+    pub fn bg(&self) -> Color {
         EMPTY
     }
 

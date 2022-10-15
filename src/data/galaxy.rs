@@ -25,8 +25,10 @@ impl Asset for GalaxyProbability {
 
 impl GalaxyProbability {
     pub fn roll_planet(&self, name: String, rng: &mut RandomNumberGenerator) -> PlanetInfo {
-        let width = rng.roll_dice(3, 6);
-        let height = rng.roll_dice(3, 6);
+        // TODO: Configure Planet Size rng
+        let size_dice = DiceType::new(1, 18, 9);
+        let width = rng.roll(size_dice);
+        let height = rng.roll(size_dice);
         let inner = rng.get_rng();
 
         let planet_type = self.planet_type.next_element(inner);

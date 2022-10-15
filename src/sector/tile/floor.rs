@@ -1,3 +1,4 @@
+use macroquad::prelude::Color;
 use serde::{Deserialize, Serialize};
 
 use crate::color::COMMON;
@@ -36,7 +37,7 @@ impl FloorKind {
         false
     }
 
-    pub fn fg(&self) -> rgb::RGBA8 {
+    pub fn fg(&self) -> Color {
         COMMON.three
     }
 }

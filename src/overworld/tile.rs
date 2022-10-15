@@ -1,4 +1,4 @@
-use rgb::RGBA8;
+use macroquad::prelude::Color;
 
 use crate::{
     color::{COMMON, FIRE, PLANT, WATER},
@@ -26,7 +26,7 @@ impl OverworldTile {
         }
     }
 
-    pub fn fg(&self) -> RGBA8 {
+    pub fn fg(&self) -> Color {
         match self {
             OverworldTile::City => COMMON.three,
             OverworldTile::Barren => COMMON.two,

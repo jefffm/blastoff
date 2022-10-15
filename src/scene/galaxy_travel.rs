@@ -129,12 +129,7 @@ impl Scene<Resources> for GalaxyTravel {
             let y = i as f32 * MAX_PLANET_SPRITE_SIZE;
 
             let planet_pixel_point = PixelPoint::new(1 * TILE_SIZE.width, y as i32);
-
-            // TODO: scale and color these like we did before
-            resources
-                .assets
-                .tileset
-                .spr(planet_info.sprite(), &planet_pixel_point);
+            planet_info.draw(&planet_pixel_point, &resources.assets.tileset);
 
             if selected_point == point {
                 // TODO: this looks ugly

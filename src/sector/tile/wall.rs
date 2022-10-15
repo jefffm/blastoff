@@ -1,3 +1,4 @@
+use macroquad::prelude::Color;
 use serde::{Deserialize, Serialize};
 
 use crate::{color::COMMON, component::Cardinal, sector::Map, util::WorldPoint};
@@ -119,7 +120,7 @@ impl WallKind {
         true
     }
 
-    pub fn fg(&self) -> rgb::RGBA8 {
+    pub fn fg(&self) -> Color {
         COMMON.four
     }
 }

@@ -47,21 +47,28 @@ impl Tileset {
     }
 
     pub fn spr(&self, sprite: u32, dest: &PixelPoint) {
-        self.draw_sprite(sprite, dest, None, false)
+        self.draw(sprite, dest, None, None, false)
     }
 
     pub fn spr_flip_x(&self, sprite: u32, dest: &PixelPoint) {
-        self.draw_sprite(sprite, dest, None, true)
+        self.draw(sprite, dest, None, None, true)
     }
 
-    fn draw_sprite(&self, sprite: u32, dest: &PixelPoint, scale: Option<i32>, flip_x: bool) {
+    pub fn draw(
+        &self,
+        sprite: u32,
+        dest: &PixelPoint,
+        color: Option<Color>,
+        scale: Option<u8>,
+        flip_x: bool,
+    ) {
         let spr_rect = self.sprite_rect(sprite);
 
         draw_texture_ex(
             self.texture,
             dest.x as f32,
             dest.y as f32,
-            WHITE,
+            color.unwrap_or(WHITE),
             DrawTextureParams {
                 dest_size: scale.map(|scale| vec2(scale as f32, scale as f32)),
                 flip_x,
