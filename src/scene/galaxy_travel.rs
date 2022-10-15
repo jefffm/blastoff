@@ -145,16 +145,11 @@ impl Scene<Resources> for GalaxyTravel {
                 ); // rocket pic
 
                 // TODO: center this on the bottom
-                draw_text_ex(
-                    &format!("{} at {:?}", planet_info, *point),
-                    MAX_PLANET_SPRITE_SIZE,
-                    y,
-                    TextParams {
-                        font: resources.assets.font,
-                        font_size: FONT_SIZE,
-                        ..Default::default()
-                    },
-                );
+                let text_origin = PixelPoint::new(MAX_PLANET_SPRITE_SIZE as i32, y as i32);
+                resources
+                    .assets
+                    .monospace_font
+                    .draw(&format!("{} at {:?}", planet_info, *point), text_origin);
             }
         }
 

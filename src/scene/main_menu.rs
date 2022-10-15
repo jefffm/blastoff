@@ -5,7 +5,7 @@ use macroquad::prelude::*;
 use crate::{
     game::consts::{FONT_SIZE, HEADER_FONT_SIZE, PIXEL_RECT, TITLE_HEADER},
     resource::Resources,
-    util::{Scene, SceneSwitch},
+    util::{PixelPoint, Scene, SceneSwitch},
 };
 
 use super::{GalaxyTravel, MenuResult};
@@ -110,34 +110,25 @@ impl Scene<Resources> for MainMenu {
         let selection = self.state.selection();
         let can_continue: bool = false;
 
-        draw_text_ex(
-            TITLE_HEADER,
-            PIXEL_RECT.center().x as f32 / 2.,
-            PIXEL_RECT.center().y as f32 / 2.,
-            TextParams {
-                font: resources.assets.font,
-                font_size: HEADER_FONT_SIZE,
-                ..Default::default()
-            },
-        );
+        resources
+            .assets
+            .monospace_font
+            .draw(TITLE_HEADER, PIXEL_RECT.center());
 
         let entries = selection.entries(can_continue);
         for (i, entry) in entries.iter().enumerate() {
             let color = if entry == selection { WHITE } else { GRAY };
 
-            let size = measure_text("testing", Some(resources.assets.font), FONT_SIZE * 2, 0.6);
-            draw_text_ex(
-                &format!("Size: {}", size.height),
-                PIXEL_RECT.center().x as f32 / 2.,
-                FONT_SIZE as f32 * (i as f32 + 6.),
-                TextParams {
-                    font: resources.assets.font,
-                    font_size: FONT_SIZE * 2,
-                    font_scale: 0.6,
-                    color,
-                    ..Default::default()
-                },
+            let point = PixelPoint::new(
+                (PIXEL_RECT.center().x as f32 / 2.) as i32,
+                resources.assets.monospace_font.char_size.height as i32 * (i as i32 + 6),
             );
+
+            // TODO: make it possible to pass in color for monospace_font
+            resources
+                .assets
+                .monospace_font
+                .draw(&entry.to_string(), point);
         }
 
         Ok(())
