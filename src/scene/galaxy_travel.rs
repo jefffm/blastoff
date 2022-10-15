@@ -5,11 +5,11 @@ use macroquad::prelude::*;
 
 use crate::{
     galaxy::Galaxy,
-    game::consts::{FONT_SIZE, MAX_PLANET_SPRITE_SIZE, TILE_SIZE},
+    game::consts::{FONT_SIZE, MAX_PLANET_SPRITE_SIZE, PIXEL_RECT, TILE_SIZE},
     overworld::PlanetInfo,
     procgen::{GalaxyGenerator, OverworldProcgenLoader, StaticGalaxy, StaticPlanet},
     resource::Resources,
-    util::{GalaxyPoint, PixelPoint, PixelSpace, Scene, SceneSwitch},
+    util::{GalaxyPoint, PixelPoint, PixelSpace, PixelVector, Scene, SceneSwitch},
 };
 
 // use super::{MenuResult, OverworldMap};
@@ -127,18 +127,9 @@ impl Scene<Resources> for GalaxyTravel {
         let visible = carousel.visible(5);
         for (i, (point, planet_info)) in visible.enumerate() {
             let y = i as f32 * MAX_PLANET_SPRITE_SIZE;
-
-            let planet_pixel_point = PixelPoint::new(1 * TILE_SIZE.width, y as i32);
-            planet_info.draw(&planet_pixel_point, &resources.assets.tileset);
+            let planet_pixel_point = PixelPoint::new(y as i32, 1 * TILE_SIZE.width);
 
             if selected_point == point {
-                // TODO: this looks ugly
-                resources.assets.tileset.spr_flip_x(
-                    1063,
-                    &(planet_pixel_point
-                        + Vector2D::<i32, PixelSpace>::new(TILE_SIZE.width * 3, 0)),
-                ); // rocket pic
-
                 // TODO: center this on the bottom
                 let text_origin = PixelPoint::new(MAX_PLANET_SPRITE_SIZE as i32, y as i32);
                 resources.assets.monospace_font.draw(
@@ -147,6 +138,16 @@ impl Scene<Resources> for GalaxyTravel {
                     None,
                     None,
                 );
+
+                // TODO: this looks ugly
+                resources
+                    .assets
+                    .tileset
+                    .spr_flip_x(1063, &PIXEL_RECT.center()); // rocket pic
+
+                planet_info.draw(&planet_pixel_point, &resources.assets.tileset, Some(2.));
+            } else {
+                planet_info.draw(&planet_pixel_point, &resources.assets.tileset, Some(0.5));
             }
         }
 

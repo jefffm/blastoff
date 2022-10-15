@@ -204,7 +204,7 @@ impl PlanetInfo {
         }
     }
 
-    pub fn draw(&self, point: &PixelPoint, tileset: &Tileset) {
+    pub fn draw(&self, point: &PixelPoint, tileset: &Tileset, scale_mod: Option<f32>) {
         // Determine the sprite scale by deriving a square size from the
         // planet's area (planets can technically be rectangles).
         // x normalized = (x – x minimum) / (x maximum – x minimum)
@@ -214,7 +214,7 @@ impl PlanetInfo {
         // TODO: remove magic numbers from planet sprite
         let x_min: f32 = 1.;
         let scale = (x - x_min) / (MAX_PLANET_SPRITE_SIZE - x_min);
-        let size = (MAX_PLANET_SPRITE_SIZE * scale).round() as u8;
+        let size = (MAX_PLANET_SPRITE_SIZE * scale * scale_mod.unwrap_or(1.)).round() as u8;
 
         tileset.draw(
             265, // use the round planet looking thing
