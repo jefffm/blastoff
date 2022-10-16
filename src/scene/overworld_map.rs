@@ -3,7 +3,10 @@ use std::{cell::RefCell, rc::Rc};
 use macroquad::prelude::*;
 
 use crate::{
-    game::consts::{get_screen_to_pixel_transform_float, SCREEN_RECT, SECTOR_SIZE},
+    game::consts::{
+        get_screen_to_pixel_transform_float, SCREEN_RECT, SECTOR_SIZE, VIEWPORT_HEIGHT,
+        VIEWPORT_WIDTH,
+    },
     overworld::Overworld,
     procgen::{
         seed::{self},
@@ -46,20 +49,21 @@ pub struct OverworldMap {
 impl OverworldMap {
     pub fn new(planet: Rc<RefCell<Overworld>>) -> Self {
         let t1 = OverworldToViewport::default();
-        let viewport = Viewport::new(
+        let mut viewport = Viewport::new(
             ViewportRect::new(
                 ViewportPoint::new(0, 0),
-                ViewportSize::new(SCREEN_RECT.width() - 2, SCREEN_RECT.height() - 3),
+                ViewportSize::new(VIEWPORT_WIDTH, VIEWPORT_HEIGHT),
             ),
             t1,
         );
-
         let screen_transform = ViewportFloatToScreen::from_points(
             ViewportFloatPoint::new(0., 0.),
-            ScreenFloatPoint::new(2., 2.),
+            ScreenFloatPoint::new(-0.5, 1.),
         );
 
         let player_position = (*planet).borrow().center();
+        viewport.update_transform(player_position.to_f32());
+
         Self {
             state: OverworldMapState::NeedsIntroCutscene,
             planet,
@@ -73,6 +77,8 @@ impl OverworldMap {
     // TODO: Use floating point and move animation
     fn move_player(&mut self, vector: OverworldVector) {
         self.player_position = (*self.planet).borrow().clamp(self.player_position + vector);
+        self.viewport
+            .update_transform(self.player_position.to_f32())
     }
 
     fn overworld_to_pixel(&self, point: OverworldFloatPoint) -> PixelPoint {
@@ -186,14 +192,19 @@ impl Scene<Resources> for OverworldMap {
             }
         }
 
+        // player
         resources
             .assets
             .tileset
+            // TODO: remove hardcoded sprite
             .spr(469, &self.overworld_to_pixel(self.player_position.to_f32()));
 
         // Coordinate debugging
         resources.assets.monospace_font.draw(
-            &format!("{:?}", self.player_position),
+            &format!(
+                "{:?}",
+                self.overworld_to_pixel(self.player_position.to_f32())
+            ),
             PixelPoint::new(0, 8),
             None,
             None,

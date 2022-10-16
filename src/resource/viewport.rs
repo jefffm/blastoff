@@ -45,6 +45,10 @@ impl<U> Viewport<U> {
             .update_transform(center, self.rect_float.center());
     }
 
+    pub fn vp_center(&self) -> ViewportFloatPoint {
+        self.rect_float.center()
+    }
+
     pub fn center(&self) -> Point2D<f32, U> {
         self.to_game_point_float(self.rect_float.center())
     }

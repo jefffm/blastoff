@@ -17,8 +17,8 @@ pub const PIXEL_RECT: PixelRect = PixelRect::new(
 pub const TILE_SIZE: PixelSize = PixelSize::new(16, 16);
 
 /// euclid Rect isn't const, so this is manually calculated
-pub const SCREEN_HEIGHT: i32 = 20; // 320 / 16 = 20
-pub const SCREEN_WIDTH: i32 = 11; // 180 / 16 = 11.25
+pub const SCREEN_HEIGHT: i32 = 11; // 180 / 16 = 11.25
+pub const SCREEN_WIDTH: i32 = 20; // 320 / 16 = 20
 
 pub const SCREEN_SIZE: ScreenSize = ScreenSize::new(SCREEN_WIDTH, SCREEN_HEIGHT);
 pub const SCREEN_RECT: ScreenRect = ScreenRect::new(ScreenPoint::new(0, 0), SCREEN_SIZE);
@@ -33,11 +33,11 @@ pub fn get_screen_to_pixel_transform_float() -> ScreenFloatToPixel {
 }
 
 // TODO: derive the viewport height instead
-pub const VIEWPORT_WIDTH: i32 = SCREEN_WIDTH - 2;
+pub const VIEWPORT_WIDTH: i32 = SCREEN_WIDTH - 1;
 pub const VIEWPORT_HEIGHT: i32 = SCREEN_HEIGHT - 2;
 
 // Where on the screen is the viewport's origin?
-pub const VIEWPORT_SCREEN_POINT: ScreenPoint = ScreenPoint::new(2, 2);
+pub const VIEWPORT_SCREEN_POINT: ScreenPoint = ScreenPoint::new(0, 1);
 pub const TITLE_HEADER: &str = "BLAST!OFF!";
 pub const UPDATE_FPS: u32 = 60;
 pub const UPDATE_INTERVAL_SECS: f32 = 1.0 / (UPDATE_FPS as f32);
