@@ -201,7 +201,13 @@ impl Scene<Resources> for OverworldMap {
 
         // Coordinate debugging
         resources.assets.monospace_font.draw(
-            &format!("Sector {:?}", self.player_position),
+            &format!(
+                "{:?} {:?}",
+                self.player_position,
+                (*self.planet)
+                    .borrow()
+                    .get_sector_info(&self.player_position)
+            ),
             PixelPoint::new(0, 8),
             None,
             None,
