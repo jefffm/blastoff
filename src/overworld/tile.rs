@@ -13,6 +13,7 @@ pub enum OverworldTile {
     Water,
     Lava,
     Jungle,
+    Mountains,
 }
 
 impl OverworldTile {
@@ -23,6 +24,7 @@ impl OverworldTile {
             OverworldTile::Water => '~',
             OverworldTile::Lava => '~',
             OverworldTile::Jungle => '♣',
+            OverworldTile::Mountains => '▲',
         }
     }
 
@@ -33,6 +35,7 @@ impl OverworldTile {
             OverworldTile::Water => 253,
             OverworldTile::Lava => 253,
             OverworldTile::Jungle => 101,
+            OverworldTile::Mountains => 264,
         }
     }
 
@@ -43,6 +46,7 @@ impl OverworldTile {
             OverworldTile::Water => WATER.three,
             OverworldTile::Lava => FIRE.three,
             OverworldTile::Jungle => PLANT.three,
+            OverworldTile::Mountains => COMMON.four,
         }
     }
 
@@ -54,12 +58,3 @@ impl OverworldTile {
             .draw(self.sprite(), point, Some(self.fg()), None, false)
     }
 }
-
-/*
-
-- egg rolls
-- shrimp and pork rice dish
-- pho chicken
-
-860 284 1196
-*/

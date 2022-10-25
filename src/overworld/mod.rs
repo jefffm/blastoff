@@ -141,6 +141,12 @@ impl Overworld {
         self.map.iter()
     }
 
+    pub fn iter_sector_infos_mut(
+        &mut self,
+    ) -> impl Iterator<Item = (&OverworldPoint, &mut SectorInfo)> {
+        self.map.iter_mut()
+    }
+
     pub fn iter_points(&self) -> impl Iterator<Item = OverworldPoint> {
         let yrange = self.info.rect.y_range();
         let xrange = self.info.rect.x_range();
