@@ -4,6 +4,7 @@ pub use name::*;
 
 use crate::{
     data::{Element, PlanetType},
+    game::consts::SECTOR_SIZE,
     overworld::{Overworld, OverworldTile, PlanetInfo, SectorInfo},
     resource::Resources,
 };
@@ -28,49 +29,69 @@ impl OverworldGenerator for StaticPlanet {
     }
 }
 
-fn create_mountain_planet(mut planet: Overworld, rng: &mut RandomNumberGenerator) -> Overworld {
-    for (_point, sector_info) in planet.iter_sector_infos_mut() {
-        sector_info.tile = if rng.roll_dice(1, 5) % 5 == 0 {
+fn create_mountain_planet<'a>(
+    mut planet: Overworld<'a>,
+    rng: &mut RandomNumberGenerator,
+) -> Overworld<'a> {
+    for point in planet.iter_points().into_iter() {
+        let tile = if rng.roll_dice(1, 5) % 5 == 0 {
             OverworldTile::Mountains
         } else {
             OverworldTile::Barren
         };
+        let sector_info = SectorInfo::new(planet.info(), tile, SECTOR_SIZE);
+        planet.set_sector_info(point, sector_info);
     }
 
     planet
 }
 
-fn create_aqueus_planet(mut planet: Overworld, rng: &mut RandomNumberGenerator) -> Overworld {
-    for (_point, sector_info) in planet.iter_sector_infos_mut() {
-        sector_info.tile = if rng.roll_dice(1, 3) % 3 == 0 {
+fn create_aqueus_planet<'a>(
+    mut planet: Overworld<'a>,
+    rng: &mut RandomNumberGenerator,
+) -> Overworld<'a> {
+    for point in planet.iter_points().into_iter() {
+        let tile = if rng.roll_dice(1, 3) % 3 == 0 {
             OverworldTile::Water
         } else {
             OverworldTile::Jungle
         };
+        let sector_info = SectorInfo::new(planet.info(), tile, SECTOR_SIZE);
+        planet.set_sector_info(point, sector_info);
     }
 
     planet
 }
 
-fn create_lush_planet(mut planet: Overworld, rng: &mut RandomNumberGenerator) -> Overworld {
-    for (_point, sector_info) in planet.iter_sector_infos_mut() {
-        sector_info.tile = if rng.roll_dice(1, 5) % 5 == 0 {
+fn create_lush_planet<'a>(
+    mut planet: Overworld<'a>,
+    rng: &mut RandomNumberGenerator,
+) -> Overworld<'a> {
+    for point in planet.iter_points().into_iter() {
+        let tile = if rng.roll_dice(1, 5) % 5 == 0 {
             OverworldTile::Jungle
         } else {
             OverworldTile::Water
         };
+        let sector_info = SectorInfo::new(planet.info(), tile, SECTOR_SIZE);
+        planet.set_sector_info(point, sector_info);
     }
 
     planet
 }
 
-fn create_barren_planet(mut planet: Overworld, rng: &mut RandomNumberGenerator) -> Overworld {
-    for (_point, sector_info) in planet.iter_sector_infos_mut() {
-        sector_info.tile = if rng.roll_dice(1, 25) % 25 == 0 {
+fn create_barren_planet<'a>(
+    mut planet: Overworld<'a>,
+    rng: &mut RandomNumberGenerator,
+) -> Overworld<'a> {
+    for point in planet.iter_points().into_iter() {
+        let tile = if rng.roll_dice(1, 25) % 25 == 0 {
             OverworldTile::Mountains
         } else {
             OverworldTile::Barren
         };
+        let sector_info = SectorInfo::new(planet.info(), tile, SECTOR_SIZE);
+        planet.set_sector_info(point, sector_info);
     }
 
     planet

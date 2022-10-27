@@ -50,11 +50,23 @@ impl OverworldTile {
         }
     }
 
-    pub fn render(&self, resources: &mut Resources, point: &PixelPoint) {
-        // TODO: render ASCII too
+    fn render_sprite(&self, resources: &mut Resources, point: &PixelPoint) {
         resources
             .assets
             .tileset
             .draw(self.sprite(), point, Some(self.fg()), None, false)
+    }
+
+    fn render_ascii(&self, resources: &mut Resources, point: PixelPoint) {
+        resources.assets.monospace_font.draw(
+            &self.glyph().to_string(),
+            point,
+            Some(self.fg()),
+            None,
+        )
+    }
+
+    pub fn render(&self, resources: &mut Resources, point: PixelPoint) {
+        self.render_ascii(resources, point)
     }
 }
