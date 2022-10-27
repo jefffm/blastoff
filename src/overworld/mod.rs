@@ -49,6 +49,7 @@ impl Overworld {
     }
 
     pub fn new(
+        // TODO: turn Planetinfo into an RC so that we can clone cheaply
         info: PlanetInfo,
         map: OverworldMap,
         default_map_tile: OverworldTile,
@@ -210,7 +211,7 @@ impl PlanetInfo {
         }
     }
 
-    pub fn draw(&self, point: &PixelPoint, tileset: &Tileset, scale_mod: Option<f32>) {
+    pub fn draw(&self, point: PixelPoint, tileset: &Tileset, scale_mod: Option<f32>) {
         // Determine the sprite scale by deriving a square size from the
         // planet's area (planets can technically be rectangles).
         // x normalized = (x – x minimum) / (x maximum – x minimum)

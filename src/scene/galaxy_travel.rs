@@ -143,11 +143,11 @@ impl Scene<Resources> for GalaxyTravel {
                 resources
                     .assets
                     .tileset
-                    .spr_flip_x(1063, &PIXEL_RECT.center()); // rocket pic
+                    .spr_flip_x(1063, PIXEL_RECT.center()); // rocket pic
 
-                planet_info.draw(&planet_pixel_point, &resources.assets.tileset, Some(2.));
+                planet_info.draw(planet_pixel_point, &resources.assets.tileset, Some(2.));
             } else {
-                planet_info.draw(&planet_pixel_point, &resources.assets.tileset, Some(0.5));
+                planet_info.draw(planet_pixel_point, &resources.assets.tileset, Some(0.5));
             }
         }
 

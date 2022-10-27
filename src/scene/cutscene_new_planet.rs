@@ -69,7 +69,7 @@ impl Scene<Resources> for CutsceneNewPlanet {
         let scale = self.planet_scale_animation.now_strict().unwrap();
         let planet: Ref<Overworld> = (*self.planet).borrow();
         planet.info().draw(
-            &PixelPoint::new(pos.x.round() as i32, pos.y.round() as i32),
+            PixelPoint::new(pos.x.round() as i32, pos.y.round() as i32),
             &resources.assets.tileset,
             Some(scale),
         );

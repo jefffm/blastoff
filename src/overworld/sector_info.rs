@@ -21,7 +21,7 @@ impl SectorInfo {
         }
     }
 
-    pub fn render(&self, resources: &mut Resources, point: &PixelPoint) {
+    pub fn render(&self, resources: &mut Resources, point: PixelPoint) {
         self.tile.render(resources, point)
     }
 }

@@ -185,10 +185,7 @@ impl Scene<Resources> for OverworldMap {
 
         for overworld_point in self.viewport.visible_points() {
             if let Some(tile) = (*self.planet).borrow().get_sector_info(&overworld_point) {
-                tile.render(
-                    resources,
-                    &self.overworld_to_pixel(overworld_point.to_f32()),
-                );
+                tile.render(resources, self.overworld_to_pixel(overworld_point.to_f32()));
             }
         }
 
@@ -197,7 +194,7 @@ impl Scene<Resources> for OverworldMap {
             .assets
             .tileset
             // TODO: remove hardcoded sprite
-            .spr(469, &self.overworld_to_pixel(self.player_position.to_f32()));
+            .spr(469, self.overworld_to_pixel(self.player_position.to_f32()));
 
         // Coordinate debugging
         resources.assets.monospace_font.draw(

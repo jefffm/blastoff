@@ -46,18 +46,18 @@ impl Tileset {
         // Rect::new(sx + 1.1, sy + 1.1, sw - 2.2, sh - 2.2)
     }
 
-    pub fn spr(&self, sprite: u32, dest: &PixelPoint) {
+    pub fn spr(&self, sprite: u32, dest: PixelPoint) {
         self.draw(sprite, dest, None, None, false)
     }
 
-    pub fn spr_flip_x(&self, sprite: u32, dest: &PixelPoint) {
+    pub fn spr_flip_x(&self, sprite: u32, dest: PixelPoint) {
         self.draw(sprite, dest, None, None, true)
     }
 
     pub fn draw(
         &self,
         sprite: u32,
-        dest: &PixelPoint,
+        dest: PixelPoint,
         color: Option<Color>,
         scale: Option<u8>,
         flip_x: bool,

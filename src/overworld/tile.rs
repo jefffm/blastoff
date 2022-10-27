@@ -50,7 +50,7 @@ impl OverworldTile {
         }
     }
 
-    fn render_sprite(&self, resources: &mut Resources, point: &PixelPoint) {
+    fn render_sprite(&self, resources: &mut Resources, point: PixelPoint) {
         resources
             .assets
             .tileset
@@ -67,6 +67,7 @@ impl OverworldTile {
     }
 
     pub fn render(&self, resources: &mut Resources, point: PixelPoint) {
-        self.render_ascii(resources, point)
+        // self.render_ascii(resources, point)
+        self.render_sprite(resources, point)
     }
 }
