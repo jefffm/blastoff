@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use macroquad::prelude::*;
 
-use crate::util::PixelPoint;
+use crate::{game::consts, util::PixelPoint};
 
 pub struct Tileset {
     tileset: tiled::Tileset,
@@ -10,16 +10,19 @@ pub struct Tileset {
 
 impl Tileset {
     pub async fn try_from_file(path: &str) -> anyhow::Result<Self> {
-        let content = load_file(path).await?;
         // TODO: Android/WASM compat for tileset path loading. Use the util library?
-        let tileset = tiled::Loader::new().load_tsx_tileset_from(&*content, path)?;
+        let tileset_path = format!("{}/{}", consts::RESOURCE_PATH, path);
+        let tileset = tiled::Loader::new().load_tsx_tileset(tileset_path)?;
         let tileset_image_path = tileset
             .image
             .to_owned()
             .ok_or_else(|| anyhow!("Expected an image for the tileset"))?
             .source;
 
-        let path_str = tileset_image_path
+        let texture_path = tileset_image_path
+            .strip_prefix(consts::RESOURCE_PATH)
+            .unwrap_or(&tileset_image_path);
+        let path_str = texture_path
             .to_str()
             .ok_or_else(|| anyhow!("Expected path to be string-able"))?;
 
@@ -65,7 +68,7 @@ impl Tileset {
         let spr_rect = self.sprite_rect(sprite);
 
         draw_texture_ex(
-            self.texture,
+            &self.texture,
             dest.x as f32,
             dest.y as f32,
             color.unwrap_or(WHITE),

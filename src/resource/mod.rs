@@ -1,4 +1,4 @@
-use assets_manager::{AssetCache, Compound, Handle};
+use assets_manager::{Asset, AssetCache, Handle};
 use bracket_random::prelude::RandomNumberGenerator;
 
 mod viewport;
@@ -62,7 +62,7 @@ impl Resources {
         })
     }
 
-    pub fn load_asset<T: Compound>(&self, id: &str) -> Handle<T> {
+    pub fn load_asset<T: Asset>(&self, id: &str) -> &Handle<T> {
         self.assets_cache
             .load::<T>(id)
             .unwrap_or_else(|err| panic!("asset load from {:?}: {}", id, err))

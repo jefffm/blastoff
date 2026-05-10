@@ -41,6 +41,8 @@ struct Cli {
     seed: Option<u64>,
 }
 
+const WINDOW_SCALE: i32 = 4;
+
 fn window_conf() -> Conf {
     Conf {
         window_title: if cfg!(debug_assertions) {
@@ -51,8 +53,8 @@ fn window_conf() -> Conf {
         .to_owned(),
         fullscreen: false,
         sample_count: 16,
-        window_height: SCREEN_HEIGHT_PIXELS * 3,
-        window_width: SCREEN_WIDTH_PIXELS * 3,
+        window_height: SCREEN_HEIGHT_PIXELS * WINDOW_SCALE,
+        window_width: SCREEN_WIDTH_PIXELS * WINDOW_SCALE,
         ..Default::default()
     }
 }
@@ -107,7 +109,7 @@ async fn main() -> anyhow::Result<()> {
     loop {
         // Render to the Canvas
         set_camera(&Camera2D {
-            render_target: Some(canvas),
+            render_target: Some(canvas.clone()),
             zoom: vec2(
                 (SCREEN_WIDTH_PIXELS as f32).recip() * 2.0,
                 (SCREEN_HEIGHT_PIXELS as f32).recip() * 2.0,
@@ -129,7 +131,7 @@ async fn main() -> anyhow::Result<()> {
 
         let (width_deficit, height_deficit) = wh_deficit();
         draw_texture_ex(
-            canvas.texture,
+            &canvas.texture,
             width_deficit / 2.0,
             height_deficit / 2.0,
             WHITE,

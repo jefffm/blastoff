@@ -5,7 +5,7 @@ pub use forbid::*;
 
 pub mod seed;
 
-use std::num::NonZeroU32;
+use std::{num::NonZeroU32, time::Instant};
 
 use grid_2d::Grid;
 use rand::Rng;
@@ -22,9 +22,12 @@ use crate::component::{Actor, ActorKind, Camera, Player, Position, Renderable, V
 use crate::overworld::SectorInfo;
 use crate::procgen::Spawner;
 use crate::resource::Resources;
-use crate::sector::{Map, Tile};
+use crate::sector::{FloorKind, Map, Tile};
 
 use super::MapGenerator;
+
+const WFC_INNER_RETRIES: usize = 100;
+const WFC_OUTER_RETRIES: usize = 25;
 
 pub struct TilePattern {
     pub grid: Grid<Tile>,
@@ -112,33 +115,91 @@ impl MapGenerator for WfcGen {
         );
 
         let pattern = self.seed.tile_pattern();
+        let pattern_size = pattern.grid.size();
         let _forbid = ForceBorderForbid::new(&pattern, self.seed.pattern_size);
-        // Run Wave Function Collapse until it succeeds
-        let grid = loop {
-            tracing::info!("Running (or rerunning) wfc gen");
-            if let Ok(grid) = pattern.run_collapse(
+
+        tracing::info!(
+            output_width = output_size.width(),
+            output_height = output_size.height(),
+            input_width = pattern_size.width(),
+            input_height = pattern_size.height(),
+            seed_pattern_size = self.seed.pattern_size,
+            orientation_count = self.seed.orientation.len(),
+            inner_retries = WFC_INNER_RETRIES,
+            outer_retries = WFC_OUTER_RETRIES,
+            "Starting WFC sector generation"
+        );
+
+        let start = Instant::now();
+        let mut last_error = None;
+
+        for attempt in 1..=WFC_OUTER_RETRIES {
+            tracing::info!(
+                attempt,
+                max_attempts = WFC_OUTER_RETRIES,
+                "Running WFC collapse"
+            );
+
+            match pattern.run_collapse(
                 output_size,
-                1000,
+                WFC_INNER_RETRIES,
                 WrapNone,
                 ForbidNothing,
                 // forbid.clone(),
                 resources.rng.get_rng(), // &mut rand::thread_rng(),
             ) {
-                break grid;
+                Ok(grid) => {
+                    tracing::info!(
+                        attempt,
+                        elapsed_ms = start.elapsed().as_millis(),
+                        "WFC sector generation succeeded"
+                    );
+
+                    let tilevec: Vec<Tile> = grid.iter().map(move |tile| tile.to_owned()).collect();
+                    let map = Map::new(
+                        "WFC tester".into(),
+                        output_size.width() as i32,
+                        output_size.height() as i32,
+                        tilevec,
+                    );
+                    mapgen_history.push(map.clone());
+
+                    return map;
+                }
+                Err(err) => {
+                    tracing::warn!(
+                        attempt,
+                        max_attempts = WFC_OUTER_RETRIES,
+                        error = ?err,
+                        elapsed_ms = start.elapsed().as_millis(),
+                        "WFC collapse failed; retrying"
+                    );
+                    last_error = Some(err);
+                }
             }
-        };
+        }
 
-        let tilevec: Vec<Tile> = grid.iter().map(move |tile| tile.to_owned()).collect();
-
-        let map = Map::new(
-            "WFC tester".into(),
-            output_size.width() as i32,
-            output_size.height() as i32,
-            tilevec,
+        tracing::error!(
+            attempts = WFC_OUTER_RETRIES,
+            inner_retries = WFC_INNER_RETRIES,
+            output_width = output_size.width(),
+            output_height = output_size.height(),
+            input_width = pattern_size.width(),
+            input_height = pattern_size.height(),
+            seed_pattern_size = self.seed.pattern_size,
+            orientation_count = self.seed.orientation.len(),
+            last_error = ?last_error,
+            elapsed_ms = start.elapsed().as_millis(),
+            "WFC sector generation exhausted retries; using simple fallback map"
         );
-        mapgen_history.push(map.clone());
 
-        map
+        let fallback = Map::init(
+            "WFC fallback after exhausted retries".into(),
+            sector_info.size,
+            Tile::Floor(FloorKind::FloorDefault),
+        );
+        mapgen_history.push(fallback.clone());
+        fallback
     }
 }
 

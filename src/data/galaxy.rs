@@ -1,4 +1,6 @@
-use assets_manager::{loader::YamlLoader, Asset};
+use std::borrow::Cow;
+
+use assets_manager::{asset::load_yaml, BoxedError, FileAsset};
 use bracket_random::prelude::{DiceType, RandomNumberGenerator};
 
 use serde::{Deserialize, Serialize};
@@ -14,13 +16,12 @@ pub struct GalaxyProbability {
     planet_element: ElementProbability,
 }
 
-impl Asset for GalaxyProbability {
+impl FileAsset for GalaxyProbability {
     const EXTENSION: &'static str = "yaml";
-    const EXTENSIONS: &'static [&'static str] = &[Self::EXTENSION];
 
-    type Loader = YamlLoader;
-
-    const HOT_RELOADED: bool = true;
+    fn from_bytes(bytes: Cow<[u8]>) -> Result<Self, BoxedError> {
+        load_yaml(&bytes)
+    }
 }
 
 impl GalaxyProbability {

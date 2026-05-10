@@ -21,8 +21,7 @@ use crate::{
     },
 };
 
-// use super::{CutsceneNewPlanet, Sector};
-use super::CutsceneNewPlanet;
+use super::{CutsceneNewPlanet, Sector};
 
 enum OverworldMapState {
     NeedsIntroCutscene,
@@ -165,8 +164,7 @@ impl Scene<Resources> for OverworldMap {
                                 })
                             };
 
-                            // early return
-                            // return SceneSwitch::Push(Box::new(Sector::new(sector)));
+                            return SceneSwitch::Push(Box::new(Sector::new(sector)));
                         }
                     }
                 }

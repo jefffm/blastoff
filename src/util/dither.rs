@@ -3,11 +3,11 @@
 //! Some other options: https://github.com/makeworld-the-better-one/dither/blob/master/ordered_ditherers.go#L3
 //!
 
-use clap::ArgEnum;
+use clap::ValueEnum;
 use image::{imageops, DynamicImage};
 use morton_encoding::morton_encode;
 
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Copy, Clone, ArgEnum)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Copy, Clone, ValueEnum)]
 pub enum BayerLevel {
     Zero = 0,
     One = 1,

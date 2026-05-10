@@ -1,7 +1,6 @@
-use assets_manager::{
-    loader::{LoadFrom, StringLoader},
-    Asset,
-};
+use std::borrow::Cow;
+
+use assets_manager::{BoxedError, FileAsset};
 
 pub struct MarkovSeed(String);
 impl MarkovSeed {
@@ -16,12 +15,10 @@ impl From<String> for MarkovSeed {
     }
 }
 
-impl Asset for MarkovSeed {
+impl FileAsset for MarkovSeed {
     const EXTENSION: &'static str = "txt";
 
-    const EXTENSIONS: &'static [&'static str] = &[Self::EXTENSION];
-
-    type Loader = LoadFrom<String, StringLoader>;
-
-    const HOT_RELOADED: bool = true;
+    fn from_bytes(bytes: Cow<[u8]>) -> Result<Self, BoxedError> {
+        Ok(String::from_utf8(bytes.into_owned())?.into())
+    }
 }

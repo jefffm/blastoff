@@ -13,8 +13,8 @@ pub use main_menu::*;
 // mod game_over;
 // pub use game_over::*;
 
-// mod sector;
-// pub use sector::*;
+mod sector;
+pub use sector::*;
 
 mod galaxy_travel;
 pub use galaxy_travel::*;
