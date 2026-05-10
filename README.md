@@ -1,6 +1,6 @@
 # blastoff
 
-WIP pixel-art roguelike.
+A pixel art roguelike used as a playground for messing with Rust, procedural generation, and GPU-rendered retro graphics.
 
 ## Demo
 
